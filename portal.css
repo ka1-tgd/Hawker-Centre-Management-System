@@ -1,0 +1,97 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+
+  background-image:
+    linear-gradient(
+      rgba(224, 231, 255, 0.85),
+      rgba(224, 231, 255, 0.85)
+    ),
+    url("hawker-centre.png");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Center everything */
+.portal-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Logo section */
+.logo-section {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.logo {
+  width: 90px;
+  margin-bottom: 10px;
+}
+
+.logo-section h1 {
+  color: #1F3A8A;              /* primary */
+  margin: 0;
+}
+
+.logo-section p {
+  color: #444;
+}
+
+/* Role selection box */
+.role-box {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 14px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+.role-box h2 {
+  text-align: center;
+  color: #1F3A8A;
+  margin-bottom: 25px;
+}
+
+/* Cards */
+.role-card {
+  display: block;
+  width: 280px;
+  padding: 22px;
+  margin-bottom: 18px;
+  text-decoration: none;
+  border-radius: 12px;
+  border: 2px solid #1F3A8A;
+  background-color: #E0E7FF;
+  color: #1F3A8A;
+  transition: all 0.2s ease;
+}
+
+.role-card:last-child {
+  margin-bottom: 0;
+}
+
+.role-card h3 {
+  margin: 0 0 6px;
+}
+
+.role-card p {
+  margin: 0;
+  font-size: 0.9em;
+}
+
+/* Hover effect */
+.role-card:hover {
+  background-color: #1F3A8A;
+  color: white;
+}
+
+.role-card:hover h3,
+.role-card:hover p {
+  color: white;
+}

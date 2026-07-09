@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Registration Complete | HawkerHub</title>
+  <link rel="stylesheet" href="customers.css">
+
+  <style>
+    body.success-page .center{
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      background: #f6f6f6;
+    }
+
+    body.success-page .form-box{
+      background: #fff;
+      width: min(420px, 92vw);
+      padding: 28px 24px;
+      border-radius: 14px;
+      text-align: center;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+    }
+
+    body.success-page .form-box img{
+      width: 80px;
+      margin-bottom: 12px;
+    }
+
+    body.success-page .form-box h2{
+      margin: 10px 0 8px;
+    }
+
+    body.success-page .form-box p{
+      margin: 0 0 18px;
+      color: #555;
+    }
+
+    /* Make the link look like a button */
+    body.success-page .primary-btn{
+      display: inline-block;
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #e63946;
+      color: #fff;
+      text-decoration: none; 
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+
+    body.success-page .primary-btn:hover{
+      filter: brightness(0.95);
+    }
+  </style>
+</head>
+
+<body class="success-page">
+  <div class="center">
+    <div class="form-box">
+      <img src="HawkerHub.png" alt="HawkerHub Logo">
+      <h2>Account Created Successfully 🎉</h2>
+      <p>Your account has been created. You can now sign in.</p>
+
+      <a class="primary-btn" href="customer-login.html">Go to Sign In</a>
+    </div>
+  </div>
+   <script>
+    setTimeout(() => {
+      window.location.assign("customer-login.html");
+    }, 2000);
+  </script>
+</body>
+</html>

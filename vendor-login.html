@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>HawkerHub Vendor Login</title>
+  <link rel="stylesheet" href="vendor.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Back to Portal -->
+  <a class="back" href="portal.html" aria-label="Back to portal">
+    <span class="back-circle">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+           stroke="#000000" stroke-width="3"
+           stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 5 5 12 12 19"/>
+      </svg>
+    </span>
+  </a>
+
+  <div class="container">
+
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+      <h1>Vendor Portal</h1>
+      <p>Log in to manage your stall, menu, and incoming orders</p>
+      <a href="vendor_create_account.html">
+        <button class="outline-btn">Register as Vendor</button>
+      </a>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+
+      <div class="form-box">
+        <div class="logo">
+          <img src="HawkerHub.png" alt="HawkerHub Logo">
+          <div class="logo-text">HawkerHub</div>
+        </div>
+
+        <h2>VENDOR LOG IN</h2>
+
+        <!-- Username or Email (UPDATED: added id) -->
+        <div class="input-box">
+          <i class="fa fa-user"></i>
+          <input id="loginId" type="text" placeholder="Username or Email" required>
+        </div>
+
+        <!-- Password (UPDATED: added id) -->
+        <div class="input-box">
+          <i class="fa fa-lock"></i>
+          <input id="vendorPassword" type="password" placeholder="Password" required>
+        </div>
+
+        <!-- Login Button (UPDATED: added id + type="button") -->
+        <button type="button" class="primary-btn" id="btnVendorLogin">Login</button>
+
+        <!-- Message area for errors/success (ADDED) -->
+        <p class="note" id="msg"></p>
+
+        <p class="note">
+          This portal is for registered stall vendors only.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script type="module" src="vendors-login.js"></script>
+
+</body>
+</html>

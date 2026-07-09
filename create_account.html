@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>HawkerHub Create Account</title>
+  <link rel="stylesheet" href="customers.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <h1>Welcome!</h1>
+    <p>To keep connected with us please create an account</p>
+    <a href="customer-login.html">
+      <button class="outline-btn">Back to Login</button>
+    </a>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="form-box">
+
+      <div class="logo">
+        <img src="HawkerHub.png" alt="HawkerHub Logo">
+        <div class="logo-text">HawkerHub</div>
+      </div>
+
+      <h2>Create Account</h2>
+
+      <!-- ✅ FORM START -->
+      <form id="registerForm">
+
+        <div class="input-box">
+          <i class="fa fa-user"></i>
+          <input id="username" type="text" placeholder="Username" required>
+        </div>
+
+        <div class="input-box">
+          <i class="fa fa-envelope"></i>
+          <input id="email" type="email" placeholder="Email" required>
+        </div>
+
+        <div class="input-box">
+          <i class="fa fa-lock"></i>
+          <input id="password" type="password" placeholder="Password" required>
+        </div>
+
+        <div class="input-box">
+          <i class="fa fa-lock"></i>
+          <input id="confirmPassword" type="password" placeholder="Confirm Password" required>
+        </div>
+
+        <p id="msg" class="error-msg"></p>
+
+        <button class="primary-btn" type="submit">Create Account</button>
+
+      </form>
+      <!-- ✅ FORM END -->
+
+    </div>
+  </div>
+
+</div>
+
+<script type="module" src="register.js"></script>
+</body>
+</html>

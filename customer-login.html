@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>HawkerHub Login</title>
+  <link rel="stylesheet" href="customers.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<a class="back" href="portal.html" aria-label="Back to portal">
+  <span class="back-circle">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"/>
+      <polyline points="12 5 5 12 12 19"/>
+    </svg>
+  </span>
+</a>
+
+<div class="container">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <h1>Welcome!</h1>
+    <p>To keep connected with us please login with your personal information</p>
+    <a href="create_account.html">
+      <button class="outline-btn">Create account</button>
+    </a>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="form-box">
+
+      <div class="logo">
+        <img src="HawkerHub.png" alt="HawkerHub Logo">
+        <div class="logo-text">HawkerHub</div>
+      </div>
+
+      <h2>LOG IN</h2>
+
+      <!-- ✅ FORM START -->
+      <form id="loginForm">
+
+        <div class="input-box">
+          <i class="fa fa-user"></i>
+          <input id="loginUsername" type="text" placeholder="Username" required>
+        </div>
+
+        <div class="input-box">
+          <i class="fa fa-lock"></i>
+          <input id="loginPassword" type="password" placeholder="Password" required>
+        </div>
+
+        <p id="msg" class="error-msg"></p>
+
+        <button class="primary-btn" type="submit">Sign in</button>
+
+      </form>
+      <!-- ✅ FORM END -->
+
+      <p class="social-text">Or sign in with:</p>
+      <div class="social-icons">
+        <i class="fab fa-facebook-f"></i>
+        <i class="fab fa-twitter"></i>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script type="module" src="login.js"></script>
+</body>
+</html>
