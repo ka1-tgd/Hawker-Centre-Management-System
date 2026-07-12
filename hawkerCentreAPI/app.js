@@ -3,9 +3,15 @@ const express = require("express");
 const sql = require("mssql");
 const dotenv = require("dotenv");
 const path = require("path");
-
-// Load environment variables
 dotenv.config();
+console.log("DB_SERVER is:", process.env.DB_SERVER);
+const inspectionController = require("./controllers/nea-officer/inspectionController");
+const {
+  validateInspection,
+  validateStallId,
+} = require("./middleware/nea-officer/inspectionValidation");
+// Load environment variables
+
 
 // Require contollers
 
@@ -22,8 +28,9 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bo
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "public")));
 
-// Routes
-
+// Routes for inspections
+app.get("/nea/inspections/stall/:stallId", validateStallId, inspectionController.getInspectionsByStall);
+app.post("/nea/inspections", validateInspection, inspectionController.createInspection);
 // Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
