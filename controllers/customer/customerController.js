@@ -15,6 +15,24 @@ async function getAllHawkerCentres(req, res) {
     }
 }
 
+// Get hawker centre by ID
+async function getHawkerCentreById(req, res) {
+  try {
+    const id = parseInt(req.params.id);
+    const hawkerCentre = await bookModel.getHawkerCentreById(id);
+    if (!hawkerCentre) {
+      return res.status(404).json({ error: "Hawker centre not found" });
+    }
+
+    res.json(book);
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error retrieving hawker centre" });
+  }
+}
+
+
 module.exports = {
     getAllHawkerCentres,
+    getHawkerCentreById,
 };
