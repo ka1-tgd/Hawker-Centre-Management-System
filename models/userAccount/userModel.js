@@ -34,7 +34,7 @@ async function getAllUsers() {
 
 // Get user by ID
 async function getUserByUsername(username) {
-
+    
 };
 
 // Create user

@@ -134,7 +134,7 @@ async function deleteUser(req, res) {
 };
 
 // Log in user
-async function login(req, res) {
+async function loginUser(req, res) {
     try {
         // Wait for model to get user
         const user = await userModel.getUserByUsername(req.body.username);
@@ -175,5 +175,7 @@ module.exports = {
     getAllUsers,
     getUserByUsername,
     createUser,
-    updateUser
+    updateUser,
+    deleteUser,
+    loginUser
 };
