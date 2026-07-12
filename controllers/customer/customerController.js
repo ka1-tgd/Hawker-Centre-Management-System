@@ -18,7 +18,7 @@ async function getAllHawkerCentres(req, res) {
 // Get hawker centre by ID
 async function getHawkerCentreById(req, res) {
   try {
-    const id = parseInt(req.params.hawker_centre_id || req.params.hawker_center_id);
+    const id = parseInt(req.params.hawker_centre_id);
     const hawkerCentre = await customerModel.getHawkerCentreById(id);
     if (!hawkerCentre) {
       return res.status(404).json({ error: "Hawker centre not found" });
