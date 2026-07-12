@@ -31,7 +31,19 @@ async function getHawkerCentreById(req, res) {
   }
 }
 
+// Get hawker centres with stalls
+async function getHawkerCentresWithStalls(req, res) {
+  try {
+    const hawkerCentres = await customerModel.getHawkerCentresWithStalls();
+    res.json(hawkerCentres);
+  } catch (error) {
+    console.error("Controller error in getHawkerCentresWithStalls:", error);
+    res.status(500).json({ message: "Error fetching hawker centres with stalls" });
+  }
+}
+
 module.exports = {
     getAllHawkerCentres,
     getHawkerCentreById,
+    getHawkerCentresWithStalls,
 };

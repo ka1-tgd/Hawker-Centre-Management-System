@@ -53,7 +53,67 @@ async function getHawkerCentreById(hawker_centre_id) {
   }
 }
 
+// Get all hawker centres with stalls
+async function getHawkerCentresWithStalls() {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+
+    const query = `
+    SELECT h.hawker_centre_id, h.hawker_centre_name, h.hawker_centre_address, s.stall_id, s.user_id, s.stall_name, s.description, s.operating_hours, s.contact_number, s.status
+    FROM HawkerCentre h
+    INNER JOIN Stall s ON h.hawker_centre_id = s.hawker_centre_id
+    ORDER BY h.hawker_centre_id;
+    `;
+
+    const result = await connection.request().query(query);
+
+    // Group hawker centres and the stalls
+    const HCwithStalls = {};
+    for (const row of result.recordset) {
+      const HawkerCentreId = row.hawker_centre_id;
+      if (!HCwithStalls[HawkerCentreId]) {
+        HCwithStalls[HawkerCentreId] = {
+          hawker_centre_id: HawkerCentreId,
+          hawker_centre_name: row.hawker_centre_name,
+          hawker_centre_address: row.hawker_centre_address,
+          stalls: [],
+        };
+      }
+      // Only add stall if stall_id is not null (for hawker centres with no stalls)
+      if (row.stall_id !== null) {
+        HCwithStalls[HawkerCentreId].stalls.push({
+          stall_id: row.stall_id,
+          user_id: row.user_id,
+          stall_name: row.stall_name,
+          description: row.description,
+          operating_hours: row.operating_hours,
+          contact_number: row.contact_number,
+          status: row.status,
+        });
+      }
+    }
+
+    return Object.values(HCwithStalls);
+  } catch (error) {
+    console.error("Database error in getHawkerCentresWithStalls:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(
+          "Error closing connection after getHawkerCentresWithStalls:",
+          err
+        );
+      }
+    }
+  }
+}
+
 module.exports = {
   getAllHawkerCentres,
   getHawkerCentreById,
+  getHawkerCentresWithStalls,
 };
