@@ -3,19 +3,20 @@ const express = require("express");
 const sql = require("mssql");
 const dotenv = require("dotenv");
 const path = require("path");
-dotenv.config();
 console.log("DB_SERVER is:", process.env.DB_SERVER);
+
+// Load environment variables
+dotenv.config();
+
+// Require contollers
 const inspectionController = require("./controllers/nea-officer/inspectionController");
+
+
+// Require middleware functions
 const {
   validateInspection,
   validateStallId,
 } = require("./middleware/nea-officer/inspectionValidation");
-// Load environment variables
-
-
-// Require contollers
-
-// Require middleware functions
 
 // Create Express app
 const app = express();
@@ -31,6 +32,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // Routes for inspections
 app.get("/nea/inspections/stall/:stallId", validateStallId, inspectionController.getInspectionsByStall);
 app.post("/nea/inspections", validateInspection, inspectionController.createInspection);
+
 // Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
