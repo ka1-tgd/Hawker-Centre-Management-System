@@ -253,7 +253,7 @@ async function deleteUser(id) {
         connection = await sql.connect(dbConfig);
 
         // SQL Query
-        const query = `DELETE FROM User WHERE user_id = @id`;
+        const query = `DELETE FROM Users WHERE user_id = @id`;
         const request = connection.request();
         request.input("id", id);
         const result = await request.query(query);
