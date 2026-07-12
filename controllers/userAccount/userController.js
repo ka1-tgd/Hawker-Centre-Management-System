@@ -19,11 +19,11 @@ async function getAllUsers(req, res) {
     };
 };
 
-// Get user by ID
+// Get user by Username
 async function getUserByUsername(req, res) {
     try {
         // Get username from request
-        const username = req.body.name;
+        const username = req.params.name;
 
         // Wait for model to get user
         const user = await userModel.getUserByUsername(username);
