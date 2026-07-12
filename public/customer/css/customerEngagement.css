@@ -1,0 +1,173 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f5f6fa;
+  color: #222;
+}
+
+/* Top navbar */
+.navbar {
+  background: #2b3a8f;
+  color: white;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+/* Page layout: sidebar + content */
+.page {
+  display: flex;
+  max-width: 900px;
+  margin: 20px auto;
+  gap: 20px;
+  padding: 0 20px;
+}
+
+.sidebar {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  width: 180px;
+  height: fit-content;
+}
+
+.sidebar h2 {
+  font-size: 18px;
+  margin-top: 0;
+}
+
+.sidebar a {
+  display: block;
+  padding: 8px 0;
+  color: #333;
+  text-decoration: none;
+}
+
+.sidebar a.active {
+  color: #2b3a8f;
+  font-weight: bold;
+}
+
+.content {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  flex: 1;
+}
+
+/* Loyalty points bar */
+.points-value {
+  font-size: 32px;
+  color: #2b3a8f;
+  font-weight: bold;
+}
+
+.progress-bar {
+  background: #eee;
+  border-radius: 10px;
+  height: 10px;
+  margin: 10px 0;
+}
+
+.progress-fill {
+  background: #2b3a8f;
+  height: 10px;
+  border-radius: 10px;
+}
+
+/* Reward cards */
+.reward-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Scrollable wrapper so a long reward list doesn't push the page down */
+.reward-list-container {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.reward-card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.reward-card button {
+  margin-top: 8px;
+  background: #2b3a8f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.reward-card button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+/* Like list (My Likes page) */
+.like-item {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding: 12px 0;
+}
+
+.like-item > *:nth-child(1) { flex: 2; font-weight: bold; }
+.like-item > *:nth-child(2) { flex: 1; color: #444; }
+.like-item > *:nth-child(3) { flex: 1.3; color: #888; }
+
+.like-item button {
+  background: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.like-item button:hover {
+  background: #b52b27;
+}
+
+/* Heart-style like button (for the menu items page) */
+.like-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.liked {
+  color: red;
+}
+
+.not-liked {
+  color: #ccc;
+}
+
+#message {
+  color: #b00020;
+  font-size: 14px;
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #2b3a8f;
+  text-decoration: none;
+}

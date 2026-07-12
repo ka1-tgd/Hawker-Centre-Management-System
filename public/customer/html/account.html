@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Account - HawkerHub</title>
+  <link rel="stylesheet" href="../css/customerEngagement.css">
+</head>
+<body>
+
+<div class="navbar">
+  <h1>HawkerHub</h1>
+</div>
+
+<div class="page">
+
+  <div class="sidebar">
+    <h2>My Account</h2>
+    <a href="account.html" class="active">My Details</a>
+    <a href="likes.html">My Likes</a>
+  </div>
+
+  <div class="content">
+
+    <h2 id="userName">Loading...</h2>
+    <p id="userEmail"></p>
+    <p id="userContact"></p>
+
+    <hr>
+
+    <h3>Loyalty Points</h3>
+    <div class="points-value" id="pointsValue">0</div>
+    <p id="tierLabel"></p>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+    </div>
+
+    <h3>Rewards <small>Use your points</small></h3>
+    <div class="reward-list-container">
+      <div class="reward-grid" id="rewardGrid">Loading rewards...</div>
+    </div>
+
+    <div id="message"></div>
+
+  </div>
+
+</div>
+
+<script>
+  // Defaults to user 5. Type ?userId=6 (or any seeded customer) onto the URL to demo someone else
+  const params = new URLSearchParams(window.location.search);
+  const userId = parseInt(params.get("userId")) || 5;
+</script>
+
+<script src="../scripts/loyalty-script.js"></script>
+</body>
+</html>
