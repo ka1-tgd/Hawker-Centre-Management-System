@@ -3,7 +3,7 @@ const Joi = require("joi"); // Import Joi for validation
 // Middleware to validate hawker centre ID from URL parameters (for GET by ID, PUT, DELETE)
 function validateHCId(req, res, next) {
   // Parse the ID from request parameters
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.hawker_centre_id);
 
   // Check if the parsed ID is a valid positive number
   if (isNaN(id) || id <= 0) {
