@@ -29,7 +29,7 @@ async function getHawkerCentreById(hawker_centre_id) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
-    const query = "SELECT hawker_centre_id, hawker_centre_name, hawker_centre_address FROM HawkerCentre WHERE hawker_centre_id = @hawker_centre_id";
+    const query = "SELECT hawker_centre_name, hawker_centre_address FROM HawkerCentre WHERE hawker_centre_id = @hawker_centre_id";
     const request = connection.request();
     request.input("hawker_centre_id", hawker_centre_id);
     const result = await request.query(query);
