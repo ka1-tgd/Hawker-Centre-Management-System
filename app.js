@@ -10,13 +10,17 @@ dotenv.config();
 
 // Require contollers
 const inspectionController = require("./controllers/nea-officer/inspectionController");
-
+const userController = require("./controllers/userAccount/userController.js");
 
 // Require middleware functions
 const {
   validateInspection,
   validateStallId,
 } = require("./middleware/nea-officer/inspectionValidation");
+
+const {
+  verifyJWT
+} = require("./middleware/userAccount/authorization.js");
 
 // Create Express app
 const app = express();
@@ -32,6 +36,15 @@ app.use(express.static(path.join(__dirname, "public")));
 // Routes for inspections
 app.get("/nea/inspections/stall/:stallId", validateStallId, inspectionController.getInspectionsByStall);
 app.post("/nea/inspections", validateInspection, inspectionController.createInspection);
+
+// Routes for user account management
+app.post("/register", userController.createUser);
+app.post("/login", userController.loginUser);
+app.get("/users", userController.getAllUsers);
+app.get("/users/:name", userController.getUserByUsername);
+app.put("/users/:id", userController.updateUser);
+app.put("/users/:id/update-password", userController.updatePassword);
+app.delete("/users/:id", userController.deleteUser);
 
 // Start server
 app.listen(port, () => {
