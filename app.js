@@ -9,6 +9,7 @@ console.log("DB_SERVER is:", process.env.DB_SERVER);
 dotenv.config();
 
 // Require contollers
+const customerController = require("./controllers/customer/customerController.js");
 const inspectionController = require("./controllers/nea-officer/inspectionController");
 const userController = require("./controllers/userAccount/userController.js");
 
