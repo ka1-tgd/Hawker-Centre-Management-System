@@ -18,19 +18,18 @@ async function getAllHawkerCentres(req, res) {
 // Get hawker centre by ID
 async function getHawkerCentreById(req, res) {
   try {
-    const id = parseInt(req.params.id);
-    const hawkerCentre = await bookModel.getHawkerCentreById(id);
+    const id = parseInt(req.params.hawker_centre_id || req.params.hawker_center_id);
+    const hawkerCentre = await customerModel.getHawkerCentreById(id);
     if (!hawkerCentre) {
       return res.status(404).json({ error: "Hawker centre not found" });
     }
 
-    res.json(book);
+    res.json(hawkerCentre);
   } catch (error) {
     console.error("Controller error:", error);
     res.status(500).json({ error: "Error retrieving hawker centre" });
   }
 }
-
 
 module.exports = {
     getAllHawkerCentres,
