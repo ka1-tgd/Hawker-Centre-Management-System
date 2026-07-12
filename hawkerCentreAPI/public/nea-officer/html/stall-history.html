@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stall History - NEA Inspection Portal</title>
+<link rel="stylesheet" href="../css/nea-styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">NEA Inspection Portal</div>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="new-inspection.html">New Inspection</a>
+    <a href="stall-history.html" class="active">Stall History</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>Stall History</h1>
+  <p class="subtitle">View past inspections and hygiene grade for a stall.</p>
+
+  <div class="card">
+    <label for="stallIdInput">Stall ID</label>
+    <input id="stallIdInput" type="number" class="input" placeholder="Enter stall ID" style="margin-top:10px;">
+    <button id="loadHistoryBtn" class="btn btn-primary" style="margin-top:10px;">Load History</button>
+  </div>
+
+  <div class="card">
+    <h3>Current Grade</h3>
+    <p id="currentGrade"></p>
+  </div>
+
+  <div class="card">
+    <h3>Inspection Records</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Score</th>
+          <th>Grade</th>
+          <th>Remarks</th>
+          <th>Officer</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="historyTableBody">
+        <!-- rows filled by JS -->
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script src="../scripts/nea-script.js"></script>
+</body>
+</html>

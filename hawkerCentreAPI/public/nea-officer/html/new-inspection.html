@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>New Inspection - NEA Inspection Portal</title>
+<link rel="stylesheet" href="../css/nea-styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">NEA Inspection Portal</div>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="new-inspection.html" class="active">New Inspection</a>
+    <a href="stall-history.html">Stall History</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>New Inspection</h1>
+  <p class="subtitle">Record the score and remarks from a stall visit.</p>
+
+  <form class="card" id="inspectionForm">
+
+    <div class="field">
+      <label for="stall">Stall ID</label>
+      <input id="stall" type="number" class="input" placeholder="Enter stall ID">
+    </div>
+
+    <div class="field">
+      <label for="officer">Officer ID</label>
+      <input id="officer" type="number" class="input" placeholder="Enter officer ID">
+    </div>
+
+    <div class="field">
+      <label for="date">Inspection Date</label>
+      <input type="date" id="date" name="date">
+    </div>
+
+    <div class="field">
+      <label for="score">Score (0-100)</label>
+      <input type="number" id="score" name="score" min="0" max="100">
+    </div>
+
+    <div class="field">
+      <label for="remarks">Remarks</label>
+      <textarea id="remarks" name="remarks" placeholder="Enter remarks..."></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Inspection</button>
+    <a href="dashboard.html" class="btn btn-secondary">Cancel</a>
+
+    <div id="message"></div>
+
+  </form>
+</div>
+
+<script src="../scripts/nea-script.js"></script>
+</body>
+</html>

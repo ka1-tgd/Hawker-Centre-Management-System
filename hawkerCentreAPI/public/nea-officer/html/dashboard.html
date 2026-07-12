@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard - NEA Inspection Portal</title>
+<link rel="stylesheet" href="../css/nea-styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">NEA Inspection Portal</div>
+  <nav>
+    <a href="dashboard.html" class="active">Dashboard</a>
+    <a href="new-inspection.html">New Inspection</a>
+    <a href="stall-history.html">Stall History</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>Dashboard</h1>
+  <p class="subtitle">Overview of hygiene grades and recent inspections.</p>
+
+  <div class="card">
+    <h3>Grade Distribution</h3>
+    <table>
+      <tr>
+        <th>Grade</th>
+        <th>Number of Stalls</th>
+      </tr>
+      <tr>
+        <td><span class="grade grade-a">A</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="grade grade-b">B</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="grade grade-c">C</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="grade grade-d">D</span></td>
+        <td></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Recent Inspections</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Stall</th>
+          <th>Date</th>
+          <th>Score</th>
+          <th>Grade</th>
+          <th>Officer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- rows will be filled by backend data -->
+      </tbody>
+    </table>
+    <div class="empty-state">No inspection records yet.</div>
+  </div>
+
+</div>
+
+</body>
+</html>
