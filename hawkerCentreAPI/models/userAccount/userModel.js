@@ -2,7 +2,7 @@
 const sql = require("mssql");
 const dbConfig = require("../../dbConfig");
 
-// *Get all users                                                    *for Postman testing
+// Get all users (for Postman testing)
 async function getAllUsers() {
     let connection;
     try {
@@ -27,18 +27,36 @@ async function getAllUsers() {
             } catch (err) {
                 // If fail to close connection, display error in console
                 console.error("Error closing connection:", err);
-            }
-        }
-    }
+            };
+        };
+    };
 };
 
 // Get user by ID
-async function getUserByID() {
+async function getUserByUsername(username) {
 
 };
 
 // Create user
+async function createUser() {
+
+};
 
 // Update user
+async function updateUser() {
+    // name, password, contactNo
+};
 
 // Delete user
+async function deleteUser() {
+
+};
+
+// Export functions
+module.exports = {
+    getAllUsers,
+    getUserByUsername,
+    createUser,
+    updateUser,
+    deleteUser
+};
