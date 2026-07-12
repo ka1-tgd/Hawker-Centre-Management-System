@@ -15,6 +15,10 @@ const userController = require("./controllers/userAccount/userController.js");
 
 // Require middleware functions
 const {
+  validateHCId,
+} = require("./middleware/customer/operationalValidation.js");
+
+const {
   validateInspection,
   validateStallId,
 } = require("./middleware/nea-officer/inspectionValidation");
