@@ -124,7 +124,7 @@ async function createUser(userData) {
         request.input("name", userData.name);
         request.input("contact_no", userData.contact_no);
         request.input("email", userData.email);
-        request.input("passwordHash", userData.passwordHash);
+        request.input("passwordHash", userData.password);
         request.input("role", userData.role);
         const result = await request.query(query);
 
