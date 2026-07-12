@@ -23,7 +23,7 @@ async function getAllUsers(req, res) {
 async function getUserByUsername(req, res) {
     try {
         // Get username from request
-        const username = req.body.username;
+        const username = req.body.name;
 
         // Wait for model to get user
         const user = await userModel.getUserByUsername(username);
@@ -46,8 +46,8 @@ async function getUserByUsername(req, res) {
 // Create user
 async function createUser(req, res) {
     try {
-        // Check for existing username
-        const existingUser = await userModel.getUserByUsername(req.body.username);
+        // Check for existing name
+        const existingUser = await userModel.getUserByUsername(req.body.name);
         if (existingUser) {
             // If username already exists, inform user
             return res.status(400).json({ message: "This username is already taken" });
@@ -103,6 +103,51 @@ async function updateUser(req, res) {
     };
 };
 
+// Update password
+async function updatePassword(req, res) {    
+    try {
+        // Get ID and updated user data from request
+        const userId = parseInt(req.params.id);
+        let updatedPassword = req.body.password;
+
+        // Check if userId is valid
+        if (isNaN(userId)) {
+            // If userId is not a number, send error message
+            return res.status(400).send("Invalid user ID");
+        };
+
+        // Check if password was provided
+        if (!updatedPassword) {
+            // If not provided, send error message
+            return res.status(400).send("Password is required");
+        }
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(updatedPassword, salt);
+
+        // Replace user-entered password as hashed password
+        updatedPassword = hashedPassword;
+
+        // Wait for model to update user password
+        const updatedUser = await userModel.updatePassword(userId, updatedPassword);
+
+        // Check if user was updated
+        if (!updatedUser) {
+            // If user was not found and updated, send error message
+            return res.status(404).send("User not found");
+        };
+
+        // Inform user of success
+        res.status(200).send("Password updated successfully");
+    } catch (error) {
+        // Catch errors and log error message
+        console.error("Controller error:", error);
+        res.status(500).json({ error: "Error updating user" });
+    };
+};
+
+
 // Delete user
 async function deleteUser(req, res) {
     try {
@@ -137,7 +182,7 @@ async function deleteUser(req, res) {
 async function loginUser(req, res) {
     try {
         // Wait for model to get user
-        const user = await userModel.getUserByUsername(req.body.username);
+        const user = await userModel.getUserByUsername(req.body.name);
 
         // Check if user is found
         if (!user) {
@@ -176,6 +221,7 @@ module.exports = {
     getUserByUsername,
     createUser,
     updateUser,
+    updatePassword,
     deleteUser,
     loginUser
 };
