@@ -1,5 +1,5 @@
 // Require model and node modules
-const userModel = require("../../models/customer/customerModel");
+const customerModel = require("../../models/customer/customerModel");
 const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
