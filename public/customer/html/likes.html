@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Likes - HawkerHub</title>
+  <link rel="stylesheet" href="../css/customerEngagement.css">
+</head>
+<body>
+
+<div class="navbar">
+  <h1>HawkerHub</h1>
+</div>
+
+<div class="page">
+
+  <div class="sidebar">
+    <h2>My Account</h2>
+    <a href="account.html">My Details</a>
+    <a href="likes.html" class="active">My Likes</a>
+  </div>
+
+  <div class="content">
+
+    <h2>My Likes</h2>
+
+    <div id="likesList">Loading likes...</div>
+
+    <div id="message"></div>
+
+  </div>
+
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const userId = parseInt(params.get("userId")) || 5;
+</script>
+
+<script src="../scripts/likes-script.js"></script>
+</body>
+</html>
