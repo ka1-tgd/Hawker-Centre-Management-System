@@ -12,6 +12,7 @@ dotenv.config();
 const customerController = require("./controllers/customer/customerController.js");
 const inspectionController = require("./controllers/nea-officer/inspectionController");
 const userController = require("./controllers/userAccount/userController.js");
+const stallController = require("./controllers/vendor/stallController.js");
 
 // Require middleware functions
 const {
@@ -26,6 +27,11 @@ const {
 const {
   verifyJWT
 } = require("./middleware/userAccount/authorization.js");
+
+const {
+    validateStall,
+    validateStallId: validateVendorStallId
+} = require("./middleware/vendor/stallValidation.js");
 
 // Create Express app
 const app = express();
@@ -57,6 +63,13 @@ app.get("/users/:name", userController.getUserByUsername);
 app.put("/users/:id", userController.updateUser);
 app.put("/users/:id/update-password", userController.updatePassword);
 app.delete("/users/:id", userController.deleteUser);
+
+//route for vendor stall management
+app.get("/vendor/stalls", stallController.getLoginUserStalls);
+app.get("/vendor/stalls/:id", validateVendorStallId, stallController.getStallById);
+app.post("/vendor/stalls", validateStall, stallController.createStall);
+app.put("/vendor/stalls/:id", validateVendorStallId, validateStall,stallController.updateStall);
+app.delete("/vendor/stalls/:id", validateVendorStallId, stallController.deleteStall);
 
 // Start server
 app.listen(port, () => {
