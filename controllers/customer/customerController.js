@@ -42,8 +42,25 @@ async function getHawkerCentresWithStalls(req, res) {
   }
 }
 
+// Get menu items of a stall by stall ID
+async function getMenuItemsOfStall(req, res) {
+  try {
+    const id = parseInt(req.params.stall_id);
+    const stall = await customerModel.getMenuItemsOfStall(id);
+    if (!stall) {
+      return res.status(404).json({ error: "Stall not found" });
+    }
+
+    res.json(stall);
+  } catch (error) {
+    console.error("Controller error in getMenuItemsOfStall:", error);
+    res.status(500).json({ error: "Error fetching stall with menu items" });
+  }
+}
+
 module.exports = {
     getAllHawkerCentres,
     getHawkerCentreById,
     getHawkerCentresWithStalls,
+    getMenuItemsOfStall,
 };
