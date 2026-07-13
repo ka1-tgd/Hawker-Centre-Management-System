@@ -117,20 +117,21 @@ async function getMenuItemsOfStall(stall_id) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
+    const request = new sql.Request(connection);
 
     const query = `
     SELECT s.stall_id, s.stall_name, s.status, mi.menu_item_id, mi.item_name, mi.description, mi.availability, mi.price
     FROM Stall s INNER JOIN Menu m ON s.stall_id = m.menu_id
     INNER JOIN MenuItem mi ON m.menu_id = mi.menu_id
-    WHERE stall_id = @stall_id;
+    WHERE s.stall_id = @stall_id;
     `;
+
     request.input("stall_id", sql.Int, stall_id);
     const result = await request.query(query);
 
     if (result.recordset.length === 0) {
       return null; // Stall not found
     }
-    const result = await connection.request().query(query);
 
     // Group the menu items base on stall
     const StallWithMenuItems = {};
