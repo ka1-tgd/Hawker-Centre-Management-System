@@ -18,7 +18,7 @@ function validateHCId(req, res, next) {
 }
 
 // Middleware to validate stall ID from URL parameters (for GET by ID, PUT, DELETE)
-function validateStallId(req, res, next) {
+function validateStallIdForCustomer(req, res, next) {
   // Parse the ID from request parameters
   const id = parseInt(req.params.stall_id);
 
@@ -36,5 +36,5 @@ function validateStallId(req, res, next) {
 
 module.exports = {
   validateHCId,
-  validateStallId,
+  validateStallIdForCustomer,
 };

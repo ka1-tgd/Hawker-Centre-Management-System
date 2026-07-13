@@ -17,7 +17,7 @@ const stallController = require("./controllers/vendor/stallController.js");
 // Require middleware functions
 const {
   validateHCId,
-  validateStallId,
+  validateStallIdForCustomer,
 } = require("./middleware/customer/operationalValidation.js");
 
 const {
@@ -51,7 +51,7 @@ app.use(express.static(path.join(__dirname, "public")));
     // app.get("/customer/hawkerCentres", customerController.getAllHawkerCentres);
     // app.get("/customer/hawkerCentre/:hawker_centre_id", validateHCId, customerController.getHawkerCentreById);
 app.get("/customer/hawkerCentres/with-stalls", customerController.getHawkerCentresWithStalls);
-app.get("/customer/stall/:stall_id", validateStallId, customerController.getMenuItemsOfStall);
+app.get("/customer/stall/:stall_id", validateStallIdForCustomer, customerController.getMenuItemsOfStall);
 
 // Routes for inspections
 app.get("/nea/inspections/stall/:stallId", validateStallId, inspectionController.getInspectionsByStall);
