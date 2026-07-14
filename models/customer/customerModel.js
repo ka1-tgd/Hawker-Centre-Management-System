@@ -232,7 +232,7 @@ async function createOrder(CustOrder) {
 
     for (const item of CustOrder.order_items) {
       const itemInfoQuery = `
-      SELECT mi.unit_price, m.stall_id 
+      SELECT mi.price, m.stall_id 
       FROM MenuItem mi
       INNER JOIN Menu m ON mi.menu_id = m.menu_id
       WHERE mi.menu_item_id = @menu_item_id;
@@ -241,7 +241,7 @@ async function createOrder(CustOrder) {
       infoRequest.input("menu_item_id", sql.Int, item.menu_item_id);
       const infoResult = await infoRequest.query(itemInfoQuery);
       
-      const unitPrice = infoResult.recordset[0].unit_price;
+      const unitPrice = infoResult.recordset[0].price;
       const stallId = infoResult.recordset[0].stall_id;
 
       const itemQuery = `
