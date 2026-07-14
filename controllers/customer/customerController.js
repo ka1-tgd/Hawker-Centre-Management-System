@@ -4,17 +4,6 @@ const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-// Get all hawker centres
-async function getAllHawkerCentres(req, res) {
-    try {
-        const hawkerCentres = await customerModel.getAllHawkerCentres();
-        res.json(hawkerCentres);
-    } catch (error) {
-        console.error("Controller error:", error);
-        res.status(500).json({ error: "Error retrieving hawker centres" });
-    }
-}
-
 // Get order by ID
 async function getOrderById(req, res) {
   try {
@@ -61,7 +50,6 @@ async function getMenuItemsOfStall(req, res) {
 }
 
 module.exports = {
-  getAllHawkerCentres,
   getOrderById,
   getHawkerCentresWithStalls,
   getMenuItemsOfStall,

@@ -48,7 +48,6 @@ app.use(express.static(path.join(__dirname, "public")));
 // ROUTES //
 
 // Routes for customer operation
-    // app.get("/customer/hawkerCentres", customerController.getAllHawkerCentres);
 app.get("/customer/order/:order_id", validateOrderId, customerController.getOrderById);
 app.get("/customer/hawkerCentres/with-stalls", customerController.getHawkerCentresWithStalls);
 app.get("/customer/stall/:stall_id", validateStallIdForCustomer, customerController.getMenuItemsOfStall);
