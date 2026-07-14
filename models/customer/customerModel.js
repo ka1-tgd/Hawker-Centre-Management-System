@@ -31,6 +31,68 @@ async function getOrderById(order_id) {
   }
 }
 
+// Get all order of a user by user_id
+async function getOrdersOfUser(user_id) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const request = new sql.Request(connection);
+
+    const query = `
+    SELECT u.user_id, u.name, u.role, c.order_id, c.order_date, c.payment_type, c.status, c.total_amount
+    FROM Users u LEFT JOIN CustOrder c ON u.user_id = c.user_id
+    WHERE u.user_id = @user_id;
+    `;
+
+    request.input("user_id", sql.Int, user_id);
+    const result = await request.query(query);
+
+    if (result.recordset.length === 0) {
+      return null; // User not found
+    }
+
+    // Group the orders of user
+    const UserWithOrders = {};
+    for (const row of result.recordset) {
+      const UserId = row.user_id;
+      if (!UserWithOrders[UserId]) {
+        UserWithOrders[UserId] = {
+          user_id: UserId,
+          name: row.name,
+          role: row.role,
+          orders: [],
+        };
+      }
+      // Only add user if order_id is not null (for user with no orders)
+      if (row.order_id !== null) {
+        UserWithOrders[UserId].orders.push({
+          order_id: row.order_id,
+          order_date: row.order_date,
+          payment_type: row.payment_type,
+          total_amount: row.total_amount,
+          status: row.status,
+        });
+      }
+    }
+
+    return Object.values(UserWithOrders);
+  } catch (error) {
+    console.error("Database error in getOrdersOfUser:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(
+          "Error closing connection after getOrdersOfUser:",
+          err
+        );
+      }
+    }
+  }
+}
+
 // Get all hawker centres with stalls
 async function getHawkerCentresWithStalls() {
   let connection;
@@ -206,6 +268,7 @@ async function createOrder(CustOrder) {
 
 module.exports = {
   getOrderById,
+  getOrdersOfUser,
   getHawkerCentresWithStalls,
   getMenuItemsOfStall,
   createOrder,

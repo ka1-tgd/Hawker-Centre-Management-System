@@ -17,24 +17,32 @@ function validateOrderId(req, res, next) {
   next();
 }
 
+// Validate user ID from URL parameters (for GET by ID, PUT, DELETE)
+function validateUserIdForCustomer(req, res, next) {
+  const id = parseInt(req.params.user_id);
+
+  if (isNaN(id) || id <= 0) {
+    return res
+      .status(400)
+      .json({ error: "Invalid user ID. ID must be a positive number" });
+  }
+  next();
+}
+
 // Middleware to validate stall ID from URL parameters (for GET by ID, PUT, DELETE)
 function validateStallIdForCustomer(req, res, next) {
-  // Parse the ID from request parameters
   const id = parseInt(req.params.stall_id);
 
-  // Check if the parsed ID is a valid positive number
   if (isNaN(id) || id <= 0) {
-    // If not valid, send a 400 response
     return res
       .status(400)
       .json({ error: "Invalid stall ID. ID must be a positive number" });
   }
-
-  // If validation succeeds, pass control to the next middleware/route handler
   next();
 }
 
 module.exports = {
   validateOrderId,
+  validateUserIdForCustomer,
   validateStallIdForCustomer,
 };

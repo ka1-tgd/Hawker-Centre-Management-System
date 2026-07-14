@@ -20,6 +20,24 @@ async function getOrderById(req, res) {
   }
 }
 
+// Get orders of a user by user ID
+async function getOrdersOfUser(req, res) {
+  try {
+    const userId = parseInt(req.params.user_id);
+    const orders = await customerModel.getOrdersOfUser(userId);
+
+    if (!orders) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.json(orders);
+
+  } catch (error) {
+    console.error("Controller error in getOrdersOfUser:", error);
+    return res.status(500).json({ error: "Error fetching user with orders" });
+  }
+}
+
 // Get hawker centres with stalls
 async function getHawkerCentresWithStalls(req, res) {
   try {
@@ -51,6 +69,7 @@ async function getMenuItemsOfStall(req, res) {
 
 module.exports = {
   getOrderById,
+  getOrdersOfUser,
   getHawkerCentresWithStalls,
   getMenuItemsOfStall,
 };
