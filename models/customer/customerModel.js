@@ -7,8 +7,15 @@ async function getOrderById(order_id) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
-    const query = "SELECT user_id, order_date, total_amount, payment_type, status FROM CustOrder WHERE order_id = @order_id";
-    const request = connection.request();
+    const request = new sql.Request(connection);
+
+    const query = `
+    SELECT c.user_id, c.order_date, c.total_amount, c.payment_type, c.status, o.order_item_no, o.stall_id, mi.item_name, o.quantity, o.unit_price
+    FROM CustOrder c LEFT JOIN OrderItem o ON c.order_id = o.order_id
+    LEFT JOIN MenuItem mi ON mi.menu_item_id = o.menu_item_id
+    WHERE c.order_id = @order_id;
+    `;
+
     request.input("order_id", sql.Int, order_id);
     const result = await request.query(query);
 
@@ -16,16 +23,46 @@ async function getOrderById(order_id) {
       return null; // Order not found
     }
 
-    return result.recordset[0];
+    // Group the order items for an order
+    const OrderItemsOfOrder = {};
+    for (const row of result.recordset) {
+      const OrderId = row.order_id;
+      if (!OrderItemsOfOrder[OrderId]) {
+        OrderItemsOfOrder[OrderId] = {
+          order_id: OrderId,
+          user_id: row.user_id,
+          order_date: row.order_date,
+          total_amount: row.total_amount,
+          payment_type: row.payment_type,
+          status: row.status,
+          order_items: [],
+        };
+      }
+      // Only add order item if order_item_no is not null (for order with no order items)
+      if (row.order_item_no !== null) {
+        OrderItemsOfOrder[OrderId].order_items.push({
+          order_item_no: row.order_item_no,
+          item_name: row.item_name,
+          stall_id: row.stall_id,
+          quantity: row.quantity,
+          unit_price: row.unit_price,
+        });
+      }
+    }
+
+    return Object.values(OrderItemsOfOrder);
   } catch (error) {
-    console.error("Database error:", error);
+    console.error("Database error in getOrderById:", error);
     throw error;
   } finally {
     if (connection) {
       try {
         await connection.close();
       } catch (err) {
-        console.error("Error closing connection:", err);
+        console.error(
+          "Error closing connection after getOrderedById:",
+          err
+        );
       }
     }
   }
