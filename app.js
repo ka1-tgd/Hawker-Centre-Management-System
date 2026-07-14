@@ -19,6 +19,7 @@ const {
   validateOrderId,
   validateUserIdForCustomer,
   validateStallIdForCustomer,
+  validateOrder,
 } = require("./middleware/customer/operationalValidation.js");
 
 const {
@@ -53,6 +54,7 @@ app.get("/customer/order/:order_id", validateOrderId, customerController.getOrde
 app.get("/customer/orders/:user_id", validateUserIdForCustomer, customerController.getOrdersOfUser);
 app.get("/customer/hawkerCentres/with-stalls", customerController.getHawkerCentresWithStalls);
 app.get("/customer/stall/:stall_id", validateStallIdForCustomer, customerController.getMenuItemsOfStall);
+app.post("/customer/orders", validateOrder, customerController.createOrder);
 
 // Routes for inspections
 app.get("/nea/inspections/stall/:stallId", verifyJWT, validateStallId, inspectionController.getInspectionsByStall);
