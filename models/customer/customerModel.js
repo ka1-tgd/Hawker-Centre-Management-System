@@ -230,6 +230,8 @@ async function createOrder(CustOrder) {
 
     const newOrderId = result.recordset[0].order_id;
 
+    let totalAmount = 0;
+
     for (const item of CustOrder.order_items) {
       const itemInfoQuery = `
       SELECT mi.price, m.stall_id 
@@ -243,6 +245,8 @@ async function createOrder(CustOrder) {
       
       const unitPrice = infoResult.recordset[0].price;
       const stallId = infoResult.recordset[0].stall_id;
+      const itemTotal = item.quantity * unitPrice;
+      totalAmount += itemTotal;
 
       const itemQuery = `
         INSERT INTO OrderItem (order_id, menu_item_id, quantity, unit_price, stall_id) 
@@ -258,6 +262,13 @@ async function createOrder(CustOrder) {
       
       await itemRequest.query(itemQuery);
     }
+
+    const updateOrderQuery = 
+    `UPDATE CustOrder SET total_amount = @total_amount WHERE order_id = @order_id;`;
+    const updateRequest = connection.request();
+    updateRequest.input("order_id", sql.Int, newOrderId);
+    updateRequest.input("total_amount", sql.Decimal(10,2), totalAmount);
+    await updateRequest.query(updateOrderQuery);
 
     return await getOrderById(newOrderId);
   } catch (error) {
