@@ -14,7 +14,16 @@ function verifyJWT(req, res, next) {
 
         // Set authorized roles and paths
         const authorizedRoles = {
+            // Officer exclusive
+            "POST /nea/inspections": ["officer"],
+            "GET /nea/inspections/stall/:stallId": ["officer"],
 
+            // Hawker exclusive
+            "POST /vendor/stalls": ["hawker"],
+            "GET /vendor/stalls": ["hawker"],
+            "GET /vendor/stalls/:id": ["hawker"],
+            "PUT /vendor/stalls/:id": ["hawker"],
+            "DELETE /vendor/stalls/:id": ["hawker"],
         };
 
         const requestedEndpoint = `${req.method} ${req.url}`; // Include method in endpointl;

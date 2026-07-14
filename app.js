@@ -54,8 +54,8 @@ app.get("/customer/hawkerCentres/with-stalls", customerController.getHawkerCentr
 app.get("/customer/stall/:stall_id", validateStallIdForCustomer, customerController.getMenuItemsOfStall);
 
 // Routes for inspections
-app.get("/nea/inspections/stall/:stallId", validateStallId, inspectionController.getInspectionsByStall);
-app.post("/nea/inspections", validateInspection, inspectionController.createInspection);
+app.get("/nea/inspections/stall/:stallId", verifyJWT, validateStallId, inspectionController.getInspectionsByStall);
+app.post("/nea/inspections", verifyJWT, validateInspection, inspectionController.createInspection);
 
 // Routes for user account management
 app.post("/register", userController.createUser);
@@ -67,11 +67,11 @@ app.put("/users/:id/update-password", userController.updatePassword);
 app.delete("/users/:id", userController.deleteUser);
 
 //route for vendor stall management
-app.get("/vendor/stalls", stallController.getLoginUserStalls);
-app.get("/vendor/stalls/:id", validateVendorStallId, stallController.getStallById);
-app.post("/vendor/stalls", validateStall, stallController.createStall);
-app.put("/vendor/stalls/:id", validateVendorStallId, validateStall,stallController.updateStall);
-app.delete("/vendor/stalls/:id", validateVendorStallId, stallController.deleteStall);
+app.get("/vendor/stalls", verifyJWT, stallController.getLoginUserStalls);
+app.get("/vendor/stalls/:id", verifyJWT, validateVendorStallId, stallController.getStallById);
+app.post("/vendor/stalls", verifyJWT, validateStall, stallController.createStall);
+app.put("/vendor/stalls/:id", verifyJWT, validateVendorStallId, validateStall,stallController.updateStall);
+app.delete("/vendor/stalls/:id", verifyJWT, validateVendorStallId, stallController.deleteStall);
 
 // Start server
 app.listen(port, () => {
