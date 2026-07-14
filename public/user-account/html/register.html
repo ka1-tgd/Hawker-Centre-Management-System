@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Register</title>
+
+        <!--Shared Styles-->
+        <link ref="stylesheet" href="../css/main.css">
+    </head>
+
+    <body>
+        <!--Header-->
+        <header class="header-box">
+            <h1 class="header-title">Register Account</h1>
+        </header>
+
+        <!--Main Content-->
+        <main class="main-content">
+            <form class="enter-info" id="signup-form">
+                
+                <div class="enter-info-row">
+                    <label for="email">Membership:</label>
+                    <div class="account-type">
+                        <label class="acc-type-choice">
+                            <input type="radio" name="userType" value="customer" required>
+                            Customer
+                        </label>
+                        <label class="acc-type-choice">
+                            <input type="radio" name="userType" value="hawker" required>
+                            Hawker
+                        </label>
+                        <label class="acc-type-choice">
+                            <input type="radio" name="userType" value="officer" required>
+                            Officer
+                        </label>
+                    </div>
+                </div>
+
+                <div class="enter-info-row">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username">
+                </div>
+
+                <div class="enter-info-row">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" required>
+                </div>
+
+                <div class="enter-info-row">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" required>
+                </div>
+
+                <div class="enter-info-row">
+                    <label for="password">Confirm Password:</label>
+                    <input type="password" id="confirm-password" required>
+                </div>
+
+                <div class="enter-info-row">
+                    <label for="contact-no">Contact Number:</label>
+                    <input type="text" id="contact-no" maxlength="8" 
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8);" 
+                        required>
+                </div>
+
+                <button type="submit" class="button">Register</button>
+            </form>
+        </main>
+
+        <!--Link to script-->
+        <script type="module" src=""></script>
+    </body>
+</html>
