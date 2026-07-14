@@ -24,18 +24,18 @@ async function getAllHawkerCentres() {
   }
 }
 
-// Get Hawker Centre by ID
-async function getHawkerCentreById(hawker_centre_id) {
+// Get Order by ID
+async function getOrderById(order_id) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
-    const query = "SELECT hawker_centre_name, hawker_centre_address FROM HawkerCentre WHERE hawker_centre_id = @hawker_centre_id";
+    const query = "SELECT user_id, order_date, total_amount, payment_type, status FROM CustOrder WHERE order_id = @order_id";
     const request = connection.request();
-    request.input("hawker_centre_id", sql.Int, hawker_centre_id);
+    request.input("order_id", sql.Int, order_id);
     const result = await request.query(query);
 
     if (result.recordset.length === 0) {
-      return null; // Hawker centre not found
+      return null; // Order not found
     }
 
     return result.recordset[0];
@@ -176,9 +176,60 @@ async function getMenuItemsOfStall(stall_id) {
   }
 }
 
+// Create an order
+async function createOrder(CustOrder) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query =
+      "INSERT INTO CustOrder (user_id, payment_type) VALUES (@user_id, @payment_type); SELECT SCOPE_IDENTITY() AS order_id;";
+    const request = connection.request();
+    request.input("user_id", CustOrder.user_id);
+    request.input("payment_type", CustOrder.payment_type);
+    const result = await request.query(query);
+
+    const newOrderId = result.recordset[0].order_id;
+
+    for (const item of CustOrder.items) {
+      const priceQuery = "SELECT unit_price FROM MenuItem WHERE menu_item_id = @menu_item_id;";
+      const priceRequest = connection.request();
+      priceRequest.input("menu_item_id", sql.Int, item.menu_item_id);
+      const priceResult = await priceRequest.query(priceQuery);
+      
+      const unitPrice = priceResult.recordset[0].unit_price;
+
+      const itemQuery = `
+        INSERT INTO OrderItem (order_id, menu_item_id, quantity, unit_price) 
+        VALUES (@order_id, @menu_item_id, @quantity, @unit_price);
+      `;
+      const itemRequest = connection.request();
+      itemRequest.input("order_id", sql.Int, newOrderId);
+      itemRequest.input("menu_item_id", sql.Int, item.menu_item_id);
+      itemRequest.input("quantity", sql.Int, item.quantity);
+      itemRequest.input("unit_price", sql.Decimal(10,2), unitPrice);
+      
+      await itemRequest.query(itemQuery);
+    }
+
+    return await getOrderById(newOrderId);
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
 module.exports = {
   getAllHawkerCentres,
-  getHawkerCentreById,
+  getOrderById,
   getHawkerCentresWithStalls,
   getMenuItemsOfStall,
+  createOrder,
 };
