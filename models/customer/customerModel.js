@@ -230,23 +230,31 @@ async function createOrder(CustOrder) {
 
     const newOrderId = result.recordset[0].order_id;
 
-    for (const item of CustOrder.items) {
-      const priceQuery = "SELECT unit_price FROM MenuItem WHERE menu_item_id = @menu_item_id;";
-      const priceRequest = connection.request();
-      priceRequest.input("menu_item_id", sql.Int, item.menu_item_id);
-      const priceResult = await priceRequest.query(priceQuery);
+    for (const item of CustOrder.order_items) {
+      const itemInfoQuery = `
+      SELECT mi.unit_price, m.stall_id 
+      FROM MenuItem mi
+      INNER JOIN Menu m ON mi.menu_id = m.menu_id
+      WHERE mi.menu_item_id = @menu_item_id;
+      `;
+      const infoRequest = connection.request();
+      infoRequest.input("menu_item_id", sql.Int, item.menu_item_id);
+      const infoResult = await infoRequest.query(itemInfoQuery);
       
-      const unitPrice = priceResult.recordset[0].unit_price;
+      const unitPrice = infoResult.recordset[0].unit_price;
+      const stallId = infoResult.recordset[0].stall_id;
 
       const itemQuery = `
-        INSERT INTO OrderItem (order_id, menu_item_id, quantity, unit_price) 
-        VALUES (@order_id, @menu_item_id, @quantity, @unit_price);
+        INSERT INTO OrderItem (order_id, menu_item_id, quantity, unit_price, stall_id) 
+        VALUES (@order_id, @menu_item_id, @quantity, @unit_price, @stall_id);
       `;
+
       const itemRequest = connection.request();
       itemRequest.input("order_id", sql.Int, newOrderId);
       itemRequest.input("menu_item_id", sql.Int, item.menu_item_id);
       itemRequest.input("quantity", sql.Int, item.quantity);
       itemRequest.input("unit_price", sql.Decimal(10,2), unitPrice);
+      itemRequest.input("stall_id", sql.Int, stallId);
       
       await itemRequest.query(itemQuery);
     }

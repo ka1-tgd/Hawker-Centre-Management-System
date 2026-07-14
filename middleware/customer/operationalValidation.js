@@ -1,5 +1,39 @@
 const Joi = require("joi"); // Import Joi for validation
 
+// Validation schema for order items (used for POST/PUT)
+const orderItemSchema = Joi.object({
+  menu_item_id: Joi.number().integer().positive().required().messages({
+    "number.base": "menu_item_id must be a integer",
+    "number.positive": "menu_item_id must be a positive integer",
+    "any.required": "menu_item_id is required"
+  }),
+  quantity: Joi.number().integer().min(1).required().messages({
+    "number.base": "quantity must be a number",
+    "number.min": "quantity must be at least 1",
+    "any.required": "quantity is required"
+  })
+});
+
+// Validation schema for orders (used for POST/PUT)
+const orderSchema = Joi.object({
+  user_id: Joi.number().integer().positive().required().messages({
+    "number.base": "user_id must be a integer",
+    "number.positive": "user_id must be a positive number",
+    "any.required": "user_id is required"
+  }),
+  payment_type: Joi.string().valid('Card', 'PayNow', 'Cash').required().messages({
+    "string.base": "payment_type must be a string",
+    "string.empty": "payment_type cannot be empty",
+    "any.only": "payment_type can only be either 'Cash', 'Card' or 'PayNow'",
+    "any.required": "payment_type is required",
+  }),
+  order_items: Joi.array().items(orderItemSchema).min(1).required().messages({
+    "array.base": "order_items must be an array of food items",
+    "array.min": "You must order at least one item",
+    "any.required": "order_items list is required"
+  })
+});
+
 // Middleware to validate order ID from URL parameters (for GET by ID, PUT, DELETE)
 function validateOrderId(req, res, next) {
   // Parse the ID from request parameters
@@ -41,8 +75,22 @@ function validateStallIdForCustomer(req, res, next) {
   next();
 }
 
+// Validate order data (for POST/PUT)
+function validateOrder(req, res, next) {
+  const { error } = orderSchema.validate(req.body, { abortEarly: false });
+
+  if (error) {
+    const errorMessage = error.details
+      .map((detail) => detail.message)
+      .join(", ");
+    return res.status(400).json({ error: errorMessage });
+  }
+  next();
+}
+
 module.exports = {
   validateOrderId,
   validateUserIdForCustomer,
   validateStallIdForCustomer,
+  validateOrder,
 };

@@ -67,9 +67,21 @@ async function getMenuItemsOfStall(req, res) {
   }
 }
 
+// Create new order
+async function createOrder(req, res) {
+  try {
+    const newOrder = await customerModel.createOrder(req.body);
+    res.status(201).json(newOrder);
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error creating order" });
+  }
+}
+
 module.exports = {
   getOrderById,
   getOrdersOfUser,
   getHawkerCentresWithStalls,
   getMenuItemsOfStall,
+  createOrder,
 };
