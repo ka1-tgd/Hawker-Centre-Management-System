@@ -227,10 +227,9 @@ async function getMenuItemsOfStall(stall_id) {
         StallWithMenuItems[StallId].menu_items.push({
           menu_item_id: row.menu_item_id,
           item_name: row.item_name,
-          stall_name: row.stall_name,
           description: row.description,
+          price: row.price,
           availability: row.availability,
-          status: row.status,
         });
       }
     }
