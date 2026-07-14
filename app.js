@@ -17,6 +17,7 @@ const stallController = require("./controllers/vendor/stallController.js");
 // Require middleware functions
 const {
   validateOrderId,
+  validateUserIdForCustomer,
   validateStallIdForCustomer,
 } = require("./middleware/customer/operationalValidation.js");
 
@@ -49,6 +50,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Routes for customer operation
 app.get("/customer/order/:order_id", validateOrderId, customerController.getOrderById);
+app.get("/customer/orders/:user_id", validateUserIdForCustomer, customerController.getOrdersOfUser);
 app.get("/customer/hawkerCentres/with-stalls", customerController.getHawkerCentresWithStalls);
 app.get("/customer/stall/:stall_id", validateStallIdForCustomer, customerController.getMenuItemsOfStall);
 
