@@ -50,11 +50,11 @@ app.use(express.static(path.join(__dirname, "public")));
 // ROUTES //
 
 // Routes for customer ordering and checkouts
-app.get("/customer/order/:order_id", validateOrderId, /*verifyJWT,*/ customerController.getOrderById);
-app.get("/customer/orders/:user_id", validateUserIdForCustomer, /*verifyJWT,*/ customerController.getOrdersOfUser);
+app.get("/customer/order/:order_id", validateOrderId, verifyJWT, customerController.getOrderById);
+app.get("/customer/orders/:user_id", validateUserIdForCustomer, verifyJWT, customerController.getOrdersOfUser);
 app.get("/customer/hawkerCentres/with-stalls", customerController.getHawkerCentresWithStalls);
 app.get("/customer/stall/:stall_id", validateStallIdForCustomer, customerController.getMenuItemsOfStall);
-app.post("/customer/orders", validateOrder, /*verifyJWT,*/ customerController.createOrder);
+app.post("/customer/orders", validateOrder, verifyJWT, customerController.createOrder);
 
 // Routes for inspections
 app.get("/nea/inspections/stall/:stallId", verifyJWT, validateStallId, inspectionController.getInspectionsByStall);
