@@ -257,16 +257,7 @@ async function createOrder(CustOrder) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
-    const query =
-      "INSERT INTO CustOrder (user_id, payment_type) VALUES (@user_id, @payment_type); SELECT SCOPE_IDENTITY() AS order_id;";
-    const request = connection.request();
-    request.input("user_id", CustOrder.user_id);
-    request.input("payment_type", CustOrder.payment_type);
-    const result = await request.query(query);
-
-    const newOrderId = result.recordset[0].order_id;
-    let totalAmount = 0;
-
+    const validatedItems = [];
     for (const item of CustOrder.order_items) {
       const itemInfoQuery = `
       SELECT mi.price, mi.availability, m.stall_id, s.status
@@ -278,20 +269,39 @@ async function createOrder(CustOrder) {
       const infoRequest = connection.request();
       infoRequest.input("menu_item_id", sql.Int, item.menu_item_id);
       const infoResult = await infoRequest.query(itemInfoQuery);
-      
+
       const unitPrice = infoResult.recordset[0].price;
       const itemAvailability = infoResult.recordset[0].availability;
       const stallId = infoResult.recordset[0].stall_id;
       const stallStatus = infoResult.recordset[0].status;
 
-      if (!stallStatus || stallStatus.toLowerCase() !== 'open') {   // If stall is open
+      if (!stallStatus || stallStatus.toLowerCase() !== 'open') {   
         throw new Error(`Cannot place order: The stall is currently closed.`);
       }
-      if (!itemAvailability || itemAvailability.toUpperCase() !== 'Y') {  // If menu item is available
+      if (!itemAvailability || itemAvailability.toUpperCase() !== 'Y') {  
         throw new Error(`Cannot place order: One or more items are currently unavailable.`);
       }
-      const itemTotal = item.quantity * unitPrice;
-      totalAmount += itemTotal;
+
+      validatedItems.push({
+        menu_item_id: item.menu_item_id,
+        quantity: item.quantity,
+        unit_price: unitPrice,
+        stall_id: stallId,
+        item_total: item.quantity * unitPrice
+      });
+    }
+
+    const query =
+      "INSERT INTO CustOrder (user_id, payment_type) VALUES (@user_id, @payment_type); SELECT SCOPE_IDENTITY() AS order_id;";
+    const request = connection.request();
+    request.input("user_id", CustOrder.user_id);
+    request.input("payment_type", CustOrder.payment_type);
+    const result = await request.query(query);
+
+    const newOrderId = result.recordset[0].order_id;
+    let totalAmount = 0;
+    for (const item of validatedItems) {
+      totalAmount += item.item_total;
 
       const itemQuery = `
         INSERT INTO OrderItem (order_id, menu_item_id, quantity, unit_price, stall_id) 
@@ -302,8 +312,8 @@ async function createOrder(CustOrder) {
       itemRequest.input("order_id", sql.Int, newOrderId);
       itemRequest.input("menu_item_id", sql.Int, item.menu_item_id);
       itemRequest.input("quantity", sql.Int, item.quantity);
-      itemRequest.input("unit_price", sql.Decimal(10,2), unitPrice);
-      itemRequest.input("stall_id", sql.Int, stallId);
+      itemRequest.input("unit_price", sql.Decimal(10,2), item.unit_price);
+      itemRequest.input("stall_id", sql.Int, item.stall_id);
       
       await itemRequest.query(itemQuery);
     }
