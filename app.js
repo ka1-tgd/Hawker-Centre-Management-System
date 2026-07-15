@@ -52,8 +52,8 @@ app.use(express.static(path.join(__dirname, "public")));
 // Routes for customer ordering and checkouts
 app.get("/customer/order/:order_id", validateOrderId, verifyJWT, customerController.getOrderById);
 app.get("/customer/orders/:user_id", validateUserIdForCustomer, verifyJWT, customerController.getOrdersOfUser);
-app.get("/customer/hawkerCentres/with-stalls", customerController.getHawkerCentresWithStalls);
-app.get("/customer/stall/:stall_id", validateStallIdForCustomer, customerController.getMenuItemsOfStall);
+app.get("/customer/hawkerCentres/with-stalls", verifyJWT, customerController.getHawkerCentresWithStalls);
+app.get("/customer/stall/:stall_id", validateStallIdForCustomer, verifyJWT, customerController.getMenuItemsOfStall);
 app.post("/customer/orders", validateOrder, verifyJWT, customerController.createOrder);
 
 // Routes for inspections
