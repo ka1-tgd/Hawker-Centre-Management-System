@@ -265,14 +265,14 @@ async function createOrder(CustOrder) {
     const result = await request.query(query);
 
     const newOrderId = result.recordset[0].order_id;
-
     let totalAmount = 0;
 
     for (const item of CustOrder.order_items) {
       const itemInfoQuery = `
-      SELECT mi.price, m.stall_id 
+      SELECT mi.price, mi.availability, m.stall_id, s.status
       FROM MenuItem mi
       INNER JOIN Menu m ON mi.menu_id = m.menu_id
+      INNER JOIN Stall s ON m.stall_id = s.stall_id
       WHERE mi.menu_item_id = @menu_item_id;
       `;
       const infoRequest = connection.request();
@@ -280,7 +280,16 @@ async function createOrder(CustOrder) {
       const infoResult = await infoRequest.query(itemInfoQuery);
       
       const unitPrice = infoResult.recordset[0].price;
+      const itemAvailability = infoResult.recordset[0].availability;
       const stallId = infoResult.recordset[0].stall_id;
+      const stallStatus = infoResult.recordset[0].status;
+
+      if (!stallStatus || stallStatus.toLowerCase() !== 'open') {   // If stall is open
+        throw new Error(`Cannot place order: The stall is currently closed.`);
+      }
+      if (!itemAvailability || itemAvailability.toUpperCase() !== 'Y') {  // If menu item is available
+        throw new Error(`Cannot place order: One or more items are currently unavailable.`);
+      }
       const itemTotal = item.quantity * unitPrice;
       totalAmount += itemTotal;
 

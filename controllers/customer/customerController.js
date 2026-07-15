@@ -74,6 +74,13 @@ async function createOrder(req, res) {
     res.status(201).json(newOrder);
   } catch (error) {
     console.error("Controller error:", error);
+
+    if (error.message && (
+      error.message.includes("The stall is currently closed") ||
+      error.message.includes("items are currently unavailable")
+    )) {
+      return res.status(400).json({ error: error.message });
+    }
     res.status(500).json({ error: "Error creating order" });
   }
 }
