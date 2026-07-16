@@ -24,6 +24,13 @@ function verifyJWT(req, res, next) {
             "GET /vendor/stalls/:id": ["hawker"],
             "PUT /vendor/stalls/:id": ["hawker"],
             "DELETE /vendor/stalls/:id": ["hawker"],
+
+            // Customer exclusive
+            "GET /customer/order/:order_id": ["customer"],
+            "GET /customer/orders/:user_id": ["customer"],
+            "GET /customer/hawkerCentres/with-stalls": ["customer"],
+            "GET /customer/stall/:stall_id": ["customer"],
+            "POST /customer/orders": ["customer"],
         };
 
         const requestedEndpoint = `${req.method} ${req.url}`; // Include method in endpointl;
