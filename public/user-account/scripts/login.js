@@ -30,6 +30,8 @@ form.addEventListener("submit", async (e) => {
         if (response.status === 200) {
             // Save the JWT token and role
             localStorage.setItem("token", responseBody.token);
+            localStorage.setItem("userId", responseBody.id);
+            localStorage.setItem("username", responseBody.name);
             localStorage.setItem("role", responseBody.role);
             alert("Login successful!");
 
