@@ -7,7 +7,7 @@ const bcrypt = require("bcryptjs");
 async function getLoginUserStalls(req, res) {
 
     try {
-        const userId = req.user.id;
+        const userId = req.user.id;  //login with current user
         const stalls = await stallModel.getLoginUserStalls(userId);
         res.json(stalls);
     } catch (error) {
