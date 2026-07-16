@@ -200,13 +200,13 @@ GO
 
 INSERT INTO Users (name, contact_no, email, passwordHash, role)
     VALUES
-    ('John', '12345678', 'john_99@mail.com', 'b9faUBUUBiBibA780gbBo', 'hawker'),
-    ('Amanda', '87654321', 'amanda_88@mail.com', 'OFnoFN0F79&GFH9F9g7BF7gf', 'hawker'),
-    ('Charlie', '11223344', 'charlie_c@mail.com', 'nfianfoFoaofnF08ahfNFiaf0n', 'officer'),
-    ('David', '66778899', 'david_d@mail.com', 'douaboa0w8dabDBD9DB0D', 'officer'),
-    ('Janice', '12131415', 'janice_j@mail.com', 'BuboubFOBofUBFAouhawd', 'customer'),
-    ('Ryan', '77498756', 'ryanhiga_1M@mail.com', 'KdiSmtIdkWosPljj97D3c67', 'customer'),
-    ('Tung', '77735678', 'tungtt@mail.com', 'HuSehuIdO1LamOeNO1990h', 'hawker');
+    ('John', '12345678', 'john_99@mail.com', '$2b$10$TIXYb4YXoXEuVRuP5yfjiOt./DCTljplSN6hzjqv9pRNrNtfZRvMq', 'hawker'),
+    ('Amanda', '87654321', 'amanda_88@mail.com', '$2b$10$eV7K1EU8BK/Rsoxgv54zw.HR0T9qeczL7CAZP2W8MAfahkTIEyhDG', 'hawker'),
+    ('Charlie', '11223344', 'charlie_c@mail.com', '$2b$10$qJlAMjJTJPtfRdnBLFhRFuFzDB2zZZwmANIS8GNOOzOTiw6macA0W', 'officer'),
+    ('David', '66778899', 'david_d@mail.com', '$2b$10$RswsaokubDUsdP3gGqJ.jOtorNcX3mX1N4jN4oE499U65rVJYFmLq', 'officer'),
+    ('Janice', '12131415', 'janice_j@mail.com', '$2b$10$pYefJPCbkRra.KUYpRYzkuLvG4QMZlc3TpPBtpeGIC1s8j.xd0w9u', 'customer'),
+    ('Ryan', '77498756', 'ryanhiga_1M@mail.com', '$2b$10$Hs70lMENn.rDcGiQgVbIteVs/0m7TR/oazYOMBd3x/tZNJ8E5adRe', 'customer'),
+    ('Tung', '77735678', 'tungtt@mail.com', '$2b$10$2ng6Y7K2f7Tp0ynQz4Blz.mIak76feRIOVejtdMqiSoTZFFD4Gp0a', 'hawker');
 
 INSERT INTO HawkerCentre (hawker_centre_id, hawker_centre_name, hawker_centre_address)
     VALUES
