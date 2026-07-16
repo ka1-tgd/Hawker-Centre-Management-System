@@ -15,7 +15,7 @@
 const vendorName = document.getElementById("vendorName");
 const logoutBtn = document.getElementById("logoutBtn");
 
-// username
+// usernamewwada
 const username = localStorage.getItem("username");
 if (username) {
     vendorName.textContent = `Welcome, ${username}`;
