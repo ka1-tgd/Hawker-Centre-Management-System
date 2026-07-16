@@ -341,52 +341,65 @@ async function createOrder(CustOrder) {
 }
 
 // Update order
-async function updateOrderItem(order_id, order_item_no, quantity) {
+async function updateOrder(order_id, orderItems) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
-    
-    const updateItemQuery = `
-      UPDATE o SET o.quantity = @quantity 
-      FROM OrderItem o
-      INNER JOIN CustOrder c ON o.order_id = c.order_id
-      WHERE o.order_id = @order_id AND o.order_item_no = @order_item_no AND c.status = 'Pending';
+    const statusCheckQuery = `
+      SELECT status FROM CustOrder WHERE order_id = @order_id;
     `;
-    
-    const request = connection.request();
-    request.input("order_id", sql.Int, order_id);
-    request.input("order_item_no", sql.Int, order_item_no);
-    request.input("quantity", sql.Int, quantity);
-    
-    const result = await request.query(updateItemQuery);
+    const checkRequest = connection.request();
+    checkRequest.input("order_id", sql.Int, order_id);
+    const checkResult = await checkRequest.query(statusCheckQuery);
 
-    if (result.rowsAffected[0] === 0) {
-      return null; 
+    if (checkResult.recordset.length === 0) {
+      return null; // Order doesn't exist
+    }
+
+    if (checkResult.recordset[0].status !== 'Pending') {
+      throw new Error("Cannot update order because it is no longer pending.");
+    }
+
+    const deleteRequest = connection.request();
+    deleteRequest.input("order_id", sql.Int, order_id);
+    await deleteRequest.query(`DELETE FROM OrderItem WHERE order_id = @order_id;`);
+
+    for (let i = 0; i < orderItems.length; i++) {
+      const item = orderItems[i];
+      const insertRequest = connection.request();
+
+      insertRequest.input("order_id", sql.Int, order_id);
+      insertRequest.input("menu_item_id", sql.Int, item.menu_item_id);
+      insertRequest.input("quantity", sql.Int, item.quantity);
+
+      await insertRequest.query(`
+        INSERT INTO OrderItem (order_id, menu_item_id, quantity, unit_price)
+        SELECT @order_id, @menu_item_id, @quantity, price
+        FROM MenuItem
+        WHERE id = @menu_item_id;
+      `);
     }
 
     const updateParentTotalQuery = `
       UPDATE CustOrder
-      SET total_amount = (
-        SELECT SUM(quantity * unit_price) FROM OrderItem WHERE order_id = @order_id
-      )
+      SET total_amount = (SELECT SUM(quantity * unit_price) FROM OrderItem WHERE order_id = @order_id)
       WHERE order_id = @order_id;
     `;
 
-    const request2 = connection.request();
-    request2.input("order_id", sql.Int, order_id);
-    await request2.query(updateParentTotalQuery);
+    const totalRequest = connection.request();
+    totalRequest.input("order_id", sql.Int, order_id);
+    await totalRequest.query(updateParentTotalQuery);
 
     return await getOrderById(order_id);
-
   } catch (error) {
-    console.error("Database error in updateOrderItem:", error);
+    console.error("Database error", error);
     throw error;
   } finally {
     if (connection) {
       try {
         await connection.close();
       } catch (err) {
-        console.error("Error closing connection after updateOrderItem:", err);
+        console.error("Error closing connection:", err);
       }
     }
   }
@@ -398,4 +411,5 @@ module.exports = {
   getHawkerCentresWithStalls,
   getMenuItemsOfStall,
   createOrder,
+  updateOrder,
 };
