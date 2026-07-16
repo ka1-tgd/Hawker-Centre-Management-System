@@ -3,7 +3,6 @@ const express = require("express");
 const sql = require("mssql");
 const dotenv = require("dotenv");
 const path = require("path");
-console.log("DB_SERVER is:", process.env.DB_SERVER);
 
 // Load environment variables
 dotenv.config();
