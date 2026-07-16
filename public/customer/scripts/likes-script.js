@@ -1,4 +1,4 @@
-// userId is declared inline in likes.html
+const token = localStorage.getItem("token");
 
 const likesListDiv = document.getElementById("likesList");
 const messageDiv = document.getElementById("message");
@@ -8,7 +8,9 @@ async function loadLikes() {
   try {
     likesListDiv.innerHTML = "Loading likes...";
 
-    const response = await fetch(`/likes/customer/${userId}`);
+    const response = await fetch(`/likes/customer/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     if (response.status === 401 || response.status === 403) {
       likesListDiv.innerHTML = "<p>Authentication failed! Please login.</p>";
@@ -47,13 +49,14 @@ async function loadLikes() {
   }
 }
 
-// Handle clicking "Unlike" 
+// Handle clicking "Unlike" - removes the like and the row from the page
 async function handleUnlikeClick(event) {
   const likeId = event.target.getAttribute("data-like-id");
 
   try {
     const response = await fetch(`/likes/${likeId}`, {
       method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     if (response.ok) {
