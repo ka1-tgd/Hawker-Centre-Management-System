@@ -57,8 +57,8 @@ async function renderMenuItems() {
             <p class="itemPrice" style="font-weight: bold; margin: 5px 0; color: #2c3e50;">
               Price: $${Number(item.price).toFixed(2)}
             </p>
-            <p class="itemAvailability" style="margin: 5px 0 0 0; font-size: 0.9em; color: ${item.availability ? 'green' : 'red'};">
-              ${item.availability ? '● Available' : '○ Out of Stock'}
+            <p class="itemAvailability" style="margin: 5px 0 0 0; font-size: 0.9em; color: ${item.availability === 'Y' ? 'green' : 'red'};">
+            ${item.availability === 'Y' ? '● Available' : '○ Out of Stock'}
             </p>
           </div>
         `).join('')
