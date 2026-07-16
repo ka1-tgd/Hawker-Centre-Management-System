@@ -23,18 +23,6 @@ async function renderHawkerCentres() {
     contentContainer.innerHTML = '<h2 id="contentHeader">Hawker Centres</h2>';
 
     hawkerCentres.forEach((centre) => {
-      // const stallsHTML = centre.stalls.length > 0 
-      //   ? centre.stalls.map(stall => `
-      //       <div class="foodStall">
-      //         <h3 class="foodStallName">${stall.stall_name}</h3>
-      //         <a class="foodStallId">Stall ID: ${stall.stall_id}</a>
-      //         <a class="foodStallDesc">${stall.description || 'No description available'}</a>
-      //         <a class="foodStallOperateHrs">Operating Hours: ${stall.operating_hours || 'N/A'}</a>
-      //         <a class="foodStallStatus">Status: ${stall.status}</a>
-      //       </div>
-      //     `).join('')
-      //   : `<p class="no-stalls" style="padding: 10px; color: darkred;">No stalls registered at this location yet.</p>`;
-
       const stallsHTML = centre.stalls.length > 0 
         ? centre.stalls.map(stall => `
             <div class="foodStall" data-stall-id="${stall.stall_id}" style="cursor: pointer;">
