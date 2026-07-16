@@ -7,7 +7,7 @@ const bcrypt = require("bcryptjs");
 async function getLoginUserStalls(req, res) {
 
     try {
-        const userId = 1;
+        const userId = req.user.id;
         const stalls = await stallModel.getLoginUserStalls(userId);
         res.json(stalls);
     } catch (error) {
@@ -21,8 +21,8 @@ async function getLoginUserStalls(req, res) {
 // get stall by ID
 async function getStallById(req, res) {
     try {
+        const userId = req.user.id;
         const stallId = parseInt(req.params.id);
-        const userId = 1;
         const stall = await stallModel.getStallById(stallId, userId);
         if (!stall) {
             return res.status(404).json({
@@ -43,7 +43,7 @@ async function getStallById(req, res) {
 // create stall
 async function createStall(req, res) {
     try {
-        const userId = 1;
+        const userId = req.user.id;
         const newStall = await stallModel.createStall(userId, req.body);
         res.status(201).json(newStall);
     } catch (error) {
@@ -58,8 +58,8 @@ async function createStall(req, res) {
 //  update stall
 async function updateStall(req, res) {
     try {
+        const userId = req.user.id;
         const stallId = parseInt(req.params.id);
-        const userId = 1;
         const updatedStall = await stallModel.updateStall(
             stallId,
             userId,
@@ -82,8 +82,8 @@ async function updateStall(req, res) {
 // delete stall
 async function deleteStall(req, res) {
     try {
+        const userId = req.user.id;
         const stallId = parseInt(req.params.id);
-        const userId = 1;
         const deleted = await stallModel.deleteStall(
             stallId,
             userId
