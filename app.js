@@ -85,26 +85,25 @@ app.put("/vendor/stalls/:id", verifyJWT, validateVendorStallId, validateStall, s
 app.delete("/vendor/stalls/:id", verifyJWT, validateVendorStallId, stallController.deleteStall);
 
 // Routes - Menu Item Likes
-app.post("/likes", menuItemLikeValidation.validateCreateLike, menuItemLikeController.createLike);
-app.get("/likes/item/:menuItemId", menuItemLikeController.getLikesByMenuItem);
-app.get("/likes/customer/:userId", menuItemLikeController.getLikesByUser);
-app.delete("/likes/:id", menuItemLikeValidation.validateLikeId, menuItemLikeController.deleteLike);
+app.post("/likes", verifyJWT, menuItemLikeValidation.validateCreateLike, menuItemLikeController.createLike);
+app.get("/likes/item/:menuItemId", verifyJWT, menuItemLikeController.getLikesByMenuItem);
+app.get("/likes/customer/:userId", verifyJWT, menuItemLikeController.getLikesByUser);
+app.delete("/likes/:id", verifyJWT, menuItemLikeValidation.validateLikeId, menuItemLikeController.deleteLike);
 
-// Routes - Loyalty Program
-app.get("/loyalty/:userId", loyaltyController.getLoyaltyPoints);
-app.get("/rewards", loyaltyController.getRewards);
-app.post("/redeem", loyaltyValidation.validateRedeem, loyaltyController.redeemReward);
-
-// Route for basic profile display on the account page (separate from
-// the /users/:name lookup above, which is your teammate's login/username route)
-app.get("/profile/:userId", loyaltyController.getUserProfile);
-
-// Routes - Feedback (full CRUD)
-app.get("/feedback/orders/:userId", feedbackController.getEligibleOrders);
-app.post("/feedback", feedbackValidation.validateCreateFeedback, feedbackController.createFeedback);
-app.get("/feedback/customer/:userId", feedbackController.getFeedbackByUser);
-app.put("/feedback/:id", feedbackValidation.validateFeedbackId, feedbackValidation.validateUpdateFeedback, feedbackController.updateFeedback);
-app.delete("/feedback/:id", feedbackValidation.validateFeedbackId, feedbackController.deleteFeedback);
+// Routes - Loyalty Program 
+app.get("/loyalty/:userId", verifyJWT, loyaltyController.getLoyaltyPoints);
+app.get("/rewards", verifyJWT, loyaltyController.getRewards);
+app.post("/redeem", verifyJWT, loyaltyValidation.validateRedeem, loyaltyController.redeemReward);
+ 
+// Route for basic profile display on the account page 
+app.get("/profile/:userId", verifyJWT, loyaltyController.getUserProfile);
+ 
+// Routes - Feedback 
+app.get("/feedback/orders/:userId", verifyJWT, feedbackController.getEligibleOrders);
+app.post("/feedback", verifyJWT, feedbackValidation.validateCreateFeedback, feedbackController.createFeedback);
+app.get("/feedback/customer/:userId", verifyJWT, feedbackController.getFeedbackByUser);
+app.put("/feedback/:id", verifyJWT, feedbackValidation.validateFeedbackId, feedbackValidation.validateUpdateFeedback, feedbackController.updateFeedback);
+app.delete("/feedback/:id", verifyJWT, feedbackValidation.validateFeedbackId, feedbackController.deleteFeedback);
 
 // Routes - Vendor Satisfaction Dashboard (per-stall ratings + complaints, SCRUM-72)
 app.get("/vendor/satisfaction", vendorDashboardValidation.validateStallId, vendorDashboardController.getSatisfaction);

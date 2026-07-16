@@ -31,6 +31,24 @@ function verifyJWT(req, res, next) {
             "GET /customer/hawkerCentres/with-stalls": ["customer"],
             "GET /customer/stall/[0-9]+": ["customer"],
             "POST /customer/orders": ["customer"],
+
+            // Customer engagement exclusive 
+            "POST /likes": ["customer"],
+            "GET /likes/item/[0-9]+": ["customer"],
+            "GET /likes/customer/[0-9]+": ["customer"],
+            "DELETE /likes/[0-9]+": ["customer"],
+
+            "GET /loyalty/[0-9]+": ["customer"],
+            "GET /rewards": ["customer"],
+            "POST /redeem": ["customer"],
+
+            "GET /profile/[0-9]+": ["customer"],
+
+            "GET /feedback/orders/[0-9]+": ["customer"],
+            "POST /feedback": ["customer"],
+            "GET /feedback/customer/[0-9]+": ["customer"],
+            "PUT /feedback/[0-9]+": ["customer"],
+            "DELETE /feedback/[0-9]+": ["customer"],
         };
 
         const requestedEndpoint = `${req.method} ${req.url}`; // Include method in endpointl;
