@@ -35,7 +35,7 @@ form.addEventListener("submit", async (e) => {
 
             // Redirect to home page based on user's role
             if (responseBody.role === "customer") {
-                window.location.href = "../../customer/html/customer-foodStallsBrowser.html";
+                window.location.href = "../../customer/html/HCs-and-stalls.html";
             } else if (responseBody.role === "hawker") {
                 window.location.href = "../../vendor/html/vendor-home.html";
             } else if (responseBody.role === "officer") {
