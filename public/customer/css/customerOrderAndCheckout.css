@@ -63,7 +63,7 @@ body {
   border-bottom: 0.4px solid #555;
 }
 
-.hawkerCentre {
+#hawkerCentre {
   border: 1px solid #555;
   padding: 4px;
   margin-bottom: 4px;
