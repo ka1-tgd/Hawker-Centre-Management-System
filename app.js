@@ -13,6 +13,10 @@ const customerController = require("./controllers/customer/customerController.js
 const inspectionController = require("./controllers/nea-officer/inspectionController");
 const userController = require("./controllers/userAccount/userController.js");
 const stallController = require("./controllers/vendor/StallController.js");
+const menuItemLikeController = require("./controllers/customerEngagement/menuItemLikeController");
+const loyaltyController = require("./controllers/customerEngagement/loyaltyController");
+const feedbackController = require("./controllers/customerEngagement/feedbackController");
+const vendorDashboardController = require("./controllers/customerEngagement/vendorDashboardController");
 
 // Require middleware functions
 const {
@@ -35,6 +39,11 @@ const {
     validateStall,
     validateStallId: validateVendorStallId
 } = require("./middleware/vendor/stallValidation.js");
+
+const menuItemLikeValidation = require("./middleware/customerEngagement/menuItemLikeValidation");
+const loyaltyValidation = require("./middleware/customerEngagement/loyaltyValidation");
+const feedbackValidation = require("./middleware/customerEngagement/feedbackValidation");
+const vendorDashboardValidation = require("./middleware/customerEngagement/vendorDashboardValidation");
 
 // Create Express app
 const app = express();
@@ -68,18 +77,44 @@ app.put("/users/:id", userController.updateUser);
 app.put("/users/:id/update-password", userController.updatePassword);
 app.delete("/users/:id", userController.deleteUser);
 
-//route for vendor stall management
+// Routes for vendor stall management
 app.get("/vendor/stalls", verifyJWT, stallController.getLoginUserStalls);
 app.get("/vendor/stalls/:id", verifyJWT, validateVendorStallId, stallController.getStallById);
 app.post("/vendor/stalls", verifyJWT, validateStall, stallController.createStall);
-app.put("/vendor/stalls/:id", verifyJWT, validateVendorStallId, validateStall,stallController.updateStall);
+app.put("/vendor/stalls/:id", verifyJWT, validateVendorStallId, validateStall, stallController.updateStall);
 app.delete("/vendor/stalls/:id", verifyJWT, validateVendorStallId, stallController.deleteStall);
+
+// Routes - Menu Item Likes
+app.post("/likes", menuItemLikeValidation.validateCreateLike, menuItemLikeController.createLike);
+app.get("/likes/item/:menuItemId", menuItemLikeController.getLikesByMenuItem);
+app.get("/likes/customer/:userId", menuItemLikeController.getLikesByUser);
+app.delete("/likes/:id", menuItemLikeValidation.validateLikeId, menuItemLikeController.deleteLike);
+
+// Routes - Loyalty Program
+app.get("/loyalty/:userId", loyaltyController.getLoyaltyPoints);
+app.get("/rewards", loyaltyController.getRewards);
+app.post("/redeem", loyaltyValidation.validateRedeem, loyaltyController.redeemReward);
+
+// Route for basic profile display on the account page (separate from
+// the /users/:name lookup above, which is your teammate's login/username route)
+app.get("/profile/:userId", loyaltyController.getUserProfile);
+
+// Routes - Feedback (full CRUD)
+app.get("/feedback/orders/:userId", feedbackController.getEligibleOrders);
+app.post("/feedback", feedbackValidation.validateCreateFeedback, feedbackController.createFeedback);
+app.get("/feedback/customer/:userId", feedbackController.getFeedbackByUser);
+app.put("/feedback/:id", feedbackValidation.validateFeedbackId, feedbackValidation.validateUpdateFeedback, feedbackController.updateFeedback);
+app.delete("/feedback/:id", feedbackValidation.validateFeedbackId, feedbackController.deleteFeedback);
+
+// Routes - Vendor Satisfaction Dashboard (per-stall ratings + complaints, SCRUM-72)
+app.get("/vendor/satisfaction", vendorDashboardValidation.validateStallId, vendorDashboardController.getSatisfaction);
+app.get("/vendor/complaints", vendorDashboardValidation.validateStallId, vendorDashboardController.getComplaints);
+app.put("/vendor/complaints/:id/resolve", vendorDashboardValidation.validateComplaintId, vendorDashboardController.resolveComplaint);
 
 // Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
 // Graceful shutdown
 // Listen for termination signals (like Ctrl+C)
 process.on("SIGINT", async () => {
