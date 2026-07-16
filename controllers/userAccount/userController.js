@@ -4,21 +4,6 @@ const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-// Get all users (for Postman Testing)
-async function getAllUsers(req, res) {
-    try {
-        // Wait for model to get all users
-        const users = await userModel.getAllUsers();
-
-        // Return list of users in JSON
-        res.json(users);
-    } catch (error) {
-        // Catch errors and log error message
-        console.error("Controller error:", error);
-        res.status(500).json({ error: "Error retrieving users" });
-    };
-};
-
 // Get user by Username
 async function getUserByUsername(req, res) {
     try {

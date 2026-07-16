@@ -63,7 +63,6 @@ app.post("/nea/inspections", verifyJWT, validateInspection, inspectionController
 // Routes for user account management
 app.post("/register", userController.createUser);
 app.post("/login", userController.loginUser);
-app.get("/users", userController.getAllUsers);
 app.get("/users/:name", userController.getUserByUsername);
 app.put("/users/:id", userController.updateUser);
 app.put("/users/:id/update-password", userController.updatePassword);
