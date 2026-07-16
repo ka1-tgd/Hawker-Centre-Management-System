@@ -28,26 +28,27 @@ form.addEventListener("submit", async (e) => {
             : { message: response.statusText };
 
         if (response.status === 200) {
-
-            // Save the JWT token
+            // Save the JWT token and role
             localStorage.setItem("token", responseBody.token);
-
+            localStorage.setItem("role", responseBody.role);
             alert("Login successful!");
 
-            // Redirect to account page
-            window.location.href = "account.html";
-
+            // Redirect to home page based on user's role
+            if (responseBody.role === "customer") {
+                window.location.href = "../../customer/html/HCs-and-stalls.html";
+            } else if (responseBody.role === "hawker") {
+                window.location.href = "../../vendor/html/vendor-home.html";
+            } else if (responseBody.role === "officer") {
+                window.location.href = "../../nea-officer/html/dashboard.html";
+            } else {
+                alert("Unknown role");
+            }
         } else {
-
             alert(responseBody.message);
-
         }
 
     } catch (error) {
-
         console.error(error);
         alert("Unable to connect to the server.");
-
     }
-
 });
