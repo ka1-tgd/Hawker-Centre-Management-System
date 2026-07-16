@@ -1,3 +1,4 @@
+const token = localStorage.getItem("token");
 const userNameEl = document.getElementById("userName");
 const userEmailEl = document.getElementById("userEmail");
 const userContactEl = document.getElementById("userContact");
