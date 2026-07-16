@@ -11,6 +11,12 @@ const messageDiv = document.getElementById("message");
 async function loadEligibleOrders() {
   try {
     const response = await fetch(`/feedback/orders/${userId}`);
+
+    if (response.status === 401 || response.status === 403) {
+      orderSelect.innerHTML = '<option value="">Authentication failed! Please login.</option>';
+      return;
+    }
+
     const eligibleOrders = await response.json();
 
     if (eligibleOrders.length === 0) {
@@ -46,6 +52,12 @@ async function loadMyFeedback() {
     feedbackListDiv.innerHTML = "Loading your feedback...";
 
     const response = await fetch(`/feedback/customer/${userId}`);
+
+    if (response.status === 401 || response.status === 403) {
+      feedbackListDiv.innerHTML = "<p>Authentication failed! Please login.</p>";
+      return;
+    }
+
     const feedbackItems = await response.json();
 
     if (feedbackItems.length === 0) {
@@ -122,6 +134,9 @@ async function handleSaveFeedback(feedbackId, feedbackElement) {
       messageDiv.textContent = "Feedback updated!";
       messageDiv.style.color = "green";
       loadMyFeedback();
+    } else if (response.status === 401 || response.status === 403) {
+      messageDiv.textContent = "Authentication failed! Please login.";
+      messageDiv.style.color = "red";
     } else {
       const data = await response.json();
       messageDiv.textContent = data.error;
@@ -148,6 +163,9 @@ async function handleDeleteFeedback(feedbackId, feedbackElement) {
       feedbackElement.remove();
       messageDiv.textContent = "Feedback deleted";
       messageDiv.style.color = "green";
+    } else if (response.status === 401 || response.status === 403) {
+      messageDiv.textContent = "Authentication failed! Please login.";
+      messageDiv.style.color = "red";
     } else {
       messageDiv.textContent = "Failed to delete feedback";
       messageDiv.style.color = "red";
@@ -190,6 +208,9 @@ feedbackForm.addEventListener("submit", async (event) => {
       messageDiv.style.color = "green";
       feedbackForm.reset();
       loadMyFeedback();
+    } else if (response.status === 401 || response.status === 403) {
+      messageDiv.textContent = "Authentication failed! Please login.";
+      messageDiv.style.color = "red";
     } else {
       const data = await response.json();
       messageDiv.textContent = data.error;

@@ -1,3 +1,5 @@
+// userId is declared once in account.html and shared by every script on this page
+
 const userNameEl = document.getElementById("userName");
 const userEmailEl = document.getElementById("userEmail");
 const userContactEl = document.getElementById("userContact");
@@ -7,16 +9,22 @@ const progressFillEl = document.getElementById("progressFill");
 const rewardGridEl = document.getElementById("rewardGrid");
 const messageEl = document.getElementById("message");
 
-// Points required to REACH each tier (simple fixed thresholds)
+// Points required to REACH each tier 
 const tierThresholds = { Bronze: 0, Silver: 100, Gold: 250 };
 const tierOrder = ["Bronze", "Silver", "Gold"];
 
 let currentPoints = 0;
 
-// Load the user's profile details (name, email, contact)
+// Load the user's profile details 
 async function loadUserDetails() {
   try {
     const response = await fetch(`/profile/${userId}`);
+
+    if (response.status === 401 || response.status === 403) {
+      userNameEl.textContent = "Authentication failed! Please login.";
+      return;
+    }
+
     const user = await response.json();
 
     userNameEl.textContent = user.name;
@@ -32,13 +40,19 @@ async function loadUserDetails() {
 async function loadLoyaltyPoints() {
   try {
     const response = await fetch(`/loyalty/${userId}`);
+
+    if (response.status === 401 || response.status === 403) {
+      tierLabelEl.textContent = "Authentication failed! Please login.";
+      return;
+    }
+
     const loyalty = await response.json();
 
     currentPoints = loyalty.CurrentPoints;
     pointsValueEl.textContent = currentPoints;
     tierLabelEl.textContent = `Current Tier: ${loyalty.Tier}`;
 
-    // Find the tier after the current one - Gold has no "next" tier, so show a full bar
+    // Find the tier after the current one 
     const currentIndex = tierOrder.indexOf(loyalty.Tier);
     const nextTier = tierOrder[currentIndex + 1];
 
@@ -58,6 +72,12 @@ async function loadLoyaltyPoints() {
 async function loadRewards() {
   try {
     const response = await fetch("/rewards");
+
+    if (response.status === 401 || response.status === 403) {
+      rewardGridEl.innerHTML = "<p>Authentication failed! Please login.</p>";
+      return;
+    }
+
     const rewards = await response.json();
 
     rewardGridEl.innerHTML = "";
@@ -103,6 +123,12 @@ async function handleRedeemClick(event) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ user_id: userId, reward_id: parseInt(rewardId) }),
     });
+
+    if (response.status === 401 || response.status === 403) {
+      messageEl.textContent = "Authentication failed! Please login.";
+      messageEl.style.color = "red";
+      return;
+    }
 
     const data = await response.json();
 
