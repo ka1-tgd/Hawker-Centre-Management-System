@@ -139,7 +139,7 @@ async function getHawkerCentresWithStalls() {
     const query = `
     SELECT h.hawker_centre_id, h.hawker_centre_name, h.hawker_centre_address, s.stall_id, s.user_id, s.stall_name, s.description, s.operating_hours, s.contact_number, s.status
     FROM HawkerCentre h
-    INNER JOIN Stall s ON h.hawker_centre_id = s.hawker_centre_id
+    LEFT JOIN Stall s ON h.hawker_centre_id = s.hawker_centre_id
     ORDER BY h.hawker_centre_id;
     `;
 

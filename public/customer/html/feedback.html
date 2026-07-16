@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Feedback - HawkerHub</title>
+  <link rel="stylesheet" href="../css/customerEngagement.css">
+</head>
+<body>
+
+<div class="navbar">
+  <h1>HawkerHub</h1>
+</div>
+
+<div class="page">
+
+  <div class="sidebar">
+    <h2>My Account</h2>
+    <a href="account.html">My Details</a>
+    <a href="likes.html">My Likes</a>
+    <a href="feedback.html" class="active">Feedback</a>
+  </div>
+
+  <div class="content">
+
+    <h2>Submit Feedback</h2>
+
+    <form id="feedbackForm">
+      <label for="orderSelect">Which order?</label>
+      <select id="orderSelect" required>
+        <option value="">Loading your orders...</option>
+      </select>
+
+      <label for="ratingSelect">Rating</label>
+      <select id="ratingSelect" required>
+        <option value="5">5 - Excellent</option>
+        <option value="4">4 - Good</option>
+        <option value="3">3 - Average</option>
+        <option value="2">2 - Poor</option>
+        <option value="1">1 - Very Poor</option>
+      </select>
+
+      <label for="commentInput">Comment</label>
+      <textarea id="commentInput" rows="3" maxlength="500" placeholder="Tell us about your experience..."></textarea>
+
+      <button type="submit">Submit Feedback</button>
+    </form>
+
+    <div id="message"></div>
+
+    <hr>
+
+    <h2>My Feedback</h2>
+    <div id="feedbackList">Loading your feedback...</div>
+
+  </div>
+
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const userId = parseInt(params.get("userId")) || 5;
+  const preselectOrderId = params.get("orderId") ? parseInt(params.get("orderId")) : null;
+</script>
+
+<script src="../scripts/feedback-script.js"></script>
+</body>
+</html>
