@@ -1,8 +1,6 @@
 function renderCartPage() {
-  // Grab the container dynamically inside the render loop
   const contentContainer = document.querySelector(".content");
   
-  // 1. Safety check to see if the script can actually find your HTML div
   if (!contentContainer) {
     console.error("CRITICAL ERROR: Could not find the element with class '.content' on this page!");
     return;
@@ -10,11 +8,9 @@ function renderCartPage() {
 
   console.log("SUCCESS: .content container found. Reading localStorage...");
 
-  // 2. Grab the cart from the browser's storage
   const cart = JSON.parse(localStorage.getItem("cart")) || { order_items: [] };
   console.log("Current cart data retrieved:", cart);
 
-  // 3. Handle the empty cart scenario gracefully
   if (!cart.order_items || cart.order_items.length === 0) {
     console.log("Cart is empty. Rendering empty message.");
     contentContainer.insertAdjacentHTML(
@@ -26,7 +22,6 @@ function renderCartPage() {
 
   console.log(`Cart has ${cart.order_items.length} unique items! Commencing HTML generation...`);
 
-  // 4. Map through the locally saved array to list the cart items
   const cartItemsHTML = cart.order_items.map(item => `
     <div class="cartItem" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee;">
       <div>
@@ -36,7 +31,6 @@ function renderCartPage() {
     </div>
   `).join('');
 
-  // 5. Construct the interactive checkout controls
   const checkoutSectionHTML = `
     <div class="cartList" style="margin-top: 20px;">
       ${cartItemsHTML}
@@ -56,11 +50,9 @@ function renderCartPage() {
     </button>
   `;
 
-  // 6. Inject everything right below your "Your Cart" header
   contentContainer.insertAdjacentHTML('beforeend', checkoutSectionHTML);
   console.log("HTML successfully injected into DOM container layout.");
 
-  // 7. Bind the network request logic to the newly created button
   setupOrderSubmission();
 }
 
@@ -117,7 +109,6 @@ function setupOrderSubmission() {
   }); 
 }
 
-// Ensure execution waits until the window finishes constructing structural layouts
 document.addEventListener("DOMContentLoaded", () => {
   renderCartPage();
 });

@@ -70,10 +70,8 @@ async function renderMenuItems() {
   }
 }
 
-// Fire off the API fetch routine
 renderMenuItems();
 
-// Combined Click Handler (Fixed: ONLY ONE INSTANCE AT THE BOTTOM)
 contentContainer.addEventListener("click", (event) => {
   const clickedItemCard = event.target.closest(".menuItem");
   if (!clickedItemCard) return;
@@ -87,7 +85,6 @@ contentContainer.addEventListener("click", (event) => {
   const menuItemId = parseInt(clickedItemCard.dataset.id, 10);
   const itemName = clickedItemCard.dataset.name;
 
-  // Retrieve existing cart or fallback structure
   let cart = JSON.parse(localStorage.getItem("cart")) || { order_items: [] };
   const existingItem = cart.order_items.find(item => item.menu_item_id === menuItemId);
 
@@ -101,9 +98,7 @@ contentContainer.addEventListener("click", (event) => {
     });
   }
 
-  // Save updated payload
   localStorage.setItem("cart", JSON.stringify(cart));
   
-  // Navigate away instantly to your cart html layout location
-  window.location.href = "../html/customer-cart.html"; 
+  window.location.href = "../html/cart.html"; 
 });
