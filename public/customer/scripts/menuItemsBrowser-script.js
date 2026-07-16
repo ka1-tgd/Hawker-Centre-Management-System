@@ -2,7 +2,6 @@ const contentContainer = document.querySelector(".content");
 
 async function renderMenuItems() {
   try {
-    // 1. Automatically grab the stall_id from the browser's URL query string (?stall_id=X)
     const urlParams = new URLSearchParams(window.location.search);
     const stallId = urlParams.get('stall_id');
 
@@ -13,7 +12,6 @@ async function renderMenuItems() {
 
     const token = localStorage.getItem("token"); 
 
-    // 2. Dynamically plug the real stallId into the URL string (using template literals ``)
     const response = await fetch(`http://localhost:3000/customer/stall/${stallId}`, {
       method: 'GET',
       headers: {
@@ -32,8 +30,6 @@ async function renderMenuItems() {
       return;
     }
 
-    // Because your backend model returns an array from Object.values(),
-    // we grab the first item inside it [0] which contains our stall object.
     const resultData = await response.json();
     const stall = resultData[0]; 
 
@@ -42,29 +38,30 @@ async function renderMenuItems() {
       return;
     }
 
-    // 3. Render the Main Stall header
     contentContainer.innerHTML = `
       <h2 id="contentHeader">${stall.stall_name}</h2>
       <p class="stallStatus" style="margin-bottom: 20px;">Status: <strong>${stall.status}</strong></p>
     `;
 
-    // 4. Loop through the menu_items array belonging to this stall
     const menuItemsHTML = stall.menu_items.length > 0 
       ? stall.menu_items.map(item => `
-          <div class="menuItem" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 12px; border-radius: 6px;">
+          <div class="menuItem" 
+               data-id="${item.menu_item_id}" 
+               data-name="${item.item_name}" 
+               data-availability="${item.availability}"
+               style="border: 1px solid #ddd; padding: 15px; margin-bottom: 12px; border-radius: 6px; cursor: pointer;">
             <h3 class="itemName" style="margin: 0 0 5px 0; color: #333;">${item.item_name}</h3>
             <p class="itemDesc" style="color: #666; margin: 5px 0;">${item.description || 'No description available'}</p>
             <p class="itemPrice" style="font-weight: bold; margin: 5px 0; color: #2c3e50;">
               Price: $${Number(item.price).toFixed(2)}
             </p>
             <p class="itemAvailability" style="margin: 5px 0 0 0; font-size: 0.9em; color: ${item.availability === 'Y' ? 'green' : 'red'};">
-            ${item.availability === 'Y' ? '● Available' : '○ Out of Stock'}
+              ${item.availability === 'Y' ? '● Available' : '○ Out of Stock'}
             </p>
           </div>
         `).join('')
       : `<p class="no-items" style="padding: 10px; color: darkred;">This stall hasn't added any menu items yet.</p>`;
 
-    // 5. Append the compiled menu list to the container
     contentContainer.insertAdjacentHTML('beforeend', `<div class="menuList">${menuItemsHTML}</div>`);
 
   } catch (error) {
@@ -73,5 +70,40 @@ async function renderMenuItems() {
   }
 }
 
-// Fire off the function automatically when menu.html loads
+// Fire off the API fetch routine
 renderMenuItems();
+
+// Combined Click Handler (Fixed: ONLY ONE INSTANCE AT THE BOTTOM)
+contentContainer.addEventListener("click", (event) => {
+  const clickedItemCard = event.target.closest(".menuItem");
+  if (!clickedItemCard) return;
+
+  const availability = clickedItemCard.dataset.availability;
+  if (availability !== 'Y') {
+    alert("Sorry, this item is out of stock!");
+    return;
+  }
+
+  const menuItemId = parseInt(clickedItemCard.dataset.id, 10);
+  const itemName = clickedItemCard.dataset.name;
+
+  // Retrieve existing cart or fallback structure
+  let cart = JSON.parse(localStorage.getItem("cart")) || { order_items: [] };
+  const existingItem = cart.order_items.find(item => item.menu_item_id === menuItemId);
+
+  if (existingItem) {
+    existingItem.quantity += 1;
+  } else {
+    cart.order_items.push({
+      menu_item_id: menuItemId,
+      item_name: itemName, 
+      quantity: 1
+    });
+  }
+
+  // Save updated payload
+  localStorage.setItem("cart", JSON.stringify(cart));
+  
+  // Navigate away instantly to your cart html layout location
+  window.location.href = "../html/customer-cart.html"; 
+});
