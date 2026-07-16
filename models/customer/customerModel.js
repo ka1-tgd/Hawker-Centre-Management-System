@@ -198,7 +198,7 @@ async function getMenuItemsOfStall(stall_id) {
 
     const query = `
     SELECT s.stall_id, s.stall_name, s.status, mi.menu_item_id, mi.item_name, mi.description, mi.availability, mi.price
-    FROM Stall s LEFT JOIN Menu m ON s.stall_id = m.menu_id
+    FROM Stall s LEFT JOIN Menu m ON s.stall_id = m.stall_id
     LEFT JOIN MenuItem mi ON m.menu_id = mi.menu_id
     WHERE s.stall_id = @stall_id;
     `;
