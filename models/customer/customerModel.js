@@ -346,27 +346,37 @@ async function updateOrder(order_id, orderItems) {
   try {
     connection = await sql.connect(dbConfig);
     
-    const orderCheckQuery = `
-      SELECT status, stall_id FROM CustOrder WHERE order_id = @order_id;
+    const statusCheckQuery = `
+      SELECT status FROM CustOrder WHERE order_id = @order_id;
     `;
     const checkRequest = connection.request();
     checkRequest.input("order_id", sql.Int, order_id);
-    const checkResult = await checkRequest.query(orderCheckQuery);
+    const checkResult = await checkRequest.query(statusCheckQuery);
 
     if (checkResult.recordset.length === 0) {
-      return null;
+      return null; // Order doesn't exist
     }
 
-    const { status, stall_id: originalStallId } = checkResult.recordset[0];
-
-    if (status !== 'Pending') {
+    if (checkResult.recordset[0].status !== 'Pending') {
       throw new Error("Cannot update order because it is no longer pending.");
+    }
+
+    // To find the active stall_id from the existing OrderItems
+    const activeStallQuery = `
+      SELECT TOP 1 stall_id FROM OrderItem WHERE order_id = @order_id;
+    `;
+    const activeStallRequest = connection.request();
+    activeStallRequest.input("order_id", sql.Int, order_id);
+    const activeStallResult = await activeStallRequest.query(activeStallQuery);
+
+    let originalStallId = null;
+    if (activeStallResult.recordset.length > 0) {
+      originalStallId = activeStallResult.recordset[0].stall_id;
     }
 
     for (let i = 0; i < orderItems.length; i++) {
       const item = orderItems[i];
       const validationRequest = connection.request();
-      
       validationRequest.input("menu_item_id", sql.Int, item.menu_item_id);
       
       const itemStallQuery = `
@@ -384,8 +394,12 @@ async function updateOrder(order_id, orderItems) {
 
       const itemStallId = itemStallResult.recordset[0].stall_id;
 
-      if (itemStallId !== originalStallId) {
+      if (originalStallId !== null && itemStallId !== originalStallId) {
         throw new Error(`Cannot add menu item ID ${item.menu_item_id}. All items in this order must belong to Stall ID ${originalStallId}.`);
+      }
+
+      if (originalStallId === null) {
+        originalStallId = itemStallId;
       }
     }
 
