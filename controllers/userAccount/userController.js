@@ -193,8 +193,10 @@ async function loginUser(req, res) {
 
         // Return token in JSON
         return res.status(200).json({ 
-            token,
-            role: user.role
+            token: token,
+            id: user.user_id,
+            role: user.role,
+            name: user.name
          });
     } catch (error) {
         // Catch errors and log error message
