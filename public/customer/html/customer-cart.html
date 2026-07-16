@@ -3,35 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer's Cart</title>
+    <title>Cart</title>
     <link rel="stylesheet" href="../css/customerOrderAndCheckout.css">
 </head>
 <body>
-    
-    <div class="topbar">
-        <div class="brand">HawkerHub</div>
+
+    <div class="navbar">
+        <h1>HawkerHub</h1>
     </div>
 
     <div class="page">
-        <p class="subtitle">Add your food items here.</p>
+        <div class="sidebar">
+            <h2>My Account</h2>
+            <a href="customer-foodStallsBrowser.html">Home</a>
+            <a href="account.html">My Details</a>
+            <a>My Orders</a>
+            <a href="likes.html">My Likes</a>
+            <a href="feedback.html">Feedback</a>
+        </div>
 
-        <form class="card" id="foodItems">
-
-            <div class="field">
-                <label>Food Item 1</label>
-            </div>
-
-            <div class="field">
-                <label>Food Item 2</label>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Proceed</button>
-            <a href="menu-browser.html" class="btn btn-secondary">Cancel</a>
-
-            <div id="message"></div>
-
-        </form>
+        <div class="content">
+            <h2 id="contentHeader">Your Cart</h2>
+            
+        </div>
     </div>
+
+    <script src="../scripts/menuItemsBrowser-script.js"></script>
 
 </body>
 </html>
