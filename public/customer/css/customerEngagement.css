@@ -171,3 +171,123 @@ body {
   color: #2b3a8f;
   text-decoration: none;
 }
+
+/* Feedback form (submission page) */
+#feedbackForm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 400px;
+}
+
+#feedbackForm label {
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+#feedbackForm select,
+#feedbackForm textarea,
+.feedback-edit select,
+.feedback-edit textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: inherit;
+}
+
+#feedbackForm button,
+.feedback-display button,
+.feedback-edit button {
+  margin-top: 8px;
+  margin-right: 6px;
+  background: #2b3a8f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.feedback-display .delete-btn {
+  background: #d9534f;
+}
+
+/* Submitted feedback list */
+.feedback-item {
+  border-bottom: 1px solid #eee;
+  padding: 12px 0;
+}
+
+.feedback-item p {
+  margin: 6px 0;
+}
+
+.feedback-items {
+  color: #666;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.feedback-comment {
+  color: #222;
+  border-left: 3px solid #2b3a8f;
+  padding-left: 10px;
+  margin: 8px 0;
+}
+
+.feedback-date {
+  color: #888;
+  font-size: 13px;
+}
+
+/* Customer Satisfaction Dashboard */
+.stall-rating-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+}
+
+.rating-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+}
+
+.rating-bar-row .progress-bar {
+  flex: 1;
+  margin: 0;
+}
+
+/* Vendor Satisfaction Dashboard extras */
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.pagination button {
+  background: #2b3a8f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+.complaint-tag {
+  display: inline-block;
+  background: #fdecea;
+  color: #b00020;
+  border-radius: 6px;
+  padding: 4px 10px;
+  margin: 0 6px 6px 0;
+  font-size: 13px;
+}
