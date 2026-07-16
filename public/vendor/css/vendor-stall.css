@@ -1,0 +1,305 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:#f5f7fa;
+    color:#333;
+}
+
+header{
+    background:#26a354;
+    color:white;
+    height:70px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 40px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+
+.logo{
+    font-size:28px;
+    font-weight:bold;
+}
+
+nav ul{
+    list-style:none;
+    display:flex;
+    gap:35px;
+}
+
+nav a{
+    text-decoration:none;
+    color:white;
+    font-size:16px;
+    transition:.3s;
+}
+
+nav a:hover{
+    opacity:.8;
+}
+
+.active{
+    border-bottom:3px solid white;
+    padding-bottom:5px;
+}
+
+.container{
+    width:90%;
+    max-width:1400px;
+    margin:40px auto;
+}
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.page-header h1{
+    font-size:40px;
+    margin-bottom:8px;
+}
+
+.page-header p{
+    color:#666;
+}
+
+#btnAddStall{
+    background:#26a354;
+    color:white;
+    border:none;
+    padding:14px 28px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:15px;
+    transition:.3s;
+}
+
+#btnAddStall:hover{
+    background:#208847;
+}
+
+.search-section{
+    margin-bottom:25px;
+}
+
+#searchInput{
+    width:350px;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:6px;
+    outline:none;
+}
+
+#searchInput:focus{
+    border-color:#26a354;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+thead{
+    background:#26a354;
+    color:white;
+}
+
+th{
+    padding:18px;
+    text-align:left;
+}
+
+td{
+    padding:16px;
+    border-bottom:1px solid #eee;
+}
+
+tbody tr:hover{
+    background:#f8f8f8;
+}
+
+.editBtn{
+    background:#2196F3;
+    color:white;
+    border:none;
+    padding:8px 16px;
+    border-radius:5px;
+    cursor:pointer;
+    margin-right:8px;
+}
+
+.editBtn:hover{
+    background:#1976d2;
+}
+
+.deleteBtn{
+    background:#e53935;
+    color:white;
+    border:none;
+    padding:8px 16px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.deleteBtn:hover{
+    background:#c62828;
+}
+
+
+.modal{
+    display:none;
+    position:fixed;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.45);
+    overflow-y:auto;
+    padding:40px;
+    z-index:1000;
+}
+
+.modal-content{
+    width:600px;
+    max-width:95%;
+    background:white;
+    margin:auto;
+    border-radius:10px;
+    padding:30px;
+    max-height:90vh;
+    overflow-y:auto;
+
+}
+
+.modal-header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+
+}
+
+.modal-header h2{
+
+    color:#26a354;
+
+}
+
+#closeModal{
+
+    font-size:32px;
+    cursor:pointer;
+
+}
+
+#closeModal:hover{
+
+    color:red;
+
+}
+
+.form-group{
+
+    margin-bottom:20px;
+
+}
+
+.form-group label{
+
+    display:block;
+    margin-bottom:8px;
+    font-weight:bold;
+
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select{
+
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:5px;
+    font-size:15px;
+
+}
+
+.form-group textarea{
+
+    resize:vertical;
+
+}
+
+.form-buttons{
+    margin-top:25px;
+    display:flex;
+    justify-content:flex-end;
+    gap:15px;
+}
+
+#saveButton{
+    background:#26a354;
+    color:white;
+    border:none;
+    padding:12px 28px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+#saveButton:hover{
+    background:#208847;
+}
+
+#cancelButton{
+    background:#888;
+    color:white;
+    border:none;
+    padding:12px 28px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+#cancelButton:hover{
+
+    background:#666;
+}
+
+@media(max-width:900px){
+
+    .page-header{
+
+        flex-direction:column;
+        align-items:flex-start;
+        gap:20px;
+
+    }
+    nav ul{
+
+        gap:15px;
+
+    }
+    table{
+
+        display:block;
+
+        overflow-x:auto;
+
+    }
+    #searchInput{
+
+        width:100%;
+
+    }
+}
