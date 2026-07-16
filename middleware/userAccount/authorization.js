@@ -16,20 +16,20 @@ function verifyJWT(req, res, next) {
         const authorizedRoles = {
             // Officer exclusive
             "POST /nea/inspections": ["officer"],
-            "GET /nea/inspections/stall/:stallId": ["officer"],
+            "GET /nea/inspections/stall/[0-9]+": ["officer"],
 
             // Hawker exclusive
             "POST /vendor/stalls": ["hawker"],
             "GET /vendor/stalls": ["hawker"],
-            "GET /vendor/stalls/:id": ["hawker"],
-            "PUT /vendor/stalls/:id": ["hawker"],
-            "DELETE /vendor/stalls/:id": ["hawker"],
+            "GET /vendor/stalls/[0-9]+": ["hawker"],
+            "PUT /vendor/stalls/[0-9]+": ["hawker"],
+            "DELETE /vendor/stalls/[0-9]+": ["hawker"],
 
             // Customer exclusive
-            "GET /customer/order/:order_id": ["customer"],
-            "GET /customer/orders/:user_id": ["customer"],
+            "GET /customer/order/[0-9]+": ["customer"],
+            "GET /customer/orders/[0-9]+": ["customer"],
             "GET /customer/hawkerCentres/with-stalls": ["customer"],
-            "GET /customer/stall/:stall_id": ["customer"],
+            "GET /customer/stall/[0-9]+": ["customer"],
             "POST /customer/orders": ["customer"],
         };
 
