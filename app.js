@@ -12,7 +12,7 @@ dotenv.config();
 const customerController = require("./controllers/customer/customerController.js");
 const inspectionController = require("./controllers/nea-officer/inspectionController");
 const userController = require("./controllers/userAccount/userController.js");
-const stallController = require("./controllers/vendor/stallController.js");
+const stallController = require("./controllers/vendor/StallController.js");
 
 // Require middleware functions
 const {
