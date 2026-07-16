@@ -1,18 +1,22 @@
 const contentContainer = document.querySelector(".content");
 
+let isStallOpen = false;
+let currentStallId = null;
+
 async function renderMenuItems() {
   try {
     const urlParams = new URLSearchParams(window.location.search);
-    const stallId = urlParams.get('stall_id');
+    
+    currentStallId = urlParams.get('stall_id');
 
-    if (!stallId) {
+    if (!currentStallId) {
       contentContainer.innerHTML = "<p style='padding: 20px; color: red;'>Error: No stall selected.</p>";
       return;
     }
 
     const token = localStorage.getItem("token"); 
 
-    const response = await fetch(`http://localhost:3000/customer/stall/${stallId}`, {
+    const response = await fetch(`http://localhost:3000/customer/stall/${currentStallId}`, {
       method: 'GET',
       headers: {
         'Authorization': token ? `Bearer ${token}` : '', 
@@ -38,9 +42,14 @@ async function renderMenuItems() {
       return;
     }
 
+    isStallOpen = stall.status && stall.status.toLowerCase() === 'open';
+    const statusColor = isStallOpen ? "green" : "red";
+
     contentContainer.innerHTML = `
       <h2 id="contentHeader">${stall.stall_name}</h2>
-      <p class="stallStatus" style="margin-bottom: 20px;">Status: <strong>${stall.status}</strong></p>
+      <p class="stallStatus" style="margin-bottom: 20px;">
+        Status: <strong style="color: ${statusColor};">${stall.status.toUpperCase()}</strong>
+      </p>
     `;
 
     const menuItemsHTML = stall.menu_items.length > 0 
@@ -76,6 +85,11 @@ contentContainer.addEventListener("click", (event) => {
   const clickedItemCard = event.target.closest(".menuItem");
   if (!clickedItemCard) return;
 
+  if (!isStallOpen) {
+    alert("This stall is currently closed. You cannot add items to your cart!");
+    return;
+  }
+
   const availability = clickedItemCard.dataset.availability;
   if (availability !== 'Y') {
     alert("Sorry, this item is out of stock!");
@@ -94,7 +108,9 @@ contentContainer.addEventListener("click", (event) => {
     cart.order_items.push({
       menu_item_id: menuItemId,
       item_name: itemName, 
-      quantity: 1
+      quantity: 1,
+      price: Number(clickedItemCard.querySelector('.itemPrice').textContent.replace(/[^0-9.]/g, '')),
+      stall_id: parseInt(currentStallId, 10)
     });
   }
 
