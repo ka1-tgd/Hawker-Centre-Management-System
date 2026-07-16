@@ -1,33 +1,28 @@
 const contentContainer = document.querySelector(".content");
 
-const TEST_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwicm9sZSI6ImN1c3RvbWVyIiwiaWF0IjoxNzg0MTgwMjkxLCJleHAiOjE3ODQxODM4OTF9.yNzcXqth6rif5kU4dbnrHK9Vc_Yj8ON8xCbkVXyieBE";
-const cors = require('cors');
-app.use(cors());
-
-
 async function renderHawkerCentres() {
   try {
-    // 2. Add the headers object to send your token to the backend
+    // 1. DYNAMICALLY pull the active token from the browser's storage
+    const token = localStorage.getItem("token"); 
+
+    // 2. Fetch data from your backend
     const response = await fetch('http://localhost:3000/customer/hawkerCentres/with-stalls', {
       method: 'GET',
       headers: {
-        'Authorization': TEST_TOKEN, // Passes your token along with the request
+        'Authorization': token ? `Bearer ${token}` : '', 
         'Content-Type': 'application/json'
       }
     }); 
 
-    // Handle authentication errors explicitly so you know if the token expired
     if (response.status === 401 || response.status === 403) {
-      contentContainer.innerHTML += "<p style='color: red; padding: 20px;'>Authentication failed! Check your TEST_TOKEN.</p>";
+      contentContainer.innerHTML = "<p style='color: red; padding: 20px;'>Authentication failed! Please log in again.</p>";
       return;
     }
 
     const hawkerCentres = await response.json();
-
     contentContainer.innerHTML = '<h2 id="contentHeader">Hawker Centres</h2>';
 
     hawkerCentres.forEach((centre) => {
-      
       const stallsHTML = centre.stalls.length > 0 
         ? centre.stalls.map(stall => `
             <div class="foodStall">
@@ -44,19 +39,17 @@ async function renderHawkerCentres() {
         <div class="hawkerCentre" data-id="${centre.hawker_centre_id}">
           <h2 class="hawkerCentreName">${centre.hawker_centre_name}</h2>
           <a class="hawkerCentreAddress">Location: ${centre.hawker_centre_address}</a>
-
           <div class="foodStalls">
             ${stallsHTML}
           </div>
         </div>
       `;
-
       contentContainer.insertAdjacentHTML('beforeend', centreHTML);
     });
 
   } catch (error) {
     console.error("Failed to load hawker data from database:", error);
-    contentContainer.innerHTML += "<p style='color: red; padding: 20px;'>Error loading hawker data. Please try again later.</p>";
+    contentContainer.innerHTML = "<p style='color: red; padding: 20px;'>Error loading hawker data. Please try again later.</p>";
   }
 }
 
