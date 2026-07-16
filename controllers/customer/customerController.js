@@ -85,10 +85,29 @@ async function createOrder(req, res) {
   }
 }
 
+// Update order
+async function updateOrder(req, res) {
+  try {
+    const order_id = parseInt(req.params.order_id);
+    const { order_items } = req.body;
+    const updatedOrder = await customerModel.updateOrder(order_id, order_items);
+
+    if (!updatedOrder) {
+      return res.status(404).json({ error: "Order not found or order status is no longer 'Pending'." });
+    }
+
+    res.json(updatedOrder);
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error updating order" });
+  }
+}
+
 module.exports = {
   getOrderById,
   getOrdersOfUser,
   getHawkerCentresWithStalls,
   getMenuItemsOfStall,
   createOrder,
+  updateOrder,
 };
