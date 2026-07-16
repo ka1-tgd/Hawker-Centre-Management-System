@@ -1,4 +1,4 @@
-// userId is declared inline in feedback.html
+const token = localStorage.getItem("token");
 
 const orderSelect = document.getElementById("orderSelect");
 const ratingSelect = document.getElementById("ratingSelect");
@@ -10,7 +10,9 @@ const messageDiv = document.getElementById("message");
 // Load the customer's past orders into the dropdown
 async function loadEligibleOrders() {
   try {
-    const response = await fetch(`/feedback/orders/${userId}`);
+    const response = await fetch(`/feedback/orders/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     if (response.status === 401 || response.status === 403) {
       orderSelect.innerHTML = '<option value="">Authentication failed! Please login.</option>';
@@ -51,7 +53,9 @@ async function loadMyFeedback() {
   try {
     feedbackListDiv.innerHTML = "Loading your feedback...";
 
-    const response = await fetch(`/feedback/customer/${userId}`);
+    const response = await fetch(`/feedback/customer/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     if (response.status === 401 || response.status === 403) {
       feedbackListDiv.innerHTML = "<p>Authentication failed! Please login.</p>";
@@ -126,7 +130,10 @@ async function handleSaveFeedback(feedbackId, feedbackElement) {
   try {
     const response = await fetch(`/feedback/${feedbackId}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ Rating: rating, Comment: comment }),
     });
 
@@ -157,6 +164,7 @@ async function handleDeleteFeedback(feedbackId, feedbackElement) {
   try {
     const response = await fetch(`/feedback/${feedbackId}`, {
       method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     if (response.ok) {
@@ -192,7 +200,10 @@ feedbackForm.addEventListener("submit", async (event) => {
   try {
     const response = await fetch("/feedback", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({
         order_id,
         user_id: userId,
