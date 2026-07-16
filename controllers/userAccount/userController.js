@@ -202,7 +202,6 @@ async function loginUser(req, res) {
 
 // Export functions
 module.exports = {
-    getAllUsers,
     getUserByUsername,
     createUser,
     updateUser,
