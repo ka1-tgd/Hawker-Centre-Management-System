@@ -371,12 +371,18 @@ async function updateOrder(order_id, orderItems) {
       insertRequest.input("order_id", sql.Int, order_id);
       insertRequest.input("menu_item_id", sql.Int, item.menu_item_id);
       insertRequest.input("quantity", sql.Int, item.quantity);
-
+      
       await insertRequest.query(`
-        INSERT INTO OrderItem (order_id, menu_item_id, quantity, unit_price)
-        SELECT @order_id, @menu_item_id, @quantity, price
-        FROM MenuItem
-        WHERE id = @menu_item_id;
+        INSERT INTO OrderItem (order_id, menu_item_id, quantity, unit_price, stall_id)
+        SELECT 
+          @order_id, 
+          mi.menu_item_id, 
+          @quantity, 
+          mi.price, 
+          m.stall_id
+        FROM MenuItem mi
+        INNER JOIN Menu m ON mi.menu_id = m.menu_id
+        WHERE mi.menu_item_id = @menu_item_id;
       `);
     }
 
