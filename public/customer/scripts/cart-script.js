@@ -71,7 +71,8 @@ async function renderCart() {
 
     for (const item of cart.order_items) {
       try {
-        const response = await fetch(`http://localhost:3000/customer/menu-item/${item.menu_item_id}`, {
+        // 1. Fetch the entire stall instead of the individual menu item
+        const response = await fetch(`http://localhost:3000/customer/stall/${item.stall_id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -80,42 +81,48 @@ async function renderCart() {
         });
 
         if (response.ok) {
-          const dbItem = await response.json();
-          const price = Number(dbItem.price || 0);
-          const totalItemPrice = price * item.quantity;
-          grandTotal += totalItemPrice;
+          const resultData = await response.json();
+          const stall = resultData[0]; // Get the stall object
 
-          const stallStatus = dbItem.status || dbItem.stall_status || 'open'; 
-          const isStallClosed = stallStatus.toLowerCase() !== 'open';
-          if (isStallClosed) {
-            hasClosedStallItem = true;
+          if (stall) {
+            // Check if the stall is closed
+            const stallStatus = stall.status || 'open';
+            const isStallClosed = stallStatus.toLowerCase() !== 'open';
+            if (isStallClosed) {
+              hasClosedStallItem = true;
+            }
+
+            // Find this specific menu item within the stall's menu items array
+            const dbItem = stall.menu_items.find(m => m.menu_item_id === item.menu_item_id);
+
+            if (dbItem) {
+              const price = Number(dbItem.price || 0);
+              const totalItemPrice = price * item.quantity;
+              grandTotal += totalItemPrice;
+
+              validatedItems.push({
+                ...item,
+                price: price,
+                totalPrice: totalItemPrice,
+                availability: dbItem.availability || 'Y',
+                isStallClosed: isStallClosed
+              });
+            } else {
+              // Fallback if the item was deleted from the stall's menu
+              throw new Error("Item not found in stall menu");
+            }
+          } else {
+            throw new Error("Stall data empty");
           }
-
-          validatedItems.push({
-            ...item,
-            price: price,
-            totalPrice: totalItemPrice,
-            availability: dbItem.availability,
-            isStallClosed: isStallClosed
-          });
         } else {
-          console.warn(`Could not verify item ${item.menu_item_id} with server. Using local cart details.`);
-          
-          const price = Number(item.price || 0);
-          const totalItemPrice = price * item.quantity;
-          grandTotal += totalItemPrice;
-
-          validatedItems.push({
-            ...item,
-            price: price,
-            totalPrice: totalItemPrice,
-            availability: 'Y',
-            isStallClosed: false
-          });
+          // If the API call fails (e.g. 404 or 500), trigger local fallback
+          throw new Error(`API error: ${response.status}`);
         }
+
       } catch (error) {
-        console.error(`Network error for item ${item.menu_item_id}:`, error);
+        console.warn(`Fallback active for item ${item.menu_item_id}:`, error.message);
         
+        // Fallback to saved local storage values so the user is never blocked
         const price = Number(item.price || 0);
         const totalItemPrice = price * item.quantity;
         grandTotal += totalItemPrice;
@@ -259,7 +266,7 @@ function setupCartEventListeners() {
         checkoutBtn.disabled = true;
         checkoutBtn.innerText = "Processing Order...";
 
-        const response = await fetch("http://localhost:3000/customer/order", {
+        const response = await fetch("http://localhost:3000/customer/orders", {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
