@@ -63,6 +63,15 @@ function validateUserIdForCustomer(req, res, next) {
   next();
 }
 
+// Validation schema for UPDATE order items (used for PUT)
+const updateOrderItemsSchema = Joi.object({
+  order_items: Joi.array().items(orderItemSchema).min(1).required().messages({
+    "array.base": "Order_items must be an array of food items",
+    "array.min": "Provide at least one item to update order",
+    "any.required": "Order_items list is required"
+  })
+});
+
 // Middleware to validate stall ID from URL parameters (for GET by ID, PUT, DELETE)
 function validateStallIdForCustomer(req, res, next) {
   const id = parseInt(req.params.stall_id);
@@ -88,9 +97,22 @@ function validateOrder(req, res, next) {
   next();
 }
 
+// Validate updated order items data (for PUT)
+function validateOrderItems(req, res, next) {
+  const { error } = updateOrderItemsSchema.validate(req.body, { abortEarly: false });
+  if (error) {
+    const errorMessage = error.details
+      .map((detail) => detail.message)
+      .join(", ");
+    return res.status(400).json({ error: errorMessage });
+  }
+  next();
+}
+
 module.exports = {
   validateOrderId,
   validateUserIdForCustomer,
   validateStallIdForCustomer,
   validateOrder,
+  validateOrderItems,
 };
