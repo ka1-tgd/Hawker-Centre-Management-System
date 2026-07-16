@@ -340,6 +340,58 @@ async function createOrder(CustOrder) {
   }
 }
 
+// Update order
+async function updateOrderItem(order_id, order_item_no, quantity) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    
+    const updateItemQuery = `
+      UPDATE o SET o.quantity = @quantity 
+      FROM OrderItem o
+      INNER JOIN CustOrder c ON o.order_id = c.order_id
+      WHERE o.order_id = @order_id AND o.order_item_no = @order_item_no AND c.status = 'Pending';
+    `;
+    
+    const request = connection.request();
+    request.input("order_id", sql.Int, order_id);
+    request.input("order_item_no", sql.Int, order_item_no);
+    request.input("quantity", sql.Int, quantity);
+    
+    const result = await request.query(updateItemQuery);
+
+    if (result.rowsAffected[0] === 0) {
+      return null; 
+    }
+
+    const updateParentTotalQuery = `
+      UPDATE CustOrder
+      SET total_amount = (
+        SELECT SUM(quantity * unit_price) FROM OrderItem WHERE order_id = @order_id
+      )
+      WHERE order_id = @order_id;
+    `;
+
+    const request2 = connection.request();
+    request2.input("order_id", sql.Int, order_id);
+    await request2.query(updateParentTotalQuery);
+
+    return await getOrderById(order_id);
+
+  } catch (error) {
+    console.error("Database error in updateOrderItem:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection after updateOrderItem:", err);
+      }
+    }
+  }
+}
+
 module.exports = {
   getOrderById,
   getOrdersOfUser,
