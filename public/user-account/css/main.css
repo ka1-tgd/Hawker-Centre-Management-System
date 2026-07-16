@@ -8,12 +8,16 @@ body {
     background: #f5f7f8;
 }
 
+:root{
+    --theme-colour:#ea5656;
+}
+
 /*Header Styles*/
 .header-box {
     height: 60px;
     max-width: 100%;
     margin-bottom: 10px;
-    background-color: #ea5656;
+    background-color: var(--theme-colour);
 
     display: flex;
     justify-content: space-between;
@@ -93,7 +97,7 @@ body {
     border-width: 1px;
     border-style: solid;
     border-color: #ccc;
-    background-color: #ea5656;
+    background-color: var(--theme-colour);
     box-shadow: 0 5px 15px #0000001a;
 }
 
