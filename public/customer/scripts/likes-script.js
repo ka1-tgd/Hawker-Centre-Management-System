@@ -1,3 +1,5 @@
+const token = localStorage.getItem("token");
+
 const likesListDiv = document.getElementById("likesList");
 const messageDiv = document.getElementById("message");
 
@@ -6,7 +8,15 @@ async function loadLikes() {
   try {
     likesListDiv.innerHTML = "Loading likes...";
 
-    const response = await fetch(`/likes/customer/${userId}`);
+    const response = await fetch(`/likes/customer/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      likesListDiv.innerHTML = "<p>Authentication failed! Please login.</p>";
+      return;
+    }
+
     const likedItems = await response.json();
 
     if (likedItems.length === 0) {
@@ -46,12 +56,16 @@ async function handleUnlikeClick(event) {
   try {
     const response = await fetch(`/likes/${likeId}`, {
       method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     if (response.ok) {
       event.target.closest(".like-item").remove();
       messageDiv.textContent = "Item unliked";
       messageDiv.style.color = "green";
+    } else if (response.status === 401 || response.status === 403) {
+      messageDiv.textContent = "Authentication failed! Please login.";
+      messageDiv.style.color = "red";
     } else {
       messageDiv.textContent = "Failed to unlike item";
       messageDiv.style.color = "red";

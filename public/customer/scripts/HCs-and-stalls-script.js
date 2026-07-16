@@ -2,10 +2,9 @@ const contentContainer = document.querySelector(".content");
 
 async function renderHawkerCentres() {
   try {
-    // 1. DYNAMICALLY pull the active token from the browser's storage
+
     const token = localStorage.getItem("token"); 
 
-    // 2. Fetch data from your backend
     const response = await fetch('http://localhost:3000/customer/hawkerCentres/with-stalls', {
       method: 'GET',
       headers: {
@@ -54,19 +53,12 @@ async function renderHawkerCentres() {
 
 renderHawkerCentres();
 
-// 2. Add the automatic click-to-navigate handler below it
 contentContainer.addEventListener("click", (event) => {
-  // Find the closest parent element with the class '.foodStall'
   const clickedStallCard = event.target.closest(".foodStall");
   
-  // If the user didn't click on a stall card (e.g. they clicked the header), do nothing
   if (!clickedStallCard) return;
-
-  // Automatically grab the ID from the data attribute we set up
   const stallId = clickedStallCard.dataset.stallId;
-
   if (stallId) {
-    // Redirect them to the menu page with the ID tucked quietly in the URL
-    window.location.href = `customer-menuItemsBrowser.html?stall_id=${stallId}`;
+    window.location.href = `menu-items.html?stall_id=${stallId}`;
   }
 });

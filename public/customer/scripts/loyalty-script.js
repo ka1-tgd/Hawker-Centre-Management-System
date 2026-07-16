@@ -1,3 +1,4 @@
+const token = localStorage.getItem("token");
 const userNameEl = document.getElementById("userName");
 const userEmailEl = document.getElementById("userEmail");
 const userContactEl = document.getElementById("userContact");
@@ -16,7 +17,15 @@ let currentPoints = 0;
 // Load the user's profile details (name, email, contact)
 async function loadUserDetails() {
   try {
-    const response = await fetch(`/profile/${userId}`);
+    const response = await fetch(`/profile/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      userNameEl.textContent = "Authentication failed! Please login.";
+      return;
+    }
+
     const user = await response.json();
 
     userNameEl.textContent = user.name;
@@ -31,7 +40,15 @@ async function loadUserDetails() {
 // Load the user's loyalty points and tier
 async function loadLoyaltyPoints() {
   try {
-    const response = await fetch(`/loyalty/${userId}`);
+    const response = await fetch(`/loyalty/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      tierLabelEl.textContent = "Authentication failed! Please login.";
+      return;
+    }
+
     const loyalty = await response.json();
 
     currentPoints = loyalty.CurrentPoints;
@@ -57,7 +74,15 @@ async function loadLoyaltyPoints() {
 // Load and render the rewards list
 async function loadRewards() {
   try {
-    const response = await fetch("/rewards");
+    const response = await fetch("/rewards", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      rewardGridEl.innerHTML = "<p>Authentication failed! Please login.</p>";
+      return;
+    }
+
     const rewards = await response.json();
 
     rewardGridEl.innerHTML = "";
@@ -100,9 +125,18 @@ async function handleRedeemClick(event) {
   try {
     const response = await fetch("/redeem", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ user_id: userId, reward_id: parseInt(rewardId) }),
     });
+
+    if (response.status === 401 || response.status === 403) {
+      messageEl.textContent = "Authentication failed! Please login.";
+      messageEl.style.color = "red";
+      return;
+    }
 
     const data = await response.json();
 
