@@ -80,7 +80,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (status === 'CANCELLED') statusColor = '#c0392b';
 
         return `
-          <div class="orderCard" style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          <div class="orderCard" 
+               onclick="window.location.href='my-order-items.html?order_id=${order.order_id}'"
+               style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;"
+               onmouseover="this.style.transform='translateY(-2px)'; this.style.shadow='0 4px 8px rgba(0,0,0,0.1)';"
+               onmouseout="this.style.transform='translateY(0)'; this.style.shadow='0 2px 4px rgba(0,0,0,0.05)';">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f4f4f4; padding-bottom: 10px; margin-bottom: 15px;">
               <div>
                 <h3 style="margin: 0; color: #2b3a8f;">Order #${order.order_id}</h3>
@@ -94,6 +98,9 @@ document.addEventListener("DOMContentLoaded", () => {
             <div style="display: flex; justify-content: space-between; align-items: center; background: #fafafa; padding: 12px; border-radius: 4px; font-weight: bold;">
               <span style="color: #555;">Payment Method: <span style="font-weight: normal; color: #333;">${order.payment_type || 'Cash'}</span></span>
               <span style="font-size: 1.1em; color: #2c3e50;">Total: $${Number(order.total_amount || 0).toFixed(2)}</span>
+            </div>
+            <div style="text-align: right; margin-top: 10px; font-size: 0.85em; color: #2b3a8f; font-weight: bold;">
+              View Details →
             </div>
           </div>
         `;

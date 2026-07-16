@@ -10,42 +10,42 @@ async function fetchUserAndRenderCart() {
   renderCart();
 }
 
-/*async function fetchUserAndRenderCart() {
-  if (!token) {
-    contentContainer.innerHTML = `
-      <h2 id="contentHeader">My Cart</h2>
-      <p style="padding: 20px; color: red;">You must be logged in to view your cart.</p>
-      <a href="login.html" style="display: inline-block; margin-left: 20px; padding: 10px 15px; background: #e74c3c; color: white; text-decoration: none; border-radius: 4px;">Go to Login</a>
-    `;
-    return;
-  }
+// async function fetchUserAndRenderCart() {
+//   if (!token) {
+//     contentContainer.innerHTML = `
+//       <h2 id="contentHeader">My Cart</h2>
+//       <p style="padding: 20px; color: red;">You must be logged in to view your cart.</p>
+//       <a href="login.html" style="display: inline-block; margin-left: 20px; padding: 10px 15px; background: #e74c3c; color: white; text-decoration: none; border-radius: 4px;">Go to Login</a>
+//     `;
+//     return;
+//   }
 
-  try {
-    const response = await fetch("http://localhost:3000/profile", {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      }
-    });
+//   try {
+//     const response = await fetch("http://localhost:3000/profile", {
+//       method: "GET",
+//       headers: {
+//         "Authorization": `Bearer ${token}`,
+//         "Content-Type": "application/json"
+//       }
+//     });
 
-    if (!response.ok) {
-      throw new Error("Failed to authenticate user profile");
-    }
+//     if (!response.ok) {
+//       throw new Error("Failed to authenticate user profile");
+//     }
 
-    const userData = await response.json();
-    currentUserId = userData.user_id || userData.id; 
+//     const userData = await response.json();
+//     currentUserId = userData.user_id || userData.id; 
 
-    renderCart();
+//     renderCart();
 
-  } catch (error) {
-    console.error("Authentication Error:", error);
-    contentContainer.innerHTML = `
-      <h2 id="contentHeader">My Cart</h2>
-      <p style="padding: 20px; color: red;">Session expired. Please log in again to access your cart.</p>
-    `;
-  }
-}*/
+//   } catch (error) {
+//     console.error("Authentication Error:", error);
+//     contentContainer.innerHTML = `
+//       <h2 id="contentHeader">My Cart</h2>
+//       <p style="padding: 20px; color: red;">Session expired. Please log in again to access your cart.</p>
+//     `;
+//   }
+// }
 
 async function renderCart() {
   const cart = JSON.parse(localStorage.getItem("cart")) || { order_items: [] };
