@@ -159,7 +159,7 @@ async function updateUser(id, updatedUserData) {
 
         // SQL Query
         const query = 
-            `UPDATE Users SET name = @name, contact_no = @contact_no, email = @email, role = @role WHERE user_id = @id;`;
+            `UPDATE Users SET name = @name, contact_no = @contact_no, email = @email, WHERE user_id = @id;`;
         const request = connection.request();
         request.input("id", id);
         request.input("name", updatedUserData.name);
