@@ -192,7 +192,10 @@ async function loginUser(req, res) {
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3600s"});
 
         // Return token in JSON
-        return res.status(200).json({ token });
+        return res.status(200).json({ 
+            token,
+            role: user.role
+         });
     } catch (error) {
         // Catch errors and log error message
         console.error("Controller error:", error);
