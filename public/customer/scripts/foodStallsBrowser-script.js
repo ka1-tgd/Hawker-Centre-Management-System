@@ -33,7 +33,7 @@ async function renderHawkerCentres() {
               <a class="foodStallStatus">Status: ${stall.status}</a>
             </div>
           `).join('')
-        : `<p class="no-stalls" style="padding: 10px; color: #888;">No stalls registered at this location yet.</p>`;
+        : `<p class="no-stalls" style="padding: 10px; color: darkred;">No stalls registered at this location yet.</p>`;
 
       const centreHTML = `
         <div class="hawkerCentre" data-id="${centre.hawker_centre_id}">

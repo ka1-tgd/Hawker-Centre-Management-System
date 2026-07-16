@@ -63,10 +63,11 @@ body {
   border-bottom: 0.4px solid #555;
 }
 
-#hawkerCentre {
-  border: 1px solid #555;
+.hawkerCentre {
+  border-radius: 6px;
   padding: 4px;
   margin-bottom: 4px;
+  background-color: lightskyblue;
 }
 
 .hawkerCentre h2{
@@ -76,9 +77,14 @@ body {
 .foodStall {
   display: flex;
   flex-direction: column;
-  border-top: 0.4px solid #555;
+  border-radius: 6px;
+  padding: 1px 4px 1px 4px;
+  margin: 4px 0px 4px 0px;
+  background-color: darkslateblue;
+  color: lightcyan;
 }
 
-#foodStallName {
-  margin: 10px 0px 2px 0px;
+.foodStallName {
+  margin: 10px 0px 6px 0px;
+  color: white;
 }
