@@ -402,6 +402,12 @@ async function updateOrderItemQuantity(order_id, order_item_no, newQuantity) {
   }
 }
 
+// create orderitem
+// delete orderitem
+// update order : orderitems (orderitems is an array in my CustOrder)
+// update order : status
+// delete order : status
+
 module.exports = {
   getOrderById,
   getOrdersOfUser,
