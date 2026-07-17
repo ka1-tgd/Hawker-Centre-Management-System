@@ -340,108 +340,64 @@ async function createOrder(CustOrder) {
   }
 }
 
-// Update order
-async function updateOrder(order_id, orderItems) {
+// Update order item quantity
+async function updateOrderItemQuantity(order_id, menu_item_id, newQuantity) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
-    
+
     const statusCheckQuery = `
       SELECT status FROM CustOrder WHERE order_id = @order_id;
     `;
-    const checkRequest = connection.request();
-    checkRequest.input("order_id", sql.Int, order_id);
-    const checkResult = await checkRequest.query(statusCheckQuery);
+    const checkResult = await connection.request()
+      .input("order_id", sql.Int, order_id)
+      .query(statusCheckQuery);
 
     if (checkResult.recordset.length === 0) {
-      return null; // Order doesn't exist
+      return null; // Order was not found
     }
 
-    if (checkResult.recordset[0].status !== 'Pending') {
-      throw new Error("Cannot update order because it is no longer pending.");
+    const currentStatus = checkResult.recordset[0].status;
+    if (currentStatus !== 'Pending') {
+      throw new Error(`Cannot modify items. Order status is '${currentStatus}', but must be 'Pending'.`);
     }
 
-    // To find the active stall_id from the existing OrderItems
-    const activeStallQuery = `
-      SELECT TOP 1 stall_id FROM OrderItem WHERE order_id = @order_id;
+    const itemCheckQuery = `
+      SELECT quantity FROM OrderItem 
+      WHERE order_id = @order_id AND menu_item_id = @menu_item_id;
     `;
-    const activeStallRequest = connection.request();
-    activeStallRequest.input("order_id", sql.Int, order_id);
-    const activeStallResult = await activeStallRequest.query(activeStallQuery);
+    const itemResult = await connection.request()
+      .input("order_id", sql.Int, order_id)
+      .input("menu_item_id", sql.Int, menu_item_id)
+      .query(itemCheckQuery);
 
-    let originalStallId = null;
-    if (activeStallResult.recordset.length > 0) {
-      originalStallId = activeStallResult.recordset[0].stall_id;
+    if (itemResult.recordset.length === 0) {
+      throw new Error(`Menu item ID ${menu_item_id} is not part of Order ID ${order_id}.`);
     }
 
-    for (let i = 0; i < orderItems.length; i++) {
-      const item = orderItems[i];
-      const validationRequest = connection.request();
-      validationRequest.input("menu_item_id", sql.Int, item.menu_item_id);
-      
-      const itemStallQuery = `
-        SELECT m.stall_id 
-        FROM MenuItem mi
-        INNER JOIN Menu m ON mi.menu_id = m.menu_id
-        WHERE mi.menu_item_id = @menu_item_id;
-      `;
-      
-      const itemStallResult = await validationRequest.query(itemStallQuery);
-      
-      if (itemStallResult.recordset.length === 0) {
-        throw new Error(`Menu item ID ${item.menu_item_id} does not exist.`);
-      }
-
-      const itemStallId = itemStallResult.recordset[0].stall_id;
-
-      if (originalStallId !== null && itemStallId !== originalStallId) {
-        throw new Error(`Cannot add menu item ID ${item.menu_item_id}. All items in this order must belong to Stall ID ${originalStallId}.`);
-      }
-
-      if (originalStallId === null) {
-        originalStallId = itemStallId;
-      }
-    }
-
-    const deleteRequest = connection.request();
-    deleteRequest.input("order_id", sql.Int, order_id);
-    await deleteRequest.query(`DELETE FROM OrderItem WHERE order_id = @order_id;`);
-
-    for (let i = 0; i < orderItems.length; i++) {
-      const item = orderItems[i];
-      const insertRequest = connection.request();
-
-      insertRequest.input("order_id", sql.Int, order_id);
-      insertRequest.input("menu_item_id", sql.Int, item.menu_item_id);
-      insertRequest.input("quantity", sql.Int, item.quantity);
-      
-      await insertRequest.query(`
-        INSERT INTO OrderItem (order_id, menu_item_id, quantity, unit_price, stall_id)
-        SELECT 
-          @order_id, 
-          mi.menu_item_id, 
-          @quantity, 
-          mi.price, 
-          m.stall_id
-        FROM MenuItem mi
-        INNER JOIN Menu m ON mi.menu_id = m.menu_id
-        WHERE mi.menu_item_id = @menu_item_id;
-      `);
-    }
+    const updateItemQuery = `
+      UPDATE OrderItem
+      SET quantity = @quantity
+      WHERE order_id = @order_id AND menu_item_id = @menu_item_id;
+    `;
+    await connection.request()
+      .input("quantity", sql.Int, newQuantity)
+      .input("order_id", sql.Int, order_id)
+      .input("menu_item_id", sql.Int, menu_item_id)
+      .query(updateItemQuery);
 
     const updateParentTotalQuery = `
       UPDATE CustOrder
-      SET total_amount = (SELECT SUM(quantity * unit_price) FROM OrderItem WHERE order_id = @order_id)
+      SET total_amount = ISNULL((SELECT SUM(quantity * unit_price) FROM OrderItem WHERE order_id = @order_id), 0)
       WHERE order_id = @order_id;
     `;
-
-    const totalRequest = connection.request();
-    totalRequest.input("order_id", sql.Int, order_id);
-    await totalRequest.query(updateParentTotalQuery);
+    await connection.request()
+      .input("order_id", sql.Int, order_id)
+      .query(updateParentTotalQuery);
 
     return await getOrderById(order_id);
   } catch (error) {
-    console.error("Database error", error);
+    console.error("Database error in updateOrderItemQuantity:", error);
     throw error;
   } finally {
     if (connection) {
@@ -460,5 +416,5 @@ module.exports = {
   getHawkerCentresWithStalls,
   getMenuItemsOfStall,
   createOrder,
-  updateOrder,
+  updateOrderItemQuantity,
 };

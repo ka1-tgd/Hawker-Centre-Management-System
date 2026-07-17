@@ -26,11 +26,6 @@ const orderSchema = Joi.object({
     "string.empty": "payment_type cannot be empty",
     "any.only": "payment_type can only be either 'Cash', 'Card' or 'PayNow'",
     "any.required": "payment_type is required",
-  }),
-  order_items: Joi.array().items(orderItemSchema).min(1).required().messages({
-    "array.base": "order_items must be an array of food items",
-    "array.min": "You must order at least one item",
-    "any.required": "order_items list is required"
   })
 });
 
@@ -97,9 +92,10 @@ function validateOrder(req, res, next) {
   next();
 }
 
-// Validate updated order items data (for PUT)
-function validateOrderItems(req, res, next) {
-  const { error } = updateOrderItemsSchema.validate(req.body, { abortEarly: false });
+// Validate updated order item quantity (for PUT)
+function validateOrderItemQuantity(req, res, next) {
+  const singleItemQuantitySchema = orderItemSchema.fork(['menu_item_id'], (schema) => schema.optional());
+  const { error } = singleItemQuantitySchema.validate(req.body, { abortEarly: false });
   if (error) {
     const errorMessage = error.details
       .map((detail) => detail.message)
@@ -114,5 +110,5 @@ module.exports = {
   validateUserIdForCustomer,
   validateStallIdForCustomer,
   validateOrder,
-  validateOrderItems,
+  validateOrderItemQuantity,
 };
