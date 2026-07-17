@@ -587,7 +587,11 @@ async function updateOrderItemQuantity(order_id, order_item_no, newQuantity) {
   }
 }
 
-
+/*
+Left with
+1) DELETE - UPDATE CustOrder status to 'Cancelled' for customer
+2) PUT - UPDATE CustOrder status to ('Preparing'/'Completed'/'Cancelled') but for hawkers
+*/
 
 module.exports = {
   getOrderById,
