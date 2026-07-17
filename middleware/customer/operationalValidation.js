@@ -1,20 +1,6 @@
 const Joi = require("joi"); // Import Joi for validation
 
-// Validation schema for order items (used for POST/PUT)
-const orderItemSchema = Joi.object({
-  order_item_no: Joi.number().integer().positive().required().messages({
-    "number.base": "order_item_no must be a integer",
-    "number.positive": "order_item_no must be a positive integer",
-    "any.required": "order_item_no is required"
-  }),
-  menu_item_id: Joi.number().integer().positive().required().messages({
-    "number.base": "menu_item_id must be a integer",
-    "number.positive": "menu_item_id must be a positive integer",
-    "any.required": "menu_item_id is required"
-  })
-});
-
-// Validation schema for creating a new order item (for POST)
+// Validation schema for create order item (for POST /items)
 const createOrderItemSchema = Joi.object({
   order_id: Joi.number().integer().positive().required().messages({
     "number.base": "order_id must be an integer",
@@ -23,9 +9,28 @@ const createOrderItemSchema = Joi.object({
   }),
   menu_item_id: Joi.number().integer().positive().required().messages({
     "number.base": "menu_item_id must be an integer",
-    "number.positive": "menu_item_id must be a positive number",
+    "number.positive": "menu_item_id must be a positive integer",
     "any.required": "menu_item_id is required"
   }),
+  quantity: Joi.number().integer().min(1).required().messages({
+    "number.base": "quantity must be a number",
+    "number.min": "quantity must be at least 1",
+    "any.required": "quantity is required"
+  }),
+  unit_price: Joi.number().positive().required().messages({
+    "number.base": "unit_price must be a valid number",
+    "number.positive": "unit_price must be greater than 0",
+    "any.required": "unit_price is required"
+  }),
+  stall_id: Joi.number().integer().positive().required().messages({
+    "number.base": "stall_id must be an integer",
+    "number.positive": "stall_id must be a positive integer",
+    "any.required": "stall_id is required"
+  })
+});
+
+// Validation schema for individual order item update (for PUT)
+const orderItemQuantitySchema = Joi.object({
   quantity: Joi.number().integer().min(1).required().messages({
     "number.base": "quantity must be a number",
     "number.min": "quantity must be at least 1",
@@ -33,16 +38,7 @@ const createOrderItemSchema = Joi.object({
   })
 });
 
-// Validation schema for order item quantity (for PUT)
-const orderItemQuantitySchema = Joi.object({
-  quantity: Joi.number().integer().min(1).required().messages({
-    "number.base": "quantity must be a number",
-    "number.min": "quantity must be at least 1",
-    "any.required": "quantity is required"
-  })
-})
-
-// Validation schema for orders (used for POST/PUT)
+// Validation schema for orders (used for POST)
 const orderSchema = Joi.object({
   user_id: Joi.number().integer().positive().required().messages({
     "number.base": "user_id must be a integer",
@@ -85,15 +81,6 @@ function validateUserIdForCustomer(req, res, next) {
   }
   next();
 }
-
-// Validation schema for UPDATE order items (used for PUT)
-const updateOrderItemsSchema = Joi.object({
-  order_items: Joi.array().items(orderItemSchema).min(1).required().messages({
-    "array.base": "Order_items must be an array of food items",
-    "array.min": "Provide at least one item to update order",
-    "any.required": "Order_items list is required"
-  })
-});
 
 // Middleware to validate stall ID from URL parameters (for GET by ID, PUT, DELETE)
 function validateStallIdForCustomer(req, res, next) {

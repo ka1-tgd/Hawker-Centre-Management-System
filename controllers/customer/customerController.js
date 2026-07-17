@@ -109,11 +109,7 @@ async function createOrderItem(req, res) {
     return res.status(201).json(newOrderItem);
   } catch (error) {
     console.error("Controller error in createOrderItem:", error);
-
-    if (error.message.includes("Validation Error") || error.message.includes("Invalid menu_item_id")) {
-      return res.status(400).json({ error: error.message });
-    }
-    return res.status(500).json({ error: "An internal server error occurred while adding the item." });
+    res.status(500).json({ error: "An internal server error occurred while adding the item." });
   }
 }
 
