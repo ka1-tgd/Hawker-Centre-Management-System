@@ -2,17 +2,26 @@ const Joi = require("joi"); // Import Joi for validation
 
 // Validation schema for order items (used for POST/PUT)
 const orderItemSchema = Joi.object({
+  order_item_no: Joi.number().integer().positive().required().messages({
+    "number.base": "order_item_no must be a integer",
+    "number.positive": "order_item_no must be a positive integer",
+    "any.required": "order_item_no is required"
+  }),
   menu_item_id: Joi.number().integer().positive().required().messages({
     "number.base": "menu_item_id must be a integer",
     "number.positive": "menu_item_id must be a positive integer",
     "any.required": "menu_item_id is required"
-  }),
+  })
+});
+
+// Validation schema for order item quantity (for PUT)
+const orderItemQuantitySchema = Joi.object({
   quantity: Joi.number().integer().min(1).required().messages({
     "number.base": "quantity must be a number",
     "number.min": "quantity must be at least 1",
     "any.required": "quantity is required"
   })
-});
+})
 
 // Validation schema for orders (used for POST/PUT)
 const orderSchema = Joi.object({
@@ -94,8 +103,8 @@ function validateOrder(req, res, next) {
 
 // Validate updated order item quantity (for PUT)
 function validateOrderItemQuantity(req, res, next) {
-  const singleItemQuantitySchema = orderItemSchema.fork(['menu_item_id'], (schema) => schema.optional());
-  const { error } = singleItemQuantitySchema.validate(req.body, { abortEarly: false });
+  const { error } = orderItemQuantitySchema.validate(req.body, { abortEarly: false });
+  
   if (error) {
     const errorMessage = error.details
       .map((detail) => detail.message)

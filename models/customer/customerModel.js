@@ -10,8 +10,9 @@ async function getOrderById(order_id) {
     const request = new sql.Request(connection);
 
     const query = `
-    SELECT c.user_id, c.order_date, c.total_amount, c.payment_type, c.status, o.order_item_no, o.stall_id, mi.item_name, o.quantity, o.unit_price
-    FROM CustOrder c LEFT JOIN OrderItem o ON c.order_id = o.order_id
+    SELECT c.order_id, c.user_id, c.order_date, c.total_amount, c.payment_type, c.status, o.order_item_no, o.stall_id, mi.item_name, o.quantity, o.unit_price
+    FROM CustOrder c 
+    LEFT JOIN OrderItem o ON c.order_id = o.order_id
     LEFT JOIN MenuItem mi ON mi.menu_item_id = o.menu_item_id
     WHERE c.order_id = @order_id;
     `;
@@ -341,20 +342,24 @@ async function createOrder(CustOrder) {
 }
 
 // Update order item quantity
-async function updateOrderItemQuantity(order_id, menu_item_id, newQuantity) {
+async function updateOrderItemQuantity(order_id, order_item_no, newQuantity) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
 
     const statusCheckQuery = `
-      SELECT status FROM CustOrder WHERE order_id = @order_id;
+      SELECT co.status, oi.menu_item_id
+      FROM CustOrder co
+      INNER JOIN OrderItem oi ON co.order_id = oi.order_id
+      WHERE co.order_id = @order_id AND oi.order_item_no = @order_item_no;
     `;
     const checkResult = await connection.request()
       .input("order_id", sql.Int, order_id)
+      .input("order_item_no", sql.Int, order_item_no)
       .query(statusCheckQuery);
 
     if (checkResult.recordset.length === 0) {
-      return null; // Order was not found
+      throw new Error(`Item No ${order_item_no} is not part of Order ID ${order_id}, or the order does not exist.`);
     }
 
     const currentStatus = checkResult.recordset[0].status;
@@ -362,28 +367,15 @@ async function updateOrderItemQuantity(order_id, menu_item_id, newQuantity) {
       throw new Error(`Order status is '${currentStatus}', update only available for status 'Pending'.`);
     }
 
-    const itemCheckQuery = `
-      SELECT quantity FROM OrderItem 
-      WHERE order_id = @order_id AND menu_item_id = @menu_item_id;
-    `;
-    const itemResult = await connection.request()
-      .input("order_id", sql.Int, order_id)
-      .input("menu_item_id", sql.Int, menu_item_id)
-      .query(itemCheckQuery);
-
-    if (itemResult.recordset.length === 0) {
-      throw new Error(`Menu item ID ${menu_item_id} is not part of Order ID ${order_id}.`);
-    }
-
     const updateItemQuery = `
       UPDATE OrderItem
       SET quantity = @quantity
-      WHERE order_id = @order_id AND menu_item_id = @menu_item_id;
+      WHERE order_id = @order_id AND order_item_no = @order_item_no;
     `;
     await connection.request()
       .input("quantity", sql.Int, newQuantity)
       .input("order_id", sql.Int, order_id)
-      .input("menu_item_id", sql.Int, menu_item_id)
+      .input("order_item_no", sql.Int, order_item_no)
       .query(updateItemQuery);
 
     const updateParentTotalQuery = `

@@ -87,22 +87,26 @@ async function createOrder(req, res) {
 
 // Update order item quantity
 async function updateOrderItemQuantity(req, res) {
-  const order_id = parseInt(req.params.order_id, 10);
-  const menu_item_id = parseInt(req.params.menu_item_id, 10);
+  const order_id = parseInt(req.params.order_id);
+  const order_item_no = parseInt(req.params.order_item_no); // <-- Fixed variable name
   const { quantity } = req.body;
 
   try {
-    const updatedOrder = await orderModel.updateOrderItemQuantity(order_id, menu_item_id, quantity);
+    const updatedOrder = await customerModel.updateOrderItemQuantity(order_id, order_item_no, quantity);
 
     if (!updatedOrder) {
       return res.status(404).json({ error: `Order ID ${order_id} not found.` });
     }
     return res.status(200).json(updatedOrder);
   } catch (error) {
-    if (error.message.includes("only available for status 'Pending'.") || error.message.includes("is not part of Order")) {
+
+    if (
+      error.message.includes("update only available for status") || 
+      error.message.includes("is not part of Order ID")
+    ) {
       return res.status(400).json({ error: error.message });
     }
-    console.error("Controller error in handleUpdateOrderItemQuantity:", error);
+    console.error("Controller error in updateOrderItemQuantity:", error);
     return res.status(500).json({ error: "An internal server error occurred while updating the item quantity." });
   }
 }
