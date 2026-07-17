@@ -85,24 +85,25 @@ async function createOrder(req, res) {
   }
 }
 
-// Update order
-async function updateOrder(req, res) {
+// Update order item quantity
+async function updateOrderItemQuantity(req, res) {
+  const order_id = parseInt(req.params.order_id, 10);
+  const menu_item_id = parseInt(req.params.menu_item_id, 10);
+  const { quantity } = req.body;
+
   try {
-    const order_id = parseInt(req.params.order_id);
-    const { order_items } = req.body;
-    const updatedOrder = await customerModel.updateOrder(order_id, order_items);
+    const updatedOrder = await orderModel.updateOrderItemQuantity(order_id, menu_item_id, quantity);
 
     if (!updatedOrder) {
-      return res.status(404).json({ error: "Order not found or order status is no longer 'Pending'." });
+      return res.status(404).json({ error: `Order ID ${order_id} not found.` });
     }
-
-    res.json(updatedOrder);
+    return res.status(200).json(updatedOrder);
   } catch (error) {
-    console.error("Controller error:", error);
-    if (error.message.includes("must belong to Stall") || error.message.includes("does not exist")) {
+    if (error.message.includes("only available for status 'Pending'.") || error.message.includes("is not part of Order")) {
       return res.status(400).json({ error: error.message });
     }
-    res.status(500).json({ error: "Error updating order" });
+    console.error("Controller error in handleUpdateOrderItemQuantity:", error);
+    return res.status(500).json({ error: "An internal server error occurred while updating the item quantity." });
   }
 }
 
@@ -112,5 +113,5 @@ module.exports = {
   getHawkerCentresWithStalls,
   getMenuItemsOfStall,
   createOrder,
-  updateOrder,
+  updateOrderItemQuantity,
 };

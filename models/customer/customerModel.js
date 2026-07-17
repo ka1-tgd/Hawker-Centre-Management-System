@@ -359,7 +359,7 @@ async function updateOrderItemQuantity(order_id, menu_item_id, newQuantity) {
 
     const currentStatus = checkResult.recordset[0].status;
     if (currentStatus !== 'Pending') {
-      throw new Error(`Cannot modify items. Order status is '${currentStatus}', but must be 'Pending'.`);
+      throw new Error(`Order status is '${currentStatus}', update only available for status 'Pending'.`);
     }
 
     const itemCheckQuery = `
