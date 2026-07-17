@@ -291,3 +291,14 @@ body {
   margin: 0 6px 6px 0;
   font-size: 13px;
 }
+
+.details-btn {
+  background: #2b3a8f;
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}

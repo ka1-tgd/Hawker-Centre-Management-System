@@ -87,6 +87,7 @@ body {
 }
 
 .button {
+    font-family: 'Segoe UI', sans-serif;
     font-size: large;
     font-weight: bold;
     text-decoration: none;
@@ -148,4 +149,27 @@ body {
 .user-actions button {
     width: 250px;
     margin: 10px;
+}
+
+.edit-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.back-button {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: medium;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+    padding: 5px 10px;
+    width: 50%;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #ccc;
+    background-color: var(--theme-colour);
+    box-shadow: 0 5px 15px #0000001a;
 }
