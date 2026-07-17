@@ -1,10 +1,30 @@
 const contentContainer = document.querySelector(".content");
 
+const token = localStorage.getItem("token");
+const userId = localStorage.getItem("userId");
+const username = localStorage.getItem("username");
+const role = localStorage.getItem("role");
+
+function initializeUserAccount() {
+    if (!token || role !== "customer") {
+        alert("You must be logged in as a customer to view this page.");
+        window.location.href = "../../login.html";
+        return false; // Tells the script verification failed
+    }
+
+    const welcomeMessage = document.getElementById("welcomeUser"); 
+    if (welcomeMessage && username) {
+        welcomeMessage.textContent = `Welcome, ${username}!`;
+    }
+    return true; // Verification passed
+}
+
+if (initializeUserAccount()) {
+    renderHawkerCentres();
+}
+
 async function renderHawkerCentres() {
   try {
-
-    const token = localStorage.getItem("token"); 
-
     const response = await fetch('http://localhost:3000/customer/hawkerCentres/with-stalls', {
       method: 'GET',
       headers: {
@@ -50,8 +70,6 @@ async function renderHawkerCentres() {
     contentContainer.innerHTML = "<p style='color: red; padding: 20px;'>Error loading hawker data. Please try again later.</p>";
   }
 }
-
-renderHawkerCentres();
 
 contentContainer.addEventListener("click", (event) => {
   const clickedStallCard = event.target.closest(".foodStall");
