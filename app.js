@@ -69,6 +69,7 @@ app.post("/customer/orders", verifyJWT, validateOrder, customerController.create
 // Routes for customer ordering and checkouts - order item
 app.get("/customer/orders/orderItem/:order_item_no", verifyJWT, validateOrderItemNo, customerController.getOrderItemByNo);
 app.post("/customer/orders/items", verifyJWT, validateCreateOrderItem, customerController.createOrderItem);
+app.delete("/customer/orders/:order_id/items/:order_item_no", verifyJWT, validateOrderId, validateOrderItemNo, customerController.deleteOrderItem);
 app.put("/customer/orders/:order_id/items/:order_item_no", verifyJWT, validateOrderItemQuantity, customerController.updateOrderItemQuantity);
 
 // Routes for inspections
