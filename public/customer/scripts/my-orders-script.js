@@ -1,41 +1,30 @@
 document.addEventListener("DOMContentLoaded", () => {
   const contentContainer = document.querySelector(".content");
+
   const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
+  const username = localStorage.getItem("username");
+  const role = localStorage.getItem("role");
 
-  if (!token) {
-    contentContainer.innerHTML = `
-      <h2 id="contentHeader">Order Records</h2>
-      <p style="padding: 20px; color: red;">You must be logged in to view your orders.</p>
-      <a href="login.html" style="display: inline-block; margin-left: 20px; padding: 10px 15px; background: #2b3a8f; color: white; text-decoration: none; border-radius: 4px;">Go to Login</a>
-    `;
-    return;
-  }
-
-  function getUserIdFromToken(token) {
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-      
-      const payload = JSON.parse(jsonPayload);
-      // Fallback in case your JWT payload uses either 'user_id' or 'id'
-      return payload.user_id || payload.id; 
-    } catch (e) {
-      console.error("Failed to decode token:", e);
-      return null;
+  function initializeUserAccount() {
+    if (!token || role !== "customer") {
+      contentContainer.innerHTML = `
+        <h2 id="contentHeader">Order Records</h2>
+        <p style="padding: 20px; color: red;">You must be logged in as a customer to view your orders.</p>
+        <a href="../../login.html" style="display: inline-block; margin-left: 20px; padding: 10px 15px; background: #2b3a8f; color: white; text-decoration: none; border-radius: 4px;">Go to Login</a>
+      `;
+      return false; // Tells the script verification failed
     }
+
+    const welcomeMessage = document.getElementById("welcomeUser"); 
+    if (welcomeMessage && username) {
+      welcomeMessage.textContent = `Welcome, ${username}!`;
+    }
+    return true; // Verification passed
   }
 
-  const currentUserId = getUserIdFromToken(token);
-
-  if (!currentUserId) {
-    contentContainer.innerHTML = `
-      <h2 id="contentHeader">Order Records</h2>
-      <p style="padding: 20px; color: red;">Session error. Please log in again.</p>
-    `;
-    return;
+  if (initializeUserAccount()) {
+    fetchAndRenderOrders();
   }
 
   async function fetchAndRenderOrders() {
@@ -45,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     try {
-      const response = await fetch(`http://localhost:3000/customer/orders/${currentUserId}`, {
+      const response = await fetch(`http://localhost:3000/customer/orders/${userId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

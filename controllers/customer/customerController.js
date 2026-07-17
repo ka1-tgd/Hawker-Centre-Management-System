@@ -99,6 +99,9 @@ async function updateOrder(req, res) {
     res.json(updatedOrder);
   } catch (error) {
     console.error("Controller error:", error);
+    if (error.message.includes("must belong to Stall") || error.message.includes("does not exist")) {
+      return res.status(400).json({ error: error.message });
+    }
     res.status(500).json({ error: "Error updating order" });
   }
 }

@@ -1,18 +1,28 @@
 document.addEventListener("DOMContentLoaded", () => {
   const contentContainer = document.querySelector(".content");
-  const token = localStorage.getItem("token");
 
-  // 1. Authentication Check
-  if (!token) {
-    contentContainer.innerHTML = `
-      <h2 id="contentHeader">Order Items</h2>
-      <p style="padding: 20px; color: red;">You must be logged in to view order details.</p>
-      <a href="login.html" style="display: inline-block; margin-left: 20px; padding: 10px 15px; background: #2b3a8f; color: white; text-decoration: none; border-radius: 4px;">Go to Login</a>
-    `;
-    return;
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
+  const username = localStorage.getItem("username");
+  const role = localStorage.getItem("role");
+
+  function initializeUserAccount() {
+    if (!token || role !== "customer") {
+      contentContainer.innerHTML = `
+        <h2 id="contentHeader">Order Items</h2>
+        <p style="padding: 20px; color: red;">You must be logged in as a customer to view order details.</p>
+        <a href="../../login.html" style="display: inline-block; margin-left: 20px; padding: 10px 15px; background: #2b3a8f; color: white; text-decoration: none; border-radius: 4px;">Go to Login</a>
+      `;
+      return false; // Tells the script verification failed
+    }
+
+    const welcomeMessage = document.getElementById("welcomeUser"); 
+    if (welcomeMessage && username) {
+      welcomeMessage.textContent = `Welcome, ${username}!`;
+    }
+    return true; // Verification passed
   }
 
-  // 2. Extract order_id from URL
   const urlParams = new URLSearchParams(window.location.search);
   const orderId = urlParams.get('order_id');
 
@@ -23,6 +33,10 @@ document.addEventListener("DOMContentLoaded", () => {
       <a href="my-orders.html" style="display: inline-block; margin-left: 20px; padding: 10px 15px; background: #34495e; color: white; text-decoration: none; border-radius: 4px;">Back to My Orders</a>
     `;
     return;
+  }
+
+  if (initializeUserAccount()) {
+    fetchAndRenderOrderDetails();
   }
 
   async function fetchAndRenderOrderDetails() {

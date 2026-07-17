@@ -1,20 +1,40 @@
 const contentContainer = document.querySelector(".content");
 
+const token = localStorage.getItem("token");
+const userId = localStorage.getItem("userId");
+const username = localStorage.getItem("username");
+const role = localStorage.getItem("role");
+
 let isStallOpen = false;
 let currentStallId = null;
+
+function initializeUserAccount() {
+    if (!token || role !== "customer") {
+        alert("You must be logged in as a customer to view this page.");
+        window.location.href = "../../login.html";
+        return false; // Tells the script verification failed
+    }
+
+    const welcomeMessage = document.getElementById("welcomeUser"); 
+    if (welcomeMessage && username) {
+        welcomeMessage.textContent = `Welcome, ${username}!`;
+    }
+    return true; // Verification passed
+}
+
+if (initializeUserAccount()) {
+    renderMenuItems();
+}
 
 async function renderMenuItems() {
   try {
     const urlParams = new URLSearchParams(window.location.search);
-    
     currentStallId = urlParams.get('stall_id');
 
     if (!currentStallId) {
       contentContainer.innerHTML = "<p style='padding: 20px; color: red;'>Error: No stall selected.</p>";
       return;
     }
-
-    const token = localStorage.getItem("token"); 
 
     const response = await fetch(`http://localhost:3000/customer/stall/${currentStallId}`, {
       method: 'GET',
@@ -79,8 +99,6 @@ async function renderMenuItems() {
   }
 }
 
-renderMenuItems();
-
 contentContainer.addEventListener("click", (event) => {
   const clickedItemCard = event.target.closest(".menuItem");
   if (!clickedItemCard) return;
@@ -115,6 +133,5 @@ contentContainer.addEventListener("click", (event) => {
   }
 
   localStorage.setItem("cart", JSON.stringify(cart));
-  
   window.location.href = "../html/cart.html"; 
 });
