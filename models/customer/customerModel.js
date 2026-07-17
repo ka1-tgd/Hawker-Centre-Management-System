@@ -376,14 +376,30 @@ async function createOrderItem(orderItemData) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
+    const lookupQuery = `
+      SELECT mi.price AS unit_price, m.stall_id 
+      FROM MenuItem mi
+      INNER JOIN Menu m ON mi.menu_id = m.menu_id
+      WHERE mi.menu_item_id = @menu_item_id
+    `
+    const lookupRequest = connection.request();
+    lookupRequest.input("menu_item_id", sql.Int, orderItemData.menu_item_id);
+    const lookupResult = await lookupRequest.query(lookupQuery);
+    if (lookupResult.recordset.length === 0) {
+      const error = new Error("Invalid menu_item_id. Item does not exist.");
+      error.status = 400;
+      throw error;
+    }
+    const { unit_price, stall_id } = lookupResult.recordset[0];
+
     const query = 
         "INSERT INTO OrderItem (order_id, menu_item_id, quantity, unit_price, stall_id) VALUES (@order_id, @menu_item_id, @quantity, @unit_price, @stall_id); SELECT SCOPE_IDENTITY() AS order_item_no";
     const request = connection.request();
     request.input("order_id", sql.Int, orderItemData.order_id);
     request.input("menu_item_id", sql.Int, orderItemData.menu_item_id);
     request.input("quantity", sql.Int, orderItemData.quantity);
-    request.input("unit_price", sql.Decimal(10,2), orderItemData.unit_price);
-    request.input("stall_id", sql.Int, orderItemData.stall_id);
+    request.input("unit_price", sql.Decimal(10,2), unit_price);
+    request.input("stall_id", sql.Int, stall_id);
     const result = await request.query(query);
 
     const newOrderItemNo = result.recordset[0].order_item_no;

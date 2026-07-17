@@ -109,6 +109,9 @@ async function createOrderItem(req, res) {
     return res.status(201).json(newOrderItem);
   } catch (error) {
     console.error("Controller error in createOrderItem:", error);
+    if (error.status === 400) {
+      return res.status(400).json({ error: error.message });
+    }
     res.status(500).json({ error: "An internal server error occurred while adding the item." });
   }
 }

@@ -16,16 +16,6 @@ const createOrderItemSchema = Joi.object({
     "number.base": "quantity must be a number",
     "number.min": "quantity must be at least 1",
     "any.required": "quantity is required"
-  }),
-  unit_price: Joi.number().positive().required().messages({
-    "number.base": "unit_price must be a valid number",
-    "number.positive": "unit_price must be greater than 0",
-    "any.required": "unit_price is required"
-  }),
-  stall_id: Joi.number().integer().positive().required().messages({
-    "number.base": "stall_id must be an integer",
-    "number.positive": "stall_id must be a positive integer",
-    "any.required": "stall_id is required"
   })
 });
 
