@@ -10,7 +10,7 @@ async function getOrderById(order_id) {
     const request = new sql.Request(connection);
 
     const query = `
-    SELECT c.order_id, c.user_id, c.order_date, c.total_amount, c.payment_type, c.status, o.order_item_no, o.stall_id, mi.item_name, o.quantity, o.unit_price
+    SELECT c.order_id, c.user_id, c.order_date, c.total_amount, c.payment_type, c.status, o.order_item_no, o.stall_id, o.menu_item_id, mi.item_name, o.quantity, o.unit_price
     FROM CustOrder c 
     LEFT JOIN OrderItem o ON c.order_id = o.order_id
     LEFT JOIN MenuItem mi ON mi.menu_item_id = o.menu_item_id
@@ -44,6 +44,7 @@ async function getOrderById(order_id) {
         OrderItemsOfOrder[OrderId].order_items.push({
           order_item_no: row.order_item_no,
           item_name: row.item_name,
+          menu_item_id: row.menu_item_id,
           stall_id: row.stall_id,
           quantity: row.quantity,
           unit_price: row.unit_price,
