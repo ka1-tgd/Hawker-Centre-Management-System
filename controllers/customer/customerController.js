@@ -85,6 +85,22 @@ async function createOrder(req, res) {
   }
 }
 
+// Get order item by order_item_no
+async function getOrderItemByNo(req, res) {
+  try {
+    const orderItemNo = parseInt(req.params.order_item_no);
+    const orderItem = await customerModel.getOrderItemByNo(orderItemNo);
+    if (!orderItem) {
+      return res.status(404).json({ error: "Order item not found" });
+    }
+
+    res.json(orderItem);
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error retrieving order item" });
+  }
+}
+
 // Update order item quantity
 async function updateOrderItemQuantity(req, res) {
   const order_id = parseInt(req.params.order_id);
@@ -117,5 +133,6 @@ module.exports = {
   getHawkerCentresWithStalls,
   getMenuItemsOfStall,
   createOrder,
+  getOrderItemByNo,
   updateOrderItemQuantity,
 };

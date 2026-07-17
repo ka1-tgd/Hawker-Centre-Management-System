@@ -31,6 +31,7 @@ function verifyJWT(req, res, next) {
             "GET /customer/hawkerCentres/with-stalls": ["customer"],
             "GET /customer/stall/[0-9]+": ["customer"],
             "POST /customer/orders": ["customer"],
+            "GET /customer/orders/orderItem/[0-9]+": ['customer'],
             "PUT /customer/orders/[0-9]+/items/[0-9]+": ["customer"],
 
             // Customer engagement exclusive 

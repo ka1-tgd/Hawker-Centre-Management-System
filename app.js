@@ -23,6 +23,7 @@ const {
   validateUserIdForCustomer,
   validateStallIdForCustomer,
   validateOrder,
+  validateOrderItemNo,
   validateOrderItemQuantity,
 } = require("./middleware/customer/operationalValidation.js");
 
@@ -58,12 +59,14 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // ROUTES //
 
-// Routes for customer ordering and checkouts
+// Routes for customer ordering and checkouts - customer order
 app.get("/customer/order/:order_id", verifyJWT, validateOrderId, customerController.getOrderById);
 app.get("/customer/orders/:user_id", verifyJWT, validateUserIdForCustomer, customerController.getOrdersOfUser);
 app.get("/customer/hawkerCentres/with-stalls", verifyJWT, customerController.getHawkerCentresWithStalls);
 app.get("/customer/stall/:stall_id", verifyJWT, validateStallIdForCustomer, customerController.getMenuItemsOfStall);
 app.post("/customer/orders", verifyJWT, validateOrder, customerController.createOrder);
+// Routes for customer ordering and checkouts - order item
+app.get("/customer/orders/orderItem/:order_item_no", verifyJWT, validateOrderItemNo, customerController.getOrderItemByNo);
 app.put("/customer/orders/:order_id/items/:order_item_no", verifyJWT, validateOrderItemQuantity, customerController.updateOrderItemQuantity);
 
 // Routes for inspections

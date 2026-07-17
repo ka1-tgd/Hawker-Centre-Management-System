@@ -341,6 +341,67 @@ async function createOrder(CustOrder) {
   }
 }
 
+// get order item by order_item_no
+async function getOrderItemByNo(order_item_no) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query = "SELECT order_item_no, order_id, stall_id, menu_item_id, quantity, unit_price FROM OrderItem WHERE order_item_no = @order_item_no";
+    const request = connection.request();
+    request.input("order_item_no", order_item_no);
+    const result = await request.query(query);
+
+    if (result.recordset.length === 0) {
+      return null; // Order Item not found
+    }
+
+    return result.recordset[0];
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+// create order item
+async function createOrderItem(orderItemData) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query =
+      "INSERT INTO OrderItem (order_id, order_item_no, menu_item_id, quantity, unit_price, stall_id) VALUES (@order_id, @menu_item_id, @quantity, @unit_price, @stall_id); SELECT SCOPE_IDENTITY() AS order_item_no;";
+
+    const request = connection.request();
+    request.input("order_id", orderItemData.order_id)
+    request.input("menu_item_id", orderItemData.menu_item_id);
+    request.input("quantity", orderItemData.quantity);
+    request.input("unit_price", orderItemData.unitPrice);
+    request.input("stall_id", orderItemData.stall_id)
+    const result = await request.query(query);
+
+    const newOrderItemNo = result.recordset[0].order_item_no;
+    return await getOrderItemByNo(newOrderItemNo);
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
 // Update order item quantity
 async function updateOrderItemQuantity(order_id, order_item_no, newQuantity) {
   let connection;
@@ -402,7 +463,6 @@ async function updateOrderItemQuantity(order_id, order_item_no, newQuantity) {
   }
 }
 
-// create orderitem
 // delete orderitem
 // update order : orderitems (orderitems is an array in my CustOrder)
 // update order : status
@@ -414,5 +474,7 @@ module.exports = {
   getHawkerCentresWithStalls,
   getMenuItemsOfStall,
   createOrder,
+  getOrderItemByNo,
+  createOrderItem,
   updateOrderItemQuantity,
 };

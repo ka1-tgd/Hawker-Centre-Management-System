@@ -101,6 +101,20 @@ function validateOrder(req, res, next) {
   next();
 }
 
+// Validate order item No from URL parameters (for GET by ID, PUT, DELETE)
+function validateOrderItemNo(req, res, next) {
+  const id = parseInt(req.params.order_item_no);
+
+  if (isNaN(id) || id <= 0) {
+    return res
+      .status(400)
+      .json({ error: "Invalid order item number. order item number must be a positive number" });
+  }
+
+  // If validation succeeds, pass control to the next middleware/route handler
+  next();
+}
+
 // Validate updated order item quantity (for PUT)
 function validateOrderItemQuantity(req, res, next) {
   const { error } = orderItemQuantitySchema.validate(req.body, { abortEarly: false });
@@ -119,5 +133,6 @@ module.exports = {
   validateUserIdForCustomer,
   validateStallIdForCustomer,
   validateOrder,
+  validateOrderItemNo,
   validateOrderItemQuantity,
 };
