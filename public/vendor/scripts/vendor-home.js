@@ -36,15 +36,8 @@ dashboardCards.forEach(card => {
     });
 });
 
-//logout
+// account
 
-logoutBtn.addEventListener("click", function () {
-    const confirmLogout = confirm("Are you sure you want to logout?");
-    if (!confirmLogout) {
-        return;
-    }
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    window.location.href = "login.html";
-
+accountBtn.addEventListener("click", function () {
+    window.location.href = "../../user-account/html/account.html";
 });
