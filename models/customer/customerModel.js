@@ -377,11 +377,11 @@ async function createOrderItem(orderItemData) {
   try {
     connection = await sql.connect(dbConfig);
     const lookupQuery = `
-      SELECT mi.price AS unit_price, m.stall_id 
+      SELECT mi.price AS unit_price, mi.availability, m.stall_id 
       FROM MenuItem mi
       INNER JOIN Menu m ON mi.menu_id = m.menu_id
       WHERE mi.menu_item_id = @menu_item_id
-    `
+    `;
     const lookupRequest = connection.request();
     lookupRequest.input("menu_item_id", sql.Int, orderItemData.menu_item_id);
     const lookupResult = await lookupRequest.query(lookupQuery);
@@ -390,7 +390,29 @@ async function createOrderItem(orderItemData) {
       error.status = 400;
       throw error;
     }
-    const { unit_price, stall_id } = lookupResult.recordset[0];
+    const { unit_price, availability, stall_id } = lookupResult.recordset[0];
+
+    if (!availability || availability.toUpperCase() !== 'Y') {
+      const error = new Error("Cannot add item: This menu item is currently unavailable.");
+      error.status = 400;
+      throw error;
+    }
+
+    const stallCheckQuery = `
+      SELECT TOP 1 stall_id FROM OrderItem WHERE order_id = @order_id
+    `;
+    const stallCheckRequest = connection.request();
+    stallCheckRequest.input("order_id", sql.Int, orderItemData.order_id);
+    const stallCheckResult = await stallCheckRequest.query(stallCheckQuery);
+
+    if (stallCheckResult.recordset.length > 0) {
+      const existingStallId = stallCheckResult.recordset[0].stall_id;
+      if (existingStallId !== stall_id) {
+        const error = new Error("Cannot add item: You can only add items from the same stall.");
+        error.status = 400;
+        throw error;
+      }
+    }
 
     const query = 
         "INSERT INTO OrderItem (order_id, menu_item_id, quantity, unit_price, stall_id) VALUES (@order_id, @menu_item_id, @quantity, @unit_price, @stall_id); SELECT SCOPE_IDENTITY() AS order_item_no";
@@ -403,6 +425,14 @@ async function createOrderItem(orderItemData) {
     const result = await request.query(query);
 
     const newOrderItemNo = result.recordset[0].order_item_no;
+
+    const itemTotalCost = orderItemData.quantity * unit_price;
+    const updateOrderQuery = "UPDATE CustOrder SET total_amount = total_amount + @item_total_cost WHERE order_id = @order_id;";
+    const updateRequest = connection.request();
+    updateRequest.input("order_id", sql.Int, orderItemData.order_id);
+    updateRequest.input("item_total_cost", sql.Decimal(10,2), itemTotalCost);
+    await updateRequest.query(updateOrderQuery);
+
     return await getOrderItemByNo(newOrderItemNo);
   } catch (error) {
     console.error("Database error:", error);

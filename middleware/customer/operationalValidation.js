@@ -123,8 +123,10 @@ function validateCreateOrderItem(req, res, next) {
   const { error } = createOrderItemSchema.validate(req.body, { abortEarly: false });
 
   if (error) {
-    const errors = error.details.map((detail) => detail.message);
-    return res.status(400).json({ errors });
+    const errorMessage = error.details
+      .map((detail) => detail.message)
+      .join(", ");
+    return res.status(400).json({ error: errorMessage });
   }
   next();
 }
