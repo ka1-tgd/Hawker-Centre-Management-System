@@ -15,8 +15,11 @@ function verifyJWT(req, res, next) {
         // Set authorized roles and paths
         const authorizedRoles = {
             // Officer exclusive
+            // Officer exclusive
             "POST /nea/inspections": ["officer"],
             "GET /nea/inspections/stall/[0-9]+": ["officer"],
+            "PUT /nea/inspections/[0-9]+": ["officer"],
+            "DELETE /nea/inspections/[0-9]+": ["officer"],
 
             // Hawker exclusive
             "POST /vendor/stalls": ["hawker"],
