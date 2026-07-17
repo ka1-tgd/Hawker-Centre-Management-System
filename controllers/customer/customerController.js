@@ -101,6 +101,22 @@ async function getOrderItemByNo(req, res) {
   }
 }
 
+// Create a new order item in an existing order
+async function createOrderItem(req, res) {
+  try {
+    const newOrderItem = await customerModel.createOrderItem(req.body);
+    
+    return res.status(201).json(newOrderItem);
+  } catch (error) {
+    console.error("Controller error in createOrderItem:", error);
+
+    if (error.message.includes("Validation Error") || error.message.includes("Invalid menu_item_id")) {
+      return res.status(400).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "An internal server error occurred while adding the item." });
+  }
+}
+
 // Update order item quantity
 async function updateOrderItemQuantity(req, res) {
   const order_id = parseInt(req.params.order_id);
@@ -116,10 +132,7 @@ async function updateOrderItemQuantity(req, res) {
     return res.status(200).json(updatedOrder);
   } catch (error) {
 
-    if (
-      error.message.includes("update only available for status") || 
-      error.message.includes("is not part of Order ID")
-    ) {
+    if (error.message.includes("update only available for status") || error.message.includes("is not part of Order ID")) {
       return res.status(400).json({ error: error.message });
     }
     console.error("Controller error in updateOrderItemQuantity:", error);
@@ -134,5 +147,6 @@ module.exports = {
   getMenuItemsOfStall,
   createOrder,
   getOrderItemByNo,
+  createOrderItem,
   updateOrderItemQuantity,
 };

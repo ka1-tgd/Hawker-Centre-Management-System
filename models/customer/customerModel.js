@@ -313,9 +313,8 @@ async function createOrder(CustOrder) {
       itemRequest.input("order_id", sql.Int, newOrderId);
       itemRequest.input("menu_item_id", sql.Int, item.menu_item_id);
       itemRequest.input("quantity", sql.Int, item.quantity);
-      itemRequest.input("unit_price", sql.Decimal(10,2), item.unit_price);
+      itemRequest.input("unit_price", sql.Decimal(10,2), item.unitPrice);
       itemRequest.input("stall_id", sql.Int, item.stall_id);
-      
       await itemRequest.query(itemQuery);
     }
 
@@ -340,6 +339,8 @@ async function createOrder(CustOrder) {
     }
   }
 }
+
+//-----------------------------order items-----------------------------//
 
 // get order item by order_item_no
 async function getOrderItemByNo(order_item_no) {
@@ -375,21 +376,62 @@ async function createOrderItem(orderItemData) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
-    const query =
-      "INSERT INTO OrderItem (order_id, order_item_no, menu_item_id, quantity, unit_price, stall_id) VALUES (@order_id, @menu_item_id, @quantity, @unit_price, @stall_id); SELECT SCOPE_IDENTITY() AS order_item_no;";
+    const infoRequest = connection.request();
+
+    const itemStallAndPriceQuery = `
+      SELECT m.stall_id, mi.price AS unit_price
+      FROM MenuItem mi
+      INNER JOIN Menu m ON mi.menu_id = m.menu_id
+      WHERE mi.menu_item_id = @menu_item_id;
+    `;
+    infoRequest.input("menu_item_id", sql.Int, orderItemData.menu_item_id);
+    const itemStallResult = await infoRequest.query(itemStallAndPriceQuery);
+
+    if (itemStallResult.recordset.length === 0) {
+      throw new Error("Invalid menu_item_id: Item does not exist.");
+    }
+    const newItemStallId = itemStallResult.recordset[0].stall_id;
+    const dbUnitPrice = itemResult.recordset[0].unit_price;
 
     const request = connection.request();
-    request.input("order_id", orderItemData.order_id)
-    request.input("menu_item_id", orderItemData.menu_item_id);
-    request.input("quantity", orderItemData.quantity);
-    request.input("unit_price", orderItemData.unitPrice);
-    request.input("stall_id", orderItemData.stall_id)
-    const result = await request.query(query);
+    const existingStallQuery = `
+      SELECT DISTINCT stall_id 
+      FROM OrderItem 
+      WHERE order_id = @order_id;
+    `;
+    request.input("order_id", sql.Int, orderItemData.order_id);
+    const existingStallResult = await request.query(existingStallQuery);
 
-    const newOrderItemNo = result.recordset[0].order_item_no;
+    if (existingStallResult.recordset.length > 0) {
+      const existingStallId = existingStallResult.recordset[0].stall_id;
+      
+      if (existingStallId !== newItemStallId) {
+        throw new Error(
+          `Validation Error: You can only add items from Stall ID ${existingStallId}. The selected item is from Stall ID ${newItemStallId}.`
+        );
+      }
+    }
+    const insertRequest = connection.request();
+    const insertQuery = `
+      INSERT INTO OrderItem (order_id, menu_item_id, quantity, unit_price, stall_id) 
+      VALUES (@order_id, @menu_item_id, @quantity, @unit_price, @stall_id);
+      
+      SELECT SCOPE_IDENTITY() AS order_item_no;
+    `;
+
+    insertRequest.input("order_id", sql.Int, orderItemData.order_id);
+    insertRequest.input("menu_item_id", sql.Int, orderItemData.menu_item_id);
+    insertRequest.input("quantity", sql.Int, orderItemData.quantity);
+    insertRequest.input("unit_price", sql.Decimal(10, 2), dbUnitPrice);
+    insertRequest.input("stall_id", sql.Int, newItemStallId);
+
+    const insertResult = await insertRequest.query(insertQuery);
+    const newOrderItemNo = insertResult.recordset[0].order_item_no;
+
     return await getOrderItemByNo(newOrderItemNo);
+
   } catch (error) {
-    console.error("Database error:", error);
+    console.error("Database error in createOrderItem:", error);
     throw error;
   } finally {
     if (connection) {
@@ -464,7 +506,6 @@ async function updateOrderItemQuantity(order_id, order_item_no, newQuantity) {
 }
 
 // delete orderitem
-// update order : orderitems (orderitems is an array in my CustOrder)
 // update order : status
 // delete order : status
 

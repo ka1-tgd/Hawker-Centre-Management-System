@@ -14,6 +14,25 @@ const orderItemSchema = Joi.object({
   })
 });
 
+// Validation schema for creating a new order item (for POST)
+const createOrderItemSchema = Joi.object({
+  order_id: Joi.number().integer().positive().required().messages({
+    "number.base": "order_id must be an integer",
+    "number.positive": "order_id must be a positive number",
+    "any.required": "order_id is required"
+  }),
+  menu_item_id: Joi.number().integer().positive().required().messages({
+    "number.base": "menu_item_id must be an integer",
+    "number.positive": "menu_item_id must be a positive number",
+    "any.required": "menu_item_id is required"
+  }),
+  quantity: Joi.number().integer().min(1).required().messages({
+    "number.base": "quantity must be a number",
+    "number.min": "quantity must be at least 1",
+    "any.required": "quantity is required"
+  })
+});
+
 // Validation schema for order item quantity (for PUT)
 const orderItemQuantitySchema = Joi.object({
   quantity: Joi.number().integer().min(1).required().messages({
@@ -110,8 +129,17 @@ function validateOrderItemNo(req, res, next) {
       .status(400)
       .json({ error: "Invalid order item number. order item number must be a positive number" });
   }
+  next();
+}
 
-  // If validation succeeds, pass control to the next middleware/route handler
+// Validate create order item (for POST)
+function validateCreateOrderItem(req, res, next) {
+  const { error } = createOrderItemSchema.validate(req.body, { abortEarly: false });
+
+  if (error) {
+    const errors = error.details.map((detail) => detail.message);
+    return res.status(400).json({ errors });
+  }
   next();
 }
 
@@ -134,5 +162,6 @@ module.exports = {
   validateStallIdForCustomer,
   validateOrder,
   validateOrderItemNo,
+  validateCreateOrderItem,
   validateOrderItemQuantity,
 };

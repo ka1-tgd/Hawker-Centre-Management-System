@@ -24,6 +24,7 @@ const {
   validateStallIdForCustomer,
   validateOrder,
   validateOrderItemNo,
+  validateCreateOrderItem,
   validateOrderItemQuantity,
 } = require("./middleware/customer/operationalValidation.js");
 
@@ -67,6 +68,7 @@ app.get("/customer/stall/:stall_id", verifyJWT, validateStallIdForCustomer, cust
 app.post("/customer/orders", verifyJWT, validateOrder, customerController.createOrder);
 // Routes for customer ordering and checkouts - order item
 app.get("/customer/orders/orderItem/:order_item_no", verifyJWT, validateOrderItemNo, customerController.getOrderItemByNo);
+app.post("/customer/orders/items", verifyJWT, validateCreateOrderItem, customerController.createOrderItem);
 app.put("/customer/orders/:order_id/items/:order_item_no", verifyJWT, validateOrderItemQuantity, customerController.updateOrderItemQuantity);
 
 // Routes for inspections
