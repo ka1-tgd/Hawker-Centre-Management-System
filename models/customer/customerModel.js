@@ -1,8 +1,8 @@
-// Require Node modules and dbConfig
+//Require Node modules and dbConfig
 const sql = require("mssql");
 const dbConfig = require("../../dbConfig");
 
-// Get Order by ID
+//Get Order by ID
 async function getOrderById(order_id) {
   let connection;
   try {
@@ -21,10 +21,10 @@ async function getOrderById(order_id) {
     const result = await request.query(query);
 
     if (result.recordset.length === 0) {
-      return null; // Order not found
+      return null; //Order not found
     }
 
-    // Group the order items for an order
+    //Group the order items for an order
     const OrderItemsOfOrder = {};
     for (const row of result.recordset) {
       const OrderId = row.order_id;
@@ -39,7 +39,7 @@ async function getOrderById(order_id) {
           order_items: [],
         };
       }
-      // Only add order item if order_item_no is not null (for order with no order items)
+      //Only add order item if order_item_no is not null (for order with no order items)
       if (row.order_item_no !== null) {
         OrderItemsOfOrder[OrderId].order_items.push({
           order_item_no: row.order_item_no,
@@ -70,7 +70,7 @@ async function getOrderById(order_id) {
   }
 }
 
-// Get all order of a user by user_id
+//Get all order of a user by user_id
 async function getOrdersOfUser(user_id) {
   let connection;
   try {
@@ -87,10 +87,10 @@ async function getOrdersOfUser(user_id) {
     const result = await request.query(query);
 
     if (result.recordset.length === 0) {
-      return null; // User not found
+      return null; //User not found
     }
 
-    // Group the orders of user
+    //Group the orders of user
     const UserWithOrders = {};
     for (const row of result.recordset) {
       const UserId = row.user_id;
@@ -102,7 +102,7 @@ async function getOrdersOfUser(user_id) {
           orders: [],
         };
       }
-      // Only add user if order_id is not null (for user with no orders)
+      //Only add user if order_id is not null (for user with no orders)
       if (row.order_id !== null) {
         UserWithOrders[UserId].orders.push({
           order_id: row.order_id,
@@ -132,7 +132,7 @@ async function getOrdersOfUser(user_id) {
   }
 }
 
-// Get all hawker centres with stalls
+//Get all hawker centres with stalls
 async function getHawkerCentresWithStalls() {
   let connection;
   try {
@@ -147,7 +147,7 @@ async function getHawkerCentresWithStalls() {
 
     const result = await connection.request().query(query);
 
-    // Group hawker centres and the stalls
+    //Group hawker centres and the stalls
     const HCwithStalls = {};
     for (const row of result.recordset) {
       const HawkerCentreId = row.hawker_centre_id;
@@ -159,7 +159,7 @@ async function getHawkerCentresWithStalls() {
           stalls: [],
         };
       }
-      // Only add stall if stall_id is not null (for hawker centres with no stalls)
+      //Only add stall if stall_id is not null (for hawker centres with no stalls)
       if (row.stall_id !== null) {
         HCwithStalls[HawkerCentreId].stalls.push({
           stall_id: row.stall_id,
@@ -191,7 +191,7 @@ async function getHawkerCentresWithStalls() {
   }
 }
 
-// Get all menu items of a stall
+//Get all menu items of a stall
 async function getMenuItemsOfStall(stall_id) {
   let connection;
   try {
@@ -209,10 +209,10 @@ async function getMenuItemsOfStall(stall_id) {
     const result = await request.query(query);
 
     if (result.recordset.length === 0) {
-      return null; // Stall not found
+      return null; //Stall not found
     }
 
-    // Group the menu items base on stall
+    //Group the menu items base on stall
     const StallWithMenuItems = {};
     for (const row of result.recordset) {
       const StallId = row.stall_id;
@@ -224,7 +224,7 @@ async function getMenuItemsOfStall(stall_id) {
           menu_items: [],
         };
       }
-      // Only add menu item if menu_item_id is not null (for stall with no menu items)
+      //Only add menu item if menu_item_id is not null (for stall with no menu items)
       if (row.menu_item_id !== null) {
         StallWithMenuItems[StallId].menu_items.push({
           menu_item_id: row.menu_item_id,
@@ -254,7 +254,7 @@ async function getMenuItemsOfStall(stall_id) {
   }
 }
 
-// Create an order
+//Create an order
 async function createOrder(CustOrder) {
   let connection;
   try {
@@ -343,7 +343,7 @@ async function createOrder(CustOrder) {
 
 //-----------------------------order items-----------------------------//
 
-// get order item by order_item_no
+//Get order item by order_item_no
 async function getOrderItemByNo(order_item_no) {
   let connection;
   try {
@@ -354,7 +354,7 @@ async function getOrderItemByNo(order_item_no) {
     const result = await request.query(query);
 
     if (result.recordset.length === 0) {
-      return null; // Order Item not found
+      return null; //Order Item not found
     }
 
     return result.recordset[0];
@@ -372,7 +372,7 @@ async function getOrderItemByNo(order_item_no) {
   }
 }
 
-// create order item
+//create order item
 async function createOrderItem(orderItemData) {
   let connection;
   try {
@@ -399,22 +399,38 @@ async function createOrderItem(orderItemData) {
       throw error;
     }
 
-    const stallCheckQuery = `
-      SELECT TOP 1 stall_id FROM OrderItem WHERE order_id = @order_id
+    const orderCheckQuery = `
+      SELECT co.status, 
+             (SELECT TOP 1 stall_id FROM OrderItem WHERE order_id = co.order_id) AS existing_stall_id
+      FROM CustOrder co
+      WHERE co.order_id = @order_id
     `;
-    const stallCheckRequest = connection.request();
-    stallCheckRequest.input("order_id", sql.Int, orderItemData.order_id);
-    const stallCheckResult = await stallCheckRequest.query(stallCheckQuery);
+    const orderCheckRequest = connection.request();
+    orderCheckRequest.input("order_id", sql.Int, orderItemData.order_id);
+    const orderCheckResult = await orderCheckRequest.query(orderCheckQuery);
 
-    if (stallCheckResult.recordset.length > 0) {
-      const existingStallId = stallCheckResult.recordset[0].stall_id;
-      if (existingStallId !== stall_id) {
-        const error = new Error("Cannot add item: You can only add items from the same stall.");
-        error.status = 400;
-        throw error;
-      }
+    if (orderCheckResult.recordset.length === 0) {
+      const error = new Error("Invalid order_id. Order does not exist.");
+      error.status = 400;
+      throw error;
     }
 
+    const { status, existing_stall_id } = orderCheckResult.recordset[0];
+
+    //Order status must be 'Pending'
+    if (status !== 'Pending') {
+      const error = new Error(`Cannot add item: Order status is '${status}'. Updates are only allowed for 'Pending' orders.`);
+      error.status = 400;
+      throw error;
+    }
+    //Same stall restriction
+    if (existing_stall_id !== null && existing_stall_id !== stall_id) {
+      const error = new Error("Cannot add item: You can only add items from the same stall.");
+      error.status = 400;
+      throw error;
+    }
+
+    //Creating
     const query = 
         "INSERT INTO OrderItem (order_id, menu_item_id, quantity, unit_price, stall_id) VALUES (@order_id, @menu_item_id, @quantity, @unit_price, @stall_id); SELECT SCOPE_IDENTITY() AS order_item_no";
     const request = connection.request();
@@ -426,7 +442,7 @@ async function createOrderItem(orderItemData) {
     const result = await request.query(query);
 
     const newOrderItemNo = result.recordset[0].order_item_no;
-
+    //Update the total amount again in the CustOrder
     const itemTotalCost = orderItemData.quantity * unit_price;
     const updateOrderQuery = "UPDATE CustOrder SET total_amount = total_amount + @item_total_cost WHERE order_id = @order_id;";
     const updateRequest = connection.request();
@@ -436,7 +452,7 @@ async function createOrderItem(orderItemData) {
 
     return await getOrderItemByNo(newOrderItemNo);
   } catch (error) {
-    console.error("Database error:", error);
+    console.error("Database error in createOrderItem:", error);
     throw error;
   } finally {
     if (connection) {
@@ -449,7 +465,68 @@ async function createOrderItem(orderItemData) {
   }
 }
 
-// Update order item quantity
+//Delete order item
+async function deleteOrderItem(orderId, orderItemNo) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const lookupQuery = `
+      SELECT oi.quantity, oi.unit_price, co.status 
+      FROM OrderItem oi
+      INNER JOIN CustOrder co ON oi.order_id = co.order_id
+      WHERE oi.order_id = @order_id AND oi.order_item_no = @order_item_no
+    `;
+    const lookupRequest = connection.request();
+    lookupRequest.input("order_id", sql.Int, orderId);
+    lookupRequest.input("order_item_no", sql.Int, orderItemNo);
+    const lookupResult = await lookupRequest.query(lookupQuery);
+
+    if (lookupResult.recordset.length === 0) {
+      const error = new Error("Order item not found in this order.");
+      error.status = 404;
+      throw error;
+    }
+
+    const { quantity, unit_price, status } = lookupResult.recordset[0];
+
+    //Order status must be 'Pending'
+    if (status !== 'Pending') {
+      const error = new Error(`Cannot delete item: Order status is '${status}'. Updates are only allowed for 'Pending' orders.`);
+      error.status = 400;
+      throw error;
+    }
+    const itemTotalCost = quantity * unit_price;
+    //Deleting
+    const deleteQuery = "DELETE FROM OrderItem WHERE order_id = @order_id AND order_item_no = @order_item_no";
+    const deleteRequest = connection.request();
+    deleteRequest.input("order_id", sql.Int, orderId);
+    deleteRequest.input("order_item_no", sql.Int, orderItemNo);
+    await deleteRequest.query(deleteQuery);
+
+    //Update the total amount in CustOrder again since order item being deleted
+    const updateOrderQuery = "UPDATE CustOrder SET total_amount = total_amount - @item_total_cost WHERE order_id = @order_id;";
+    const updateRequest = connection.request();
+    updateRequest.input("order_id", sql.Int, orderId);
+    updateRequest.input("item_total_cost", sql.Decimal(10,2), itemTotalCost);
+    await updateRequest.query(updateOrderQuery);
+
+    return { message: "Order item deleted successfully and total amount updated." };
+
+  } catch (error) {
+    console.error("Database error in deleteOrderItem:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+//Update order item quantity
 async function updateOrderItemQuantity(order_id, order_item_no, newQuantity) {
   let connection;
   try {
@@ -510,9 +587,7 @@ async function updateOrderItemQuantity(order_id, order_item_no, newQuantity) {
   }
 }
 
-// delete orderitem
-// update order : status
-// delete order : status
+
 
 module.exports = {
   getOrderById,
@@ -522,5 +597,6 @@ module.exports = {
   createOrder,
   getOrderItemByNo,
   createOrderItem,
+  deleteOrderItem,
   updateOrderItemQuantity,
 };
