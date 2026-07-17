@@ -313,7 +313,7 @@ async function createOrder(CustOrder) {
       itemRequest.input("order_id", sql.Int, newOrderId);
       itemRequest.input("menu_item_id", sql.Int, item.menu_item_id);
       itemRequest.input("quantity", sql.Int, item.quantity);
-      itemRequest.input("unit_price", sql.Decimal(10,2), item.unitPrice);
+      itemRequest.input("unit_price", sql.Decimal(10,2), item.unit_price);
       itemRequest.input("stall_id", sql.Int, item.stall_id);
       await itemRequest.query(itemQuery);
     }

@@ -40,6 +40,15 @@ const orderSchema = Joi.object({
     "string.empty": "payment_type cannot be empty",
     "any.only": "payment_type can only be either 'Cash', 'Card' or 'PayNow'",
     "any.required": "payment_type is required",
+  }),
+  order_items: Joi.array().items(
+    Joi.object({
+      menu_item_id: Joi.number().integer().positive().required(),
+      quantity: Joi.number().integer().min(1).required()
+    })
+  ).min(1).required().messages({
+    "array.min": "Your order must contain at least one item.",
+    "any.required": "Order items are required."
   })
 });
 
