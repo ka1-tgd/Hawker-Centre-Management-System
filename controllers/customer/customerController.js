@@ -139,7 +139,7 @@ async function deleteOrderItem(req, res) {
 // Update order item quantity
 async function updateOrderItemQuantity(req, res) {
   const order_id = parseInt(req.params.order_id);
-  const order_item_no = parseInt(req.params.order_item_no); // <-- Fixed variable name
+  const order_item_no = parseInt(req.params.order_item_no);
   const { quantity } = req.body;
 
   try {

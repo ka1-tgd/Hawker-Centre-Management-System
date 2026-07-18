@@ -26,7 +26,7 @@ const {
   validateOrderItemNo,
   validateCreateOrderItem,
   validateOrderItemQuantity,
-} = require("./middleware/customer/operationalValidation.js");
+} = require("./middleware/customer/orderingValidation.js");
 
 const {
   validateInspection,
