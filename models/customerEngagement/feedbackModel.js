@@ -141,7 +141,7 @@ async function getFeedbackByUser(userId) {
     request.input("userId", userId);
     const result = await request.query(query);
 
-    // One row per item comes back from SQL - group them under their feedback
+    // One row per item comes back from SQL 
     const feedbackList = [];
     const feedbackPositions = {};
     result.recordset.forEach((row) => {
