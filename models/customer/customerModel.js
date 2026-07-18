@@ -259,7 +259,7 @@ async function createOrder(CustOrder) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
-    const validatedItems = [];
+    const validatedItems = [];  //I added this part because for this feature it need to check condition such as the status of the stall and the availability of the menu item.
     for (const item of CustOrder.order_items) {
       const itemInfoQuery = `
       SELECT mi.price, mi.availability, m.stall_id, s.status
@@ -276,7 +276,7 @@ async function createOrder(CustOrder) {
       const itemAvailability = infoResult.recordset[0].availability;
       const stallId = infoResult.recordset[0].stall_id;
       const stallStatus = infoResult.recordset[0].status;
-
+      //Conditions
       if (!stallStatus || stallStatus.toLowerCase() !== 'open') {   
         throw new Error(`Cannot place order: The stall is currently closed.`);
       }
@@ -289,10 +289,10 @@ async function createOrder(CustOrder) {
         quantity: item.quantity,
         unit_price: unitPrice,
         stall_id: stallId,
-        item_total: item.quantity * unitPrice
+        item_total: item.quantity * unitPrice //to calculate the total amount but for the same menu item.
       });
     }
-
+    //Creating - as in like add to database.
     const query =
       "INSERT INTO CustOrder (user_id, payment_type) VALUES (@user_id, @payment_type); SELECT SCOPE_IDENTITY() AS order_id;";
     const request = connection.request();
@@ -303,7 +303,7 @@ async function createOrder(CustOrder) {
     const newOrderId = result.recordset[0].order_id;
     let totalAmount = 0;
     for (const item of validatedItems) {
-      totalAmount += item.item_total;
+      totalAmount += item.item_total; //to calculate the total amount.
 
       const itemQuery = `
         INSERT INTO OrderItem (order_id, menu_item_id, quantity, unit_price, stall_id) 
@@ -318,7 +318,7 @@ async function createOrder(CustOrder) {
       itemRequest.input("stall_id", sql.Int, item.stall_id);
       await itemRequest.query(itemQuery);
     }
-
+    //to update the calculated total amount back to CustOrder table in database.
     const updateOrderQuery = 
     `UPDATE CustOrder SET total_amount = @total_amount WHERE order_id = @order_id;`;
     const updateRequest = connection.request();
@@ -372,7 +372,7 @@ async function getOrderItemByNo(order_item_no) {
   }
 }
 
-//create order item
+//create order item - this one act like an add new item in existing order.
 async function createOrderItem(orderItemData) {
   let connection;
   try {
@@ -442,7 +442,7 @@ async function createOrderItem(orderItemData) {
     const result = await request.query(query);
 
     const newOrderItemNo = result.recordset[0].order_item_no;
-    //Update the total amount again in the CustOrder
+    //update the total amount again in the CustOrder.
     const itemTotalCost = orderItemData.quantity * unit_price;
     const updateOrderQuery = "UPDATE CustOrder SET total_amount = total_amount + @item_total_cost WHERE order_id = @order_id;";
     const updateRequest = connection.request();
@@ -503,7 +503,7 @@ async function deleteOrderItem(orderId, orderItemNo) {
     deleteRequest.input("order_item_no", sql.Int, orderItemNo);
     await deleteRequest.query(deleteQuery);
 
-    //Update the total amount in CustOrder again since order item being deleted
+    //update the total amount in CustOrder again since order item being deleted.
     const updateOrderQuery = "UPDATE CustOrder SET total_amount = total_amount - @item_total_cost WHERE order_id = @order_id;";
     const updateRequest = connection.request();
     updateRequest.input("order_id", sql.Int, orderId);
