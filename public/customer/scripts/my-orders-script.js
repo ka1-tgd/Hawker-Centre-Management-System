@@ -13,14 +13,14 @@ document.addEventListener("DOMContentLoaded", () => {
         <p style="padding: 20px; color: red;">You must be logged in as a customer to view your orders.</p>
         <a href="../../login.html" style="display: inline-block; margin-left: 20px; padding: 10px 15px; background: #2b3a8f; color: white; text-decoration: none; border-radius: 4px;">Go to Login</a>
       `;
-      return false; // Tells the script verification failed
+      return false; //Verification failed
     }
 
     const welcomeMessage = document.getElementById("welcomeUser"); 
     if (welcomeMessage && username) {
       welcomeMessage.textContent = `Welcome, ${username}!`;
     }
-    return true; // Verification passed
+    return true; //Verification passed
   }
 
   if (initializeUserAccount()) {
@@ -45,7 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!response.ok) {
         throw new Error(`Server returned status: ${response.status}`);
       }
-
       const resultData = await response.json();
       const userProfile = resultData[0]; 
       const orders = userProfile && userProfile.orders ? userProfile.orders : [];
@@ -61,7 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const ordersHTML = orders.map(order => {
         const orderDate = new Date(order.order_date).toLocaleString();
-        
         const status = (order.status || 'Pending').toUpperCase();
         let statusColor = '#ffbf00';
         if (status === 'PREPARING') statusColor = '#ff7f50';

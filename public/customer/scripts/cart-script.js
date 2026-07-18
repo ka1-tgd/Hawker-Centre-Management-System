@@ -40,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!response.ok) {
           throw new Error("Failed to authenticate user profile");
         }
-
         const userData = await response.json();
         currentUserId = userData.user_id || userData.id;
         
@@ -56,13 +55,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
     }
-
     renderCart();
   }
 
   async function renderCart() {
     const cart = JSON.parse(localStorage.getItem("cart")) || { order_items: [] };
-
     if (cart.order_items.length === 0) {
       contentContainer.innerHTML = `
         <h2 id="contentHeader">My Cart</h2>
@@ -76,17 +73,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const oldCartSummary = contentContainer.querySelector(".cartSummary");
     if (oldCartList) oldCartList.remove();
     if (oldCartSummary) oldCartSummary.remove();
-
     contentContainer.innerHTML = `
       <h2 id="contentHeader">My Cart</h2>
       <div id="cartLoading" style="padding: 20px;">Loading your cart items...</div>
     `;
-
     try {
       let validatedItems = [];
       let grandTotal = 0;
       let hasClosedStallItem = false;
-
       for (const item of cart.order_items) {
         try {
           const response = await fetch(`http://localhost:3000/customer/stall/${item.stall_id}`, {
@@ -96,25 +90,20 @@ document.addEventListener("DOMContentLoaded", () => {
               'Content-Type': 'application/json'
             }
           });
-
           if (response.ok) {
             const resultData = await response.json();
             const stall = resultData[0];
-
             if (stall) {
               const stallStatus = stall.status || 'open';
               const isStallClosed = stallStatus.toLowerCase() !== 'open';
               if (isStallClosed) {
                 hasClosedStallItem = true;
               }
-
               const dbItem = stall.menu_items.find(m => m.menu_item_id === item.menu_item_id);
-
               if (dbItem) {
                 const price = Number(dbItem.price || 0);
                 const totalItemPrice = price * item.quantity;
                 grandTotal += totalItemPrice;
-
                 validatedItems.push({
                   ...item,
                   price: price,
@@ -131,14 +120,11 @@ document.addEventListener("DOMContentLoaded", () => {
           } else {
             throw new Error(`API error: ${response.status}`);
           }
-
         } catch (error) {
           console.warn(`Fallback active for item ${item.menu_item_id}:`, error.message);
-          
           const price = Number(item.price || 0);
           const totalItemPrice = price * item.quantity;
           grandTotal += totalItemPrice;
-
           validatedItems.push({
             ...item,
             price: price,
@@ -151,7 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let itemsHTML = validatedItems.map(item => {
         const isUnavailable = item.availability !== 'Y' || item.isStallClosed;
-        
         return `
           <div class="cartItem" data-id="${item.menu_item_id}" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; ${isUnavailable ? 'background-color: #fafafa; border-color: #eca1a1;' : ''}">
             <div>
@@ -181,7 +166,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const cartSummaryHTML = `
         <div class="cartList">${itemsHTML}</div>
-        
         <div class="cartSummary" style="margin-top: 25px; padding: 20px; border-top: 2px solid #eee; background-color: #f9f9f9; border-radius: 6px;">
           <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1.2em; font-weight: bold;">
             <span>Grand Total:</span>
@@ -219,7 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
       contentContainer.insertAdjacentHTML('beforeend', cartSummaryHTML);
 
       setupCartEventListeners();
-
     } catch (error) {
       console.error("Error displaying cart:", error);
       contentContainer.innerHTML = "<p style='color: red; padding: 20px;'>Error rendering cart items.</p>";
@@ -262,7 +245,6 @@ document.addEventListener("DOMContentLoaded", () => {
       newCheckoutBtn.addEventListener("click", async () => {
         const paymentType = document.getElementById("paymentType").value;
         const cart = JSON.parse(localStorage.getItem("cart"));
-
         const orderPayload = {
           user_id: parseInt(currentUserId, 10), 
           payment_type: paymentType,
@@ -275,7 +257,6 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           newCheckoutBtn.disabled = true;
           newCheckoutBtn.innerText = "Processing Order...";
-
           const response = await fetch("http://localhost:3000/customer/orders", {
             method: 'POST',
             headers: {
@@ -284,9 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             body: JSON.stringify(orderPayload)
           });
-
           const responseData = await response.json();
-
           if (response.ok) {
             alert("Order Placed Successfully!");
             localStorage.removeItem("cart");

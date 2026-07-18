@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const username = localStorage.getItem("username");
   const role = localStorage.getItem("role");
 
-  let currentStallId = null;  //To keep track of current'order's stall, to endure can only add new order item from the same stall only.
+  let currentStallId = null;  //to keep track of current'order's stall, to endure can only add new order item from the same stall only.
 
   function initializeUserAccount() {
     if (!token || role !== "customer") {
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (initializeUserAccount()) {
     fetchAndRenderOrderDetails();
-    setupEventHandlers(); // Mount operations event hub
+    setupEventHandlers(); //Mount operations event hub
   }
 
   async function fetchAndRenderOrderDetails() {
@@ -71,34 +71,29 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
         return;
       }
-
-      // Normalized status matching your exact backend output string ('Pending')
+      //Match status ('Pending')
       const rawStatus = order.status || 'Pending';
       const isPending = rawStatus === 'Pending';
 
-      // Safe stall_id extraction from nested object collection array
+      //Safe stall_id extraction from nested object collection array
       if (order.order_items && order.order_items.length > 0) {
         currentStallId = order.order_items[0].stall_id || null;
       } else {
         currentStallId = order.stall_id || null;
       }
-
       console.log("=== Debugging Add Item Form Trigger ===");
       console.log("Is Order Status Pending?:", isPending, `(Value: "${rawStatus}")`);
       console.log("Found Stall ID Variable?:", currentStallId);
 
-      // Status color matching setup
-      let statusColor = '#ffbf00'; // Pending
+      let statusColor = '#ffbf00'; //Pending
       if (rawStatus === 'Preparing') statusColor = '#ff7f50';
       if (rawStatus === 'Completed') statusColor = '#27ae60';
       if (rawStatus === 'Cancelled') statusColor = '#c0392b';
 
-      // 1. Build the list rows text template
       let itemsHTML = '';
       if (order.order_items && order.order_items.length > 0) {
         itemsHTML = order.order_items.map(item => {
           const itemTotal = Number(item.unit_price) * item.quantity;
-          
           const controlInterface = isPending 
             ? `
               <div style="display: flex; align-items: center; gap: 10px;">
@@ -127,7 +122,6 @@ document.addEventListener("DOMContentLoaded", () => {
         itemsHTML = `<p style="padding: 20px; color: #888; text-align: center;">No items found in this order.</p>`;
       }
 
-      // 2. Build the Add Item Form HTML snippet if order status is eligible
       let addItemInterfaceHTML = '';
       if (isPending) {
         addItemInterfaceHTML = `
@@ -148,7 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
       }
 
-      // 3. Assemble all generated sub-components directly into the complete view string
       const fullLayoutHTML = `
         <div style="margin-bottom: 20px;">
           <a href="my-orders.html" style="text-decoration: none; color: #2b3a8f; font-weight: bold; display: inline-flex; align-items: center; gap: 5px;">
@@ -189,17 +182,14 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
 
-      // 4. Inject structure into the live DOM layout node
       contentContainer.innerHTML = `
         <h2 id="contentHeader">Order Items</h2>
         ${fullLayoutHTML}
       `;
-
-      // 5. Populate dropdown menu now that elements exist in the DOM
+      //populate dropdown menu now that elements exist.
       if (isPending && currentStallId) {
         populateMenuDropdown(currentStallId);
       }
-
     } catch (error) {
       console.error("Failed to load order details:", error);
       contentContainer.innerHTML = `
@@ -209,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- GET MENU FOR DROPDOWN ---
+  //Get Menu for dropdown
   async function populateMenuDropdown(stallId) {
     const dropdown = document.getElementById("stallMenuDropdown");
     if (!dropdown) return;
@@ -224,23 +214,17 @@ document.addEventListener("DOMContentLoaded", () => {
           'Content-Type': 'application/json'
         }
       });
-
       if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
 
       const result = await response.json();
-      console.log("📦 Raw Stall Menu Response Payload:", result);
-
-      // 🎯 TARGETED FIX: Unpack the nested array safely from the parent wrapper
-      // Checks both array wrapper index [0] or direct object properties
+      console.log("Raw Stall Menu Response Payload:", result);
       const stallData = Array.isArray(result) ? result[0] : result;
       const menuItems = stallData ? stallData.menu_items : null;
-
       if (!menuItems || menuItems.length === 0) {
         dropdown.innerHTML = `<option value="">No items available from this stall</option>`;
         return;
       }
-
-      console.log("🥞 Found Nested Dishes List:", menuItems);
+      console.log("Found Nested Dishes List:", menuItems);
 
       dropdown.innerHTML = `<option value="">-- Select a dish to add --</option>` + 
         menuItems
@@ -255,24 +239,22 @@ document.addEventListener("DOMContentLoaded", () => {
             return `<option value="${itemId}">${itemName} ($${Number(itemPrice).toFixed(2)})</option>`;
           })
           .join('');
-
     } catch (err) {
-      console.error("❌ Dropdown building crashed:", err);
+      console.error("Dropdown building crashed:", err);
       dropdown.innerHTML = `<option value="">Failed to load vendor inventory</option>`;
     }
   }
 
-  // --- INTERACTION LAYER CONTROLLERS ---
+  // ---------- INTERACTION LAYER CONTROLLERS ---------- //
 
   function setupEventHandlers() {
     contentContainer.addEventListener("click", async (e) => {
-      // 1. Handle Quantity Decrement (-)
       if (e.target.classList.contains("btn-qty-minus")) {
         const itemNo = e.target.dataset.itemNo;
         const currentQty = parseInt(e.target.dataset.qty, 10);
         
         if (currentQty <= 1) {
-          // If customer hits minus at quantity 1, redirect them to delete operation instead
+          //if customer hits minus at quantity 1, redirect them to delete operation instead.
           if (confirm("Would you like to completely remove this item from your order?")) {
             await executeDeleteAction(itemNo);
           }
@@ -281,14 +263,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // 2. Handle Quantity Increment (+)
       if (e.target.classList.contains("btn-qty-plus")) {
         const itemNo = e.target.dataset.itemNo;
         const currentQty = parseInt(e.target.dataset.qty, 10);
         await executeUpdateQuantityAction(itemNo, currentQty + 1);
       }
-
-      // 3. Handle Direct Delete Action
       if (e.target.classList.contains("btn-delete")) {
         const itemNo = e.target.dataset.itemNo;
         if (confirm("Are you sure you want to remove this item?")) {
@@ -301,7 +280,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const qtyInput = document.getElementById("addItemQty");
 
         if (!dropdown || !qtyInput) return;
-
         const menuItemId = dropdown.value;
         const quantity = parseInt(qtyInput.value, 10);
 
@@ -313,7 +291,6 @@ document.addEventListener("DOMContentLoaded", () => {
           alert("Please enter a valid quantity of 1 or more.");
           return;
         }
-
         await executeAddItemAction(menuItemId, quantity);
       }
     });
@@ -321,7 +298,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function executeAddItemAction(menuItemId, quantity) {
     try {
-      // Maps cleanly to your route: app.post("/customer/orders/items", ...)
       const response = await fetch(`http://localhost:3000/customer/orders/items`, {
         method: 'POST',
         headers: {
@@ -344,8 +320,6 @@ document.addEventListener("DOMContentLoaded", () => {
           throw new Error(`Server Error: Received status code ${response.status}.`);
         }
       }
-
-      // Repaint the updated interface elements seamlessly
       await fetchAndRenderOrderDetails();
     } catch (err) {
       alert(err.message);
@@ -373,7 +347,6 @@ document.addEventListener("DOMContentLoaded", () => {
           throw new Error(`Server Error: Received status code ${response.status}.`);
         }
       }
-      
       await fetchAndRenderOrderDetails(); 
     } catch (err) {
       alert(err.message);
@@ -400,7 +373,6 @@ document.addEventListener("DOMContentLoaded", () => {
           throw new Error(`Server Error: Received status code ${response.status}.`);
         }
       }
-
       await fetchAndRenderOrderDetails(); 
     } catch (err) {
       alert(err.message);
