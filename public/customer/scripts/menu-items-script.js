@@ -12,7 +12,7 @@ function initializeUserAccount() {
     if (!token || role !== "customer") {
         alert("You must be logged in as a customer to view this page.");
         window.location.href = "../../login.html";
-        return false; // Tells the script verification failed
+        return false; // Verification failed
     }
 
     const welcomeMessage = document.getElementById("welcomeUser"); 

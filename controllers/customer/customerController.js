@@ -116,10 +116,30 @@ async function createOrderItem(req, res) {
   }
 }
 
+// Delete order item
+async function deleteOrderItem(req, res) {
+  try {
+    const orderId = parseInt(req.params.order_id);
+    const orderItemNo = parseInt(req.params.order_item_no);
+    const success = await customerModel.deleteOrderItem(orderId, orderItemNo);
+
+    return res.status(200).json(success);
+  } catch (error) {
+    console.error("Controller error in deleteOrderItem:", error);
+    if (error.status === 404) {
+      return res.status(404).json({ error: error.message });
+    }
+    if (error.status === 400) {
+      return res.status(400).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "An internal server error occurred while deleting the item." });
+  }
+}
+
 // Update order item quantity
 async function updateOrderItemQuantity(req, res) {
   const order_id = parseInt(req.params.order_id);
-  const order_item_no = parseInt(req.params.order_item_no); // <-- Fixed variable name
+  const order_item_no = parseInt(req.params.order_item_no);
   const { quantity } = req.body;
 
   try {
@@ -147,5 +167,6 @@ module.exports = {
   createOrder,
   getOrderItemByNo,
   createOrderItem,
+  deleteOrderItem,
   updateOrderItemQuantity,
 };

@@ -36,7 +36,7 @@
 
 <script>
   const params = new URLSearchParams(window.location.search);
-  const userId = parseInt(params.get("userId")) || 5;
+  const userId = parseInt(localStorage.getItem("userId")) || parseInt(params.get("userId"));
 </script>
 
 <script src="../scripts/likes-script.js"></script>
