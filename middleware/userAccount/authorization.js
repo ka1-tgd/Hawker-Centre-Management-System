@@ -30,6 +30,9 @@ function verifyJWT(req, res, next) {
             "GET /vendor/stalls/[0-9]+": ["hawker"],
             "PUT /vendor/stalls/[0-9]+": ["hawker"],
             "DELETE /vendor/stalls/[0-9]+": ["hawker"],
+            "GET /vendor/sales/[0-9]+/popular-items": ["hawker"],
+            "GET /vendor/sales/[0-9]+/peak-hours": ["hawker"],
+            "GET /vendor/sales/[0-9]+/revenue": ["hawker"],
 
             // Customer exclusive
             "GET /customer/order/[0-9]+": ["customer"],

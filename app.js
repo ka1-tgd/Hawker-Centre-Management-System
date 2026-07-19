@@ -16,6 +16,7 @@ const menuItemLikeController = require("./controllers/customerEngagement/menuIte
 const loyaltyController = require("./controllers/customerEngagement/loyaltyController");
 const feedbackController = require("./controllers/customerEngagement/feedbackController");
 const vendorDashboardController = require("./controllers/customerEngagement/vendorDashboardController");
+const salesController = require("./controllers/vendor/salesController");
 
 // Require middleware functions
 const {
@@ -43,6 +44,11 @@ const {
     validateStall,
     validateStallId: validateVendorStallId
 } = require("./middleware/vendor/stallValidation.js");
+
+const {
+  validateStallId: validateSalesStallId,
+} = require("./middleware/vendor/salesValidation.js");
+
 
 const menuItemLikeValidation = require("./middleware/customerEngagement/menuItemLikeValidation");
 const loyaltyValidation = require("./middleware/customerEngagement/loyaltyValidation");
@@ -97,6 +103,11 @@ app.get("/vendor/stalls/:id", verifyJWT, validateVendorStallId, stallController.
 app.post("/vendor/stalls", verifyJWT, validateStall, stallController.createStall);
 app.put("/vendor/stalls/:id", verifyJWT, validateVendorStallId, validateStall, stallController.updateStall);
 app.delete("/vendor/stalls/:id", verifyJWT, validateVendorStallId, stallController.deleteStall);
+
+// Routes - Sales Analytics Dashboard
+app.get("/vendor/sales/:stallId/popular-items", verifyJWT, validateSalesStallId, salesController.getPopularItems);
+app.get("/vendor/sales/:stallId/peak-hours", verifyJWT, validateSalesStallId, salesController.getPeakHours);
+app.get("/vendor/sales/:stallId/revenue", verifyJWT, validateSalesStallId, salesController.getRevenueSummary);
 
 // Routes - Menu Item Likes
 app.post("/likes", verifyJWT, menuItemLikeValidation.validateCreateLike, menuItemLikeController.createLike);
