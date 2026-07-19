@@ -13,7 +13,17 @@ async function getLoyaltyPoints(userId) {
     request.input("userId", userId);
     const result = await request.query(query);
 
-    return result.recordset[0] || null;
+    if (result.recordset[0]) {
+      return result.recordset[0];
+    }
+
+    const insertRequest = connection.request();
+    insertRequest.input("userId", userId);
+    await insertRequest.query(
+      "INSERT INTO LoyaltyPoints (user_id) VALUES (@userId)"
+    );
+
+    return { CurrentPoints: 0, Tier: "Bronze" };
   } catch (error) {
     console.error("Database error:", error);
     throw error;
