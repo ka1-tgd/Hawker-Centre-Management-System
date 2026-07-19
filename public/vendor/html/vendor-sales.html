@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Analytics - Vendor Dashboard</title>
+    <link rel="stylesheet" href="../css/vendor-stall.css">
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            HawkerHub
+        </div>
+        <nav>
+            <ul>
+                <li><a href="vendor-home.html">Home</a></li>
+                <li><a href="vendor-stall.html">Stalls</a></li>
+                <li><a href="#">Menus</a></li>
+                <li><a href="#">Menu Items</a></li>
+                <li><a href="vendor-sales.html" class="active">Sales</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <div>
+                <h1>Sales Analytics</h1>
+                <p>
+                    View your stall's sales performance and trends.
+                </p>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; margin-bottom: 35px;">
+            <div style="background:white; border-radius:10px; padding:25px; text-align:center; box-shadow:0 3px 12px rgba(0,0,0,.08);">
+                <h2 id="totalRevenue" style="color:#26a354; font-size:28px; margin-bottom:8px;">$0.00</h2>
+                <p style="color:#666;">Total Revenue</p>
+            </div>
+            <div style="background:white; border-radius:10px; padding:25px; text-align:center; box-shadow:0 3px 12px rgba(0,0,0,.08);">
+                <h2 id="totalOrders" style="color:#26a354; font-size:28px; margin-bottom:8px;">0</h2>
+                <p style="color:#666;">Total Orders</p>
+            </div>
+            <div style="background:white; border-radius:10px; padding:25px; text-align:center; box-shadow:0 3px 12px rgba(0,0,0,.08);">
+                <h2 id="avgOrderValue" style="color:#26a354; font-size:28px; margin-bottom:8px;">$0.00</h2>
+                <p style="color:#666;">Average Order Value</p>
+            </div>
+        </div>
+
+        <div class="page-header">
+            <h1 style="font-size:24px;">Top Selling Items</h1>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Quantity Sold</th>
+                </tr>
+            </thead>
+            <tbody id="popularItemsBody">
+            </tbody>
+        </table>
+
+        <div class="page-header" style="margin-top:35px;">
+            <h1 style="font-size:24px;">Peak Hours</h1>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Hour of Day</th>
+                    <th>Number of Orders</th>
+                </tr>
+            </thead>
+            <tbody id="peakHoursBody">
+            </tbody>
+        </table>
+
+    </main>
+
+    <script src="../scripts/vendor-sales.js"></script>
+</body>
+
+</html>
