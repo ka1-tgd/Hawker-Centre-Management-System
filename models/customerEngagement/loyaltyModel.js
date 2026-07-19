@@ -17,6 +17,9 @@ async function getLoyaltyPoints(userId) {
       return result.recordset[0];
     }
 
+    // No record yet - reconnect in case another request closed the shared
+    // pool between the SELECT above and this INSERT
+    connection = await sql.connect(dbConfig);
     const insertRequest = connection.request();
     insertRequest.input("userId", userId);
     await insertRequest.query(
