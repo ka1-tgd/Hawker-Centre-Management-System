@@ -176,9 +176,105 @@ async function deleteInspection(inspectionId) {
   }
 }
 
+// Get grade distribution across all stalls (uses each stall's most recent grade)
+async function getGradeDistribution() {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query = `
+      SELECT hg.grade, COUNT(*) AS count
+      FROM Hygiene_Grade hg
+      INNER JOIN (
+        SELECT stall_id, MAX(valid_from) AS max_valid_from
+        FROM Hygiene_Grade
+        GROUP BY stall_id
+      ) latest ON hg.stall_id = latest.stall_id AND hg.valid_from = latest.max_valid_from
+      GROUP BY hg.grade
+    `;
+    const result = await connection.request().query(query);
+    return result.recordset;
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+// Get stalls whose current grade is expiring within the next 30 days
+async function getExpiringSoon() {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query = `
+      SELECT s.stall_id, s.stall_name, hg.grade, hg.expiry
+      FROM Hygiene_Grade hg
+      INNER JOIN (
+        SELECT stall_id, MAX(valid_from) AS max_valid_from
+        FROM Hygiene_Grade
+        GROUP BY stall_id
+      ) latest ON hg.stall_id = latest.stall_id AND hg.valid_from = latest.max_valid_from
+      INNER JOIN Stall s ON s.stall_id = hg.stall_id
+      WHERE hg.expiry BETWEEN GETDATE() AND DATEADD(DAY, 30, GETDATE())
+      ORDER BY hg.expiry ASC
+    `;
+    const result = await connection.request().query(query);
+    return result.recordset;
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+// Get the 10 most recent inspections across all stalls
+async function getRecentInspections() {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query = `
+      SELECT TOP 10 i.inspection_id, i.inspection_date, i.score, i.user_id,
+             s.stall_name, hg.grade
+      FROM Inspection i
+      INNER JOIN Stall s ON s.stall_id = i.stall_id
+      LEFT JOIN Hygiene_Grade hg ON hg.inspection_id = i.inspection_id
+      ORDER BY i.inspection_date DESC
+    `;
+    const result = await connection.request().query(query);
+    return result.recordset;
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
 module.exports = {
   getInspectionsByStall,
   createInspection,
   updateInspection,
   deleteInspection,
+  getGradeDistribution,
+  getExpiringSoon,
+  getRecentInspections,
 };

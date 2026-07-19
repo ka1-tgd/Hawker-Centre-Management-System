@@ -20,6 +20,9 @@ function verifyJWT(req, res, next) {
             "GET /nea/inspections/stall/[0-9]+": ["officer"],
             "PUT /nea/inspections/[0-9]+": ["officer"],
             "DELETE /nea/inspections/[0-9]+": ["officer"],
+            "GET /nea/inspections/summary/grades": ["officer"],
+            "GET /nea/inspections/summary/expiring": ["officer"],
+            "GET /nea/inspections/summary/recent": ["officer"],
 
             // Hawker exclusive
             "POST /vendor/stalls": ["hawker"],

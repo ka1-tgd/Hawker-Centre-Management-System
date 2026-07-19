@@ -24,27 +24,48 @@
   <div class="card">
     <h3>Grade Distribution</h3>
     <table>
-      <tr>
-        <th>Grade</th>
-        <th>Number of Stalls</th>
-      </tr>
-      <tr>
-        <td><span class="grade grade-a">A</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><span class="grade grade-b">B</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><span class="grade grade-c">C</span></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td><span class="grade grade-d">D</span></td>
-        <td></td>
-      </tr>
+      <thead>
+        <tr>
+          <th>Grade</th>
+          <th>Number of Stalls</th>
+        </tr>
+      </thead>
+      <tbody id="gradeDistributionBody">
+        <tr>
+          <td><span class="grade grade-a">A</span></td>
+          <td id="countA">0</td>
+        </tr>
+        <tr>
+          <td><span class="grade grade-b">B</span></td>
+          <td id="countB">0</td>
+        </tr>
+        <tr>
+          <td><span class="grade grade-c">C</span></td>
+          <td id="countC">0</td>
+        </tr>
+        <tr>
+          <td><span class="grade grade-d">D</span></td>
+          <td id="countD">0</td>
+        </tr>
+      </tbody>
     </table>
+  </div>
+
+  <div class="card">
+    <h3>Grades Expiring Soon (Next 30 Days)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Stall</th>
+          <th>Grade</th>
+          <th>Expiry Date</th>
+        </tr>
+      </thead>
+      <tbody id="expiringSoonBody">
+        <!-- rows filled by JS -->
+      </tbody>
+    </table>
+    <div id="expiringEmptyState" class="empty-state" style="display:none;">No grades expiring soon.</div>
   </div>
 
   <div class="card">
@@ -59,14 +80,15 @@
           <th>Officer</th>
         </tr>
       </thead>
-      <tbody>
-        <!-- rows will be filled by backend data -->
+      <tbody id="recentInspectionsBody">
+        <!-- rows filled by JS -->
       </tbody>
     </table>
-    <div class="empty-state">No inspection records yet.</div>
+    <div id="recentEmptyState" class="empty-state" style="display:none;">No inspection records yet.</div>
   </div>
 
 </div>
 
+<script src="../scripts/nea-script.js"></script>
 </body>
 </html>

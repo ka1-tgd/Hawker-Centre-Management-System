@@ -79,6 +79,9 @@ app.get("/nea/inspections/stall/:stallId", verifyJWT, validateStallId, inspectio
 app.post("/nea/inspections", verifyJWT, validateInspection, inspectionController.createInspection);
 app.put("/nea/inspections/:id", verifyJWT, validateInspectionId, validateInspectionUpdate, inspectionController.updateInspection);
 app.delete("/nea/inspections/:id", verifyJWT, validateInspectionId, inspectionController.deleteInspection);
+app.get("/nea/inspections/summary/grades", verifyJWT, inspectionController.getGradeDistribution);
+app.get("/nea/inspections/summary/expiring", verifyJWT, inspectionController.getExpiringSoon);
+app.get("/nea/inspections/summary/recent", verifyJWT, inspectionController.getRecentInspections);
 
 // Routes for user account management
 app.post("/register", userController.createUser);

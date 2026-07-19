@@ -187,3 +187,128 @@ if (cancelEditBtn) {
     document.getElementById("editSection").style.display = "none";
   });
 }
+
+
+// ============ Dashboard page ============
+const gradeDistributionBody = document.getElementById("gradeDistributionBody");
+
+if (gradeDistributionBody) {
+  loadDashboard();
+}
+
+async function loadDashboard() {
+  await loadGradeDistribution();
+  await loadExpiringSoon();
+  await loadRecentInspections();
+}
+
+async function loadGradeDistribution() {
+  try {
+    const response = await fetch(`${apiBaseUrl}/nea/inspections/summary/grades`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch grade distribution");
+    }
+
+    const distribution = await response.json();
+
+    // Reset counts to 0 first
+    document.getElementById("countA").textContent = "0";
+    document.getElementById("countB").textContent = "0";
+    document.getElementById("countC").textContent = "0";
+    document.getElementById("countD").textContent = "0";
+
+    // Fill in actual counts
+    distribution.forEach((row) => {
+      const cell = document.getElementById(`count${row.grade}`);
+      if (cell) {
+        cell.textContent = row.count;
+      }
+    });
+
+  } catch (error) {
+    console.error("Error loading grade distribution:", error);
+  }
+}
+
+async function loadExpiringSoon() {
+  const tableBody = document.getElementById("expiringSoonBody");
+  const emptyState = document.getElementById("expiringEmptyState");
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/nea/inspections/summary/expiring`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch expiring grades");
+    }
+
+    const expiring = await response.json();
+
+    tableBody.innerHTML = "";
+
+    if (expiring.length === 0) {
+      emptyState.style.display = "block";
+      return;
+    }
+
+    emptyState.style.display = "none";
+
+    expiring.forEach((row) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${row.stall_name}</td>
+        <td><span class="grade grade-${row.grade.toLowerCase()}">${row.grade}</span></td>
+        <td>${new Date(row.expiry).toLocaleDateString()}</td>
+      `;
+      tableBody.appendChild(tr);
+    });
+
+  } catch (error) {
+    console.error("Error loading expiring grades:", error);
+  }
+}
+
+async function loadRecentInspections() {
+  const tableBody = document.getElementById("recentInspectionsBody");
+  const emptyState = document.getElementById("recentEmptyState");
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/nea/inspections/summary/recent`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch recent inspections");
+    }
+
+    const recent = await response.json();
+
+    tableBody.innerHTML = "";
+
+    if (recent.length === 0) {
+      emptyState.style.display = "block";
+      return;
+    }
+
+    emptyState.style.display = "none";
+
+    recent.forEach((row) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${row.stall_name}</td>
+        <td>${new Date(row.inspection_date).toLocaleDateString()}</td>
+        <td>${row.score}</td>
+        <td><span class="grade grade-${row.grade.toLowerCase()}">${row.grade}</span></td>
+        <td>${row.user_id}</td>
+      `;
+      tableBody.appendChild(tr);
+    });
+
+  } catch (error) {
+    console.error("Error loading recent inspections:", error);
+  }
+}

@@ -57,9 +57,45 @@ async function deleteInspection(req, res) {
   }
 }
 
+// Get grade distribution summary
+async function getGradeDistribution(req, res) {
+  try {
+    const distribution = await inspectionModel.getGradeDistribution();
+    res.json(distribution);
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error retrieving grade distribution" });
+  }
+}
+
+// Get stalls expiring soon
+async function getExpiringSoon(req, res) {
+  try {
+    const expiring = await inspectionModel.getExpiringSoon();
+    res.json(expiring);
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error retrieving expiring grades" });
+  }
+}
+
+// Get recent inspections
+async function getRecentInspections(req, res) {
+  try {
+    const recent = await inspectionModel.getRecentInspections();
+    res.json(recent);
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error retrieving recent inspections" });
+  }
+}
+
 module.exports = {
   getInspectionsByStall,
   createInspection,
   updateInspection,
   deleteInspection,
+  getGradeDistribution,
+  getExpiringSoon,
+  getRecentInspections,
 };
