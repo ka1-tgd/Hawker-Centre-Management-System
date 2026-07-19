@@ -142,7 +142,7 @@ async function getFeedbackByUser(userId) {
     const result = await request.query(query);
 
     // One row per item comes back from SQL 
-    const feedbackList = [];
+    const feedbackList = [];  
     const feedbackPositions = {};
     result.recordset.forEach((row) => {
       if (feedbackPositions[row.FeedbackID] === undefined) {
