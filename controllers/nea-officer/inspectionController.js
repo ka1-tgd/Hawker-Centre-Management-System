@@ -23,7 +23,43 @@ async function createInspection(req, res) {
   }
 }
 
+// Update an inspection
+async function updateInspection(req, res) {
+  try {
+    const inspectionId = parseInt(req.params.id);
+    const updated = await inspectionModel.updateInspection(inspectionId, req.body);
+
+    if (!updated) {
+      return res.status(404).json({ error: "Inspection not found" });
+    }
+
+    res.json(updated);
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error updating inspection" });
+  }
+}
+
+// Delete an inspection
+async function deleteInspection(req, res) {
+  try {
+    const inspectionId = parseInt(req.params.id);
+    const deleted = await inspectionModel.deleteInspection(inspectionId);
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Inspection not found" });
+    }
+
+    res.json({ message: "Inspection deleted successfully" });
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error deleting inspection" });
+  }
+}
+
 module.exports = {
   getInspectionsByStall,
   createInspection,
+  updateInspection,
+  deleteInspection,
 };

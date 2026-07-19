@@ -31,6 +31,21 @@
     <p id="currentGrade"></p>
   </div>
 
+  <div id="editSection" class="card" style="display:none;">
+    <h3>Edit Inspection</h3>
+    <input type="hidden" id="editInspectionId">
+    <div class="field">
+      <label for="editScore">Score (0-100)</label>
+      <input type="number" id="editScore" class="input" min="0" max="100">
+    </div>
+    <div class="field">
+      <label for="editRemarks">Remarks</label>
+      <textarea id="editRemarks"></textarea>
+    </div>
+    <button id="saveEditBtn" class="btn btn-primary">Save Changes</button>
+    <button id="cancelEditBtn" class="btn btn-secondary">Cancel</button>
+  </div>
+
   <div class="card">
     <h3>Inspection Records</h3>
     <table>

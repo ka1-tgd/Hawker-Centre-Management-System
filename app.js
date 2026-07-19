@@ -30,7 +30,9 @@ const {
 
 const {
   validateInspection,
+  validateInspectionUpdate,
   validateStallId,
+  validateInspectionId,
 } = require("./middleware/nea-officer/inspectionValidation");
 
 const {
@@ -74,6 +76,8 @@ app.put("/customer/orders/:order_id/items/:order_item_no", verifyJWT, validateOr
 // Routes for inspections
 app.get("/nea/inspections/stall/:stallId", verifyJWT, validateStallId, inspectionController.getInspectionsByStall);
 app.post("/nea/inspections", verifyJWT, validateInspection, inspectionController.createInspection);
+app.put("/nea/inspections/:id", verifyJWT, validateInspectionId, validateInspectionUpdate, inspectionController.updateInspection);
+app.delete("/nea/inspections/:id", verifyJWT, validateInspectionId, inspectionController.deleteInspection);
 
 // Routes for user account management
 app.post("/register", userController.createUser);

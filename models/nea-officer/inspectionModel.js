@@ -15,13 +15,13 @@ async function getInspectionsByStall(stallId) {
   try {
     connection = await sql.connect(dbConfig);
     const query = `
-  SELECT i.inspection_id, i.inspection_date, i.score, i.remarks, i.user_id,
-         hg.grade, hg.valid_from, hg.expiry
-  FROM Inspection i
-  LEFT JOIN Hygiene_Grade hg ON hg.inspection_id = i.inspection_id
-  WHERE i.stall_id = @stallId
-  ORDER BY i.inspection_date DESC
-`;
+      SELECT i.inspection_id, i.inspection_date, i.score, i.remarks, i.user_id,
+             hg.grade, hg.valid_from, hg.expiry
+      FROM Inspection i
+      LEFT JOIN Hygiene_Grade hg ON hg.inspection_id = i.inspection_id
+      WHERE i.stall_id = @stallId
+      ORDER BY i.inspection_date DESC
+    `;
     const request = connection.request();
     request.input("stallId", stallId);
     const result = await request.query(query);
@@ -47,12 +47,11 @@ async function createInspection(inspectionData) {
   try {
     connection = await sql.connect(dbConfig);
 
-    // Insert inspection record
-   const insertQuery = `
-  INSERT INTO Inspection (stall_id, user_id, inspection_date, score, remarks)
-  VALUES (@stallId, @officerId, @inspectionDate, @score, @remarks);
-  SELECT SCOPE_IDENTITY() AS inspection_id;
-`;
+    const insertQuery = `
+      INSERT INTO Inspection (stall_id, user_id, inspection_date, score, remarks)
+      VALUES (@stallId, @officerId, @inspectionDate, @score, @remarks);
+      SELECT SCOPE_IDENTITY() AS inspection_id;
+    `;
     const request = connection.request();
     request.input("stallId", inspectionData.stall_id);
     request.input("officerId", inspectionData.officer_id);
@@ -64,7 +63,6 @@ async function createInspection(inspectionData) {
     const newInspectionId = result.recordset[0].inspection_id;
     const grade = calculateGrade(inspectionData.score);
 
-    // Insert hygiene grade record (valid for 12 months from inspection date)
     const gradeQuery = `
       INSERT INTO Hygiene_Grade (grade, valid_from, expiry, stall_id, inspection_id)
       VALUES (@grade, @validFrom, DATEADD(MONTH, 12, @validFrom), @stallId, @inspectionId);
@@ -91,7 +89,96 @@ async function createInspection(inspectionData) {
   }
 }
 
+// Update inspection (and recalculate hygiene grade if score changed)
+async function updateInspection(inspectionId, updateData) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+
+    const updateInspectionQuery = `
+      UPDATE Inspection
+      SET score = @score, remarks = @remarks, updated_at = GETDATE()
+      WHERE inspection_id = @inspectionId
+    `;
+    const request = connection.request();
+    request.input("score", updateData.score);
+    request.input("remarks", updateData.remarks || null);
+    request.input("inspectionId", inspectionId);
+    const result = await request.query(updateInspectionQuery);
+
+    if (result.rowsAffected[0] === 0) {
+      return null;
+    }
+
+    if (updateData.score !== undefined) {
+      const newGrade = calculateGrade(updateData.score);
+
+      const updateGradeQuery = `
+        UPDATE Hygiene_Grade
+        SET grade = @grade
+        WHERE inspection_id = @inspectionId
+      `;
+      const gradeRequest = connection.request();
+      gradeRequest.input("grade", newGrade);
+      gradeRequest.input("inspectionId", inspectionId);
+      await gradeRequest.query(updateGradeQuery);
+
+      return { inspection_id: inspectionId, grade: newGrade };
+    }
+
+    return { inspection_id: inspectionId };
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+// Delete inspection (and its related hygiene grade record)
+async function deleteInspection(inspectionId) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+
+    const deleteGradeQuery = `
+      DELETE FROM Hygiene_Grade WHERE inspection_id = @inspectionId
+    `;
+    const gradeRequest = connection.request();
+    gradeRequest.input("inspectionId", inspectionId);
+    await gradeRequest.query(deleteGradeQuery);
+
+    const deleteInspectionQuery = `
+      DELETE FROM Inspection WHERE inspection_id = @inspectionId
+    `;
+    const request = connection.request();
+    request.input("inspectionId", inspectionId);
+    const result = await request.query(deleteInspectionQuery);
+
+    return result.rowsAffected[0] > 0;
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
 module.exports = {
   getInspectionsByStall,
   createInspection,
+  updateInspection,
+  deleteInspection,
 };
