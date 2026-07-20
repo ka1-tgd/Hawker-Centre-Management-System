@@ -65,6 +65,10 @@ function verifyJWT(req, res, next) {
             "GET /feedback/customer/[0-9]+": ["customer"],
             "PUT /feedback/[0-9]+": ["customer"],
             "DELETE /feedback/[0-9]+": ["customer"],
+
+            "GET /vendor/satisfaction": ["hawker"],
+            "GET /vendor/complaints": ["hawker"],
+            "PUT /vendor/complaints/[0-9]+/resolve": ["hawker"],
         };
 
         const requestedEndpoint = `${req.method} ${req.url}`; // Include method in endpointl;
