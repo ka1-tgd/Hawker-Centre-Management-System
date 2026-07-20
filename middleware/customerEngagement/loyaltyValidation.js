@@ -29,6 +29,20 @@ function validateRedeem(req, res, next) {
   next();
 }
 
+// Validate RedemptionID param
+function validateRedemptionId(req, res, next) {
+  const id = parseInt(req.params.id, 10);
+
+  if (isNaN(id) || id <= 0) {
+    return res.status(400).json({
+      error: "Invalid redemption ID. ID must be a positive number",
+    });
+  }
+
+  next();
+}
+
 module.exports = {
   validateRedeem,
+  validateRedemptionId,
 };

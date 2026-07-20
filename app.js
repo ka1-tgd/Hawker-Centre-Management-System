@@ -119,6 +119,8 @@ app.delete("/likes/:id", verifyJWT, menuItemLikeValidation.validateLikeId, menuI
 app.get("/loyalty/:userId", verifyJWT, loyaltyController.getLoyaltyPoints);
 app.get("/rewards", verifyJWT, loyaltyController.getRewards);
 app.post("/redeem", verifyJWT, loyaltyValidation.validateRedeem, loyaltyController.redeemReward);
+app.get("/redemptions/customer/:userId", verifyJWT, loyaltyController.getRedemptionHistory);
+app.delete("/redemptions/:id", verifyJWT, loyaltyValidation.validateRedemptionId, loyaltyController.deleteRedemption);
  
 // Route for basic profile display on the account page 
 app.get("/profile/:userId", verifyJWT, loyaltyController.getUserProfile);

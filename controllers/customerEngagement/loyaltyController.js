@@ -63,6 +63,45 @@ async function redeemReward(req, res) {
   }
 }
 
+// Get a customer's redemption history (their reward claim receipts)
+async function getRedemptionHistory(req, res) {
+  try {
+    const userId = parseInt(req.params.userId);
+    const history = await loyaltyModel.getRedemptionHistory(userId);
+    res.json(history);
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error retrieving redemption history" });
+  }
+}
+
+// Cancel a redemption (before it's claimed in person) and refund the points used
+async function deleteRedemption(req, res) {
+  try {
+    const id = parseInt(req.params.id);
+    const userId = req.user.id;
+
+    const redemption = await loyaltyModel.getRedemptionById(id);
+    if (!redemption) {
+      return res.status(404).json({ error: "Redemption not found" });
+    }
+
+    if (redemption.user_id !== userId) {
+      return res.status(403).json({ error: "You can only cancel your own redemptions" });
+    }
+
+    const cancelled = await loyaltyModel.deleteRedemption(id, userId, redemption.PointsUsed);
+    if (!cancelled) {
+      return res.status(404).json({ error: "Redemption not found" });
+    }
+
+    res.json({ message: "Redemption cancelled and points refunded" });
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error cancelling redemption" });
+  }
+}
+
 // Get a customer's basic profile info for the account page
 async function getUserProfile(req, res) {
   try {
@@ -84,5 +123,7 @@ module.exports = {
   getLoyaltyPoints,
   getRewards,
   redeemReward,
+  getRedemptionHistory,
+  deleteRedemption,
   getUserProfile,
 };

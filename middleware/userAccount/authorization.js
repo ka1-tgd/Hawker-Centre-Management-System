@@ -54,6 +54,8 @@ function verifyJWT(req, res, next) {
             "GET /loyalty/[0-9]+": ["customer"],
             "GET /rewards": ["customer"],
             "POST /redeem": ["customer"],
+            "GET /redemptions/customer/[0-9]+": ["customer"],
+            "DELETE /redemptions/[0-9]+": ["customer"],
 
             "GET /profile/[0-9]+": ["customer"],
 
