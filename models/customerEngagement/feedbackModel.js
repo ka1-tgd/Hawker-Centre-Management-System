@@ -2,7 +2,7 @@
 const sql = require("mssql");
 const dbConfig = require("../../dbConfig");
 
-// Points awarded to a customer each time they submit feedbac
+// Points awarded to a customer each time they submit feedback
 const FEEDBACK_POINTS = 10;
 
 // Get a customer's past orders that are eligible for feedback
@@ -17,13 +17,14 @@ async function getEligibleOrders(userId) {
       JOIN Stall s ON oi.stall_id = s.stall_id
       JOIN MenuItem mi ON oi.menu_item_id = mi.menu_item_id
       WHERE co.user_id = @userId
+        AND co.order_id NOT IN (SELECT order_id FROM Feedback WHERE user_id = @userId)
       ORDER BY co.order_date DESC, co.order_id
     `;
     const request = connection.request();
     request.input("userId", userId);
     const result = await request.query(query);
 
-    // One row per item comes back from SQL - group them under their order.
+    // One row per item comes back from SQL
     const orders = [];
     const orderPositions = {};
     result.recordset.forEach((row) => {
@@ -60,6 +61,20 @@ async function createFeedback(feedback) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
+
+    // Prevent submitting feedback twice for the same order
+    const checkRequest = connection.request();
+    checkRequest.input("orderId", feedback.order_id);
+    const checkResult = await checkRequest.query(
+      "SELECT FeedbackID FROM Feedback WHERE order_id = @orderId"
+    );
+    if (checkResult.recordset.length > 0) {
+      const error = new Error("Feedback has already been submitted for this order");
+      error.status = 400;
+      throw error;
+    }
+
+    connection = await sql.connect(dbConfig);
     const query = `
       INSERT INTO Feedback (order_id, user_id, stall_id, Rating, Comment)
       VALUES (@order_id, @user_id, @stall_id, @Rating, @Comment);
@@ -76,6 +91,7 @@ async function createFeedback(feedback) {
     const newFeedbackId = result.recordset[0].id;
 
     // Award loyalty points for submitting feedback
+    connection = await sql.connect(dbConfig);
     const pointsRequest = connection.request();
     pointsRequest.input("userId", feedback.user_id);
     pointsRequest.input("points", FEEDBACK_POINTS);
@@ -142,7 +158,7 @@ async function getFeedbackByUser(userId) {
     const result = await request.query(query);
 
     // One row per item comes back from SQL 
-    const feedbackList = [];  
+    const feedbackList = [];
     const feedbackPositions = {};
     result.recordset.forEach((row) => {
       if (feedbackPositions[row.FeedbackID] === undefined) {
@@ -208,8 +224,8 @@ async function updateFeedback(id, updatedFeedback) {
   }
 }
 
-// Delete feedback
-async function deleteFeedback(id) {
+// Delete feedback and deduct the loyalty points that were awarded for it
+async function deleteFeedback(id, userId) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
@@ -218,7 +234,20 @@ async function deleteFeedback(id) {
     request.input("id", id);
     const result = await request.query(query);
 
-    return result.rowsAffected[0] > 0;
+    if (result.rowsAffected[0] === 0) {
+      return false;
+    }
+
+    // Deduct the points awarded for this feedback, without going below 0
+    connection = await sql.connect(dbConfig);
+    const pointsRequest = connection.request();
+    pointsRequest.input("userId", userId);
+    pointsRequest.input("points", FEEDBACK_POINTS);
+    await pointsRequest.query(
+      "UPDATE LoyaltyPoints SET CurrentPoints = CASE WHEN CurrentPoints - @points < 0 THEN 0 ELSE CurrentPoints - @points END, LastUpdated = GETDATE() WHERE user_id = @userId"
+    );
+
+    return true;
   } catch (error) {
     console.error("Database error:", error);
     throw error;

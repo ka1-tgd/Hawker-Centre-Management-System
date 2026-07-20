@@ -275,7 +275,7 @@ async function getUserProfile(userId) {
   try {
     connection = await sql.connect(dbConfig);
     const query =
-      "SELECT user_id, name, contact_no, email FROM Users WHERE user_id = @userId";
+      "SELECT user_id, name, email FROM Users WHERE user_id = @userId";
     const request = connection.request();
     request.input("userId", userId);
     const result = await request.query(query);

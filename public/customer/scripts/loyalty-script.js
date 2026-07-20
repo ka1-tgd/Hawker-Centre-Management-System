@@ -33,7 +33,6 @@ async function loadUserDetails() {
 
     userNameEl.textContent = user.name;
     userEmailEl.textContent = `Email: ${user.email}`;
-    userContactEl.textContent = `Contact: ${user.contact_no}`;
   } catch (error) {
     console.error(error);
     userNameEl.textContent = "Failed to load profile";
@@ -117,7 +116,6 @@ async function loadRewards() {
 }
 
 // Load the customer's redemption history (their claim receipts to show in person)
-// Load the customer's redemption history (their claim receipts to show in person)
 async function loadRedemptionHistory() {
   try {
     redemptionListEl.innerHTML = "Loading your redemptions...";
@@ -191,7 +189,8 @@ async function handleCancelRedemption(event) {
     if (response.ok) {
       messageEl.textContent = data.message;
       messageEl.style.color = "green";
-      loadLoyaltyPoints().then(loadRewards);
+      await loadLoyaltyPoints();
+      loadRewards();
       loadRedemptionHistory();
     } else {
       messageEl.textContent = data.error;
@@ -234,9 +233,8 @@ async function handleRedeemClick(event) {
       messageEl.textContent = data.message;
       messageEl.style.color = "green";
 
-      // Update the points shown and re-check which rewards are still affordable
-      currentPoints = data.loyalty.CurrentPoints;
-      pointsValueEl.textContent = currentPoints;
+      // Refresh points, tier, and progress bar together 
+      await loadLoyaltyPoints();
       loadRewards();
       loadRedemptionHistory();
     } else {
@@ -250,8 +248,9 @@ async function handleRedeemClick(event) {
   }
 }
 
-window.addEventListener("load", () => {
-  loadUserDetails();
-  loadLoyaltyPoints().then(loadRewards);
+window.addEventListener("load", async () => {
+  await loadUserDetails();
+  await loadLoyaltyPoints();
+  loadRewards();
   loadRedemptionHistory();
 });
