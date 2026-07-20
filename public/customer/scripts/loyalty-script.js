@@ -117,6 +117,7 @@ async function loadRewards() {
 }
 
 // Load the customer's redemption history (their claim receipts to show in person)
+// Load the customer's redemption history (their claim receipts to show in person)
 async function loadRedemptionHistory() {
   try {
     redemptionListEl.innerHTML = "Loading your redemptions...";
@@ -146,9 +147,14 @@ async function loadRedemptionHistory() {
       const redeemedDate = new Date(redemption.RedeemedDate).toLocaleDateString();
 
       item.innerHTML = `
-        <strong>${redemption.RewardName}</strong>
-        <span>${redemption.PointsUsed} points used</span>
-        <span>Redeemed on: ${redeemedDate}</span>
+        <div class="redemption-header">
+          <strong>${redemption.RewardName}</strong>
+          <span class="redemption-code">Claim Code: #${redemption.RedemptionID}</span>
+        </div>
+        <div class="redemption-meta">
+          <span>${redemption.PointsUsed} points used</span>
+          <span>Redeemed on: ${redeemedDate}</span>
+        </div>
         <button data-redemption-id="${redemption.RedemptionID}">Cancel</button>
       `;
 

@@ -2,7 +2,14 @@
 const sql = require("mssql");
 const dbConfig = require("../../dbConfig");
 
-// Get a customer's current points and tier.
+// Work out which tier a given point total qualifies for
+function calculateTier(points) {
+  if (points >= 250) return "Gold";
+  if (points >= 100) return "Silver";
+  return "Bronze";
+}
+
+// Get a customer's current points and tier. 
 async function getLoyaltyPoints(userId) {
   let connection;
   try {
@@ -14,7 +21,20 @@ async function getLoyaltyPoints(userId) {
     const result = await request.query(query);
 
     if (result.recordset[0]) {
-      return result.recordset[0];
+      const points = result.recordset[0].CurrentPoints;
+      const correctTier = calculateTier(points);
+
+      // Keep the stored Tier column in sync too, in case it's ever read directly
+      if (correctTier !== result.recordset[0].Tier) {
+        const updateRequest = connection.request();
+        updateRequest.input("userId", userId);
+        updateRequest.input("tier", correctTier);
+        await updateRequest.query(
+          "UPDATE LoyaltyPoints SET Tier = @tier WHERE user_id = @userId"
+        );
+      }
+
+      return { CurrentPoints: points, Tier: correctTier };
     }
 
     // No record yet - create one with the table's own defaults
@@ -200,7 +220,6 @@ async function deleteRedemption(redemptionId, userId, pointsUsed) {
       return false;
     }
 
-    // Reconnect before the refund update
     connection = await sql.connect(dbConfig);
     const refundRequest = connection.request();
     refundRequest.input("userId", userId);
@@ -210,6 +229,32 @@ async function deleteRedemption(redemptionId, userId, pointsUsed) {
     );
 
     return true;
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+// Mark a redemption as claimed
+async function claimRedemption(redemptionId) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const request = connection.request();
+    request.input("id", redemptionId);
+    const result = await request.query(
+      "DELETE FROM RedemptionHistory WHERE RedemptionID = @id"
+    );
+
+    return result.rowsAffected[0] > 0;
   } catch (error) {
     console.error("Database error:", error);
     throw error;
@@ -258,5 +303,6 @@ module.exports = {
   getRedemptionHistory,
   getRedemptionById,
   deleteRedemption,
+  claimRedemption,
   getUserProfile,
 };

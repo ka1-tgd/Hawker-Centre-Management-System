@@ -63,7 +63,7 @@ async function redeemReward(req, res) {
   }
 }
 
-// Get a customer's redemption history (their reward claim receipts)
+// Get a customer's redemption history (their claim codes / vouchers)
 async function getRedemptionHistory(req, res) {
   try {
     const userId = parseInt(req.params.userId);
@@ -102,6 +102,25 @@ async function deleteRedemption(req, res) {
   }
 }
 
+// Vendor marks a redemption as claimed after the customer shows their claim code
+async function claimRedemption(req, res) {
+  try {
+    const id = parseInt(req.params.id);
+
+    const redemption = await loyaltyModel.getRedemptionById(id);
+    if (!redemption) {
+      return res.status(404).json({ error: "Claim code not found or already used" });
+    }
+
+    await loyaltyModel.claimRedemption(id);
+
+    res.json({ message: "Redemption marked as claimed successfully" });
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error claiming redemption" });
+  }
+}
+
 // Get a customer's basic profile info for the account page
 async function getUserProfile(req, res) {
   try {
@@ -125,5 +144,6 @@ module.exports = {
   redeemReward,
   getRedemptionHistory,
   deleteRedemption,
+  claimRedemption,
   getUserProfile,
 };

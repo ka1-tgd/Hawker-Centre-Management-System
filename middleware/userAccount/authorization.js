@@ -56,6 +56,7 @@ function verifyJWT(req, res, next) {
             "POST /redeem": ["customer"],
             "GET /redemptions/customer/[0-9]+": ["customer"],
             "DELETE /redemptions/[0-9]+": ["customer"],
+            "PUT /redemptions/[0-9]+/claim": ["hawker"],
 
             "GET /profile/[0-9]+": ["customer"],
 
