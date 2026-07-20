@@ -2,8 +2,7 @@
 const likeToken = localStorage.getItem("token");
 const likeUserId = localStorage.getItem("userId");
 
-let likedItemIds = new Map(); // menu_item_id -> LikeID
-
+let likedItemIds = new Map(); 
 async function loadUserLikes() {
   try {
     const response = await fetch(`http://localhost:3000/likes/customer/${likeUserId}`, {
@@ -18,8 +17,7 @@ async function loadUserLikes() {
 }
 
 function addLikeButton(card) {
-  // Skip cards that already have a Like button (the observer can fire
-  // more than once for the same card)
+  // Skip cards that already have a Like button 
   if (card.querySelector(".like-btn")) return;
 
   const menuItemId = parseInt(card.dataset.id, 10);
@@ -40,8 +38,6 @@ function addLikeButton(card) {
   likeBtn.style.float = "right";
 
   likeBtn.addEventListener("click", async (event) => {
-    // Stop the click from bubbling up to the card's own click handler,
-    // so liking an item never also adds it to the cart
     event.stopPropagation();
     await handleLikeClick(likeBtn, menuItemId);
   });
@@ -90,8 +86,6 @@ async function handleLikeClick(likeBtn, menuItemId) {
   }
 }
 
-// Watch the page for menu item cards being added (by the teammate's
-// script), and attach a Like button to each one as it appears
 async function watchForMenuItems() {
   await loadUserLikes();
 
