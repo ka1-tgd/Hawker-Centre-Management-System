@@ -71,7 +71,7 @@ function verifyJWT(req, res, next) {
             "PUT /vendor/complaints/[0-9]+/resolve": ["hawker"],
         };
 
-        const requestedEndpoint = `${req.method} ${req.url}`; // Include method in endpointl;
+        const requestedEndpoint = `${req.method} ${req.path}`; // Include method in endpointl;
         const userRole = decoded.role;
 
         const authorizedRole = Object.entries(authorizedRoles).find(
