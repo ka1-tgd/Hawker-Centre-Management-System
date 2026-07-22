@@ -36,8 +36,21 @@ async function getRevenueSummary(req, res) {
   }
 }
 
+// Get chart image URL for popular items
+async function getPopularItemsChart(req, res) {
+  try {
+    const stallId = parseInt(req.params.stallId);
+    const chartUrl = await salesModel.generatePopularItemsChart(stallId);
+    res.json({ chartUrl });
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error generating chart" });
+  }
+}
+
 module.exports = {
   getPopularItems,
   getPeakHours,
   getRevenueSummary,
+  getPopularItemsChart,
 };
