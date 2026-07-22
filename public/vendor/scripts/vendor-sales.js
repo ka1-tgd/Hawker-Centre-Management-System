@@ -8,6 +8,27 @@ function getAuthHeaders() {
   };
 }
 
+async function loadPopularItemsChart(stallId) {
+  const chartContainer = document.getElementById("popularItemsChart");
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/vendor/sales/${stallId}/chart`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch chart");
+    }
+
+    const result = await response.json();
+    chartContainer.innerHTML = `<img src="${result.chartUrl}" alt="Top Selling Items Chart" style="max-width:100%;">`;
+
+  } catch (error) {
+    console.error("Error loading chart:", error);
+    chartContainer.innerHTML = "<p>Chart unavailable.</p>";
+  }
+}
+
 async function loadSalesDashboard() {
   try {
     // Step 1: get the logged in vendor's stall
@@ -32,6 +53,7 @@ async function loadSalesDashboard() {
     await loadRevenueSummary(stallId);
     await loadPopularItems(stallId);
     await loadPeakHours(stallId);
+    await loadPopularItemsChart(stallId);
 
   } catch (error) {
     console.error("Error loading sales dashboard:", error);
