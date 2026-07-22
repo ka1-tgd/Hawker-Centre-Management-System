@@ -1,5 +1,6 @@
 const sql = require("mssql");
 const dbConfig = require("../../dbConfig");
+const axios = require("axios");
 
 // Get top 5 best-selling menu items for a stall
 async function getPopularItems(stallId) {
@@ -95,8 +96,55 @@ async function getRevenueSummary(stallId) {
   }
 }
 
+// Generate a bar chart image URL for popular items using QuickChart API
+async function generatePopularItemsChart(stallId) {
+  try {
+    const items = await getPopularItems(stallId);
+
+    const chartConfig = {
+      type: "bar",
+      data: {
+        labels: items.map((item) => item.item_name),
+        datasets: [
+          {
+            label: "Quantity Sold",
+            data: items.map((item) => item.total_quantity),
+            backgroundColor: "#26a354",
+          },
+        ],
+      },
+      options: {
+        title: {
+          display: true,
+          text: "Top Selling Items",
+        },
+        scales: {
+          yAxes: [
+            {
+              ticks: {
+                beginAtZero: true,
+                stepSize: 1,
+              },
+            },
+          ],
+        },
+      },
+    };
+
+    const response = await axios.post("https://quickchart.io/chart/create", {
+      chart: chartConfig,
+    });
+
+    return response.data.url;
+  } catch (error) {
+    console.error("Chart generation error:", error);
+    throw error;
+  }
+}
+
 module.exports = {
   getPopularItems,
   getPeakHours,
   getRevenueSummary,
+  generatePopularItemsChart,
 };
