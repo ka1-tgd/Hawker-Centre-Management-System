@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim a Reward - Vendor Dashboard</title>
+    <link rel="stylesheet" href="../css/vendor-stall.css">
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            HawkerHub
+        </div>
+        <nav>
+            <ul>
+                <li><a href="vendor-home.html">Home</a></li>
+                <li><a href="vendor-stall.html">Stalls</a></li>
+                <li><a href="#">Menus</a></li>
+                <li><a href="#">Menu Items</a></li>
+                <li><a href="vendor-sales.html">Sales</a></li>
+                <li><a href="claim-redemption.html" class="active">Rewards</a></li>
+                <li><a href="satisfaction-dashboard.html">Reviews</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <div>
+                <h1>Claim a Reward</h1>
+                <p>
+                    Ask the customer for their Claim Code (shown on their "My Redemptions" list) and enter it below to mark it as used.
+                </p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="redemptionId">Claim Code (Redemption ID)</label>
+            <input type="number" id="redemptionId" placeholder="e.g. 3">
+        </div>
+
+        <div class="form-buttons">
+            <button id="saveButton">Mark as Claimed</button>
+        </div>
+
+        <p id="message" style="margin-top: 20px; font-weight: bold;"></p>
+    </main>
+
+    <script src="../scripts/claim-redemption-script.js"></script>
+</body>
+
+</html>

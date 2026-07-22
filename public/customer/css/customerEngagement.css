@@ -61,11 +61,27 @@ body {
   flex: 1;
 }
 
-/* Loyalty points bar */
+/* Loyalty points + tier badge row */
+.loyalty-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .points-value {
   font-size: 32px;
   color: #2b3a8f;
   font-weight: bold;
+}
+
+#tierLabel {
+  background: #eef0fb;
+  color: #2b3a8f;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  margin: 0;
 }
 
 .progress-bar {
@@ -79,6 +95,20 @@ body {
   background: #2b3a8f;
   height: 10px;
   border-radius: 10px;
+}
+
+/* Profile info spacing */
+.profile-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #555;
+  margin: 8px 0 16px;
+}
+
+.profile-meta p {
+  margin: 0;
+  font-size: 14px;
 }
 
 /* Reward cards */
@@ -102,8 +132,10 @@ body {
   padding: 12px;
 }
 
-.reward-card button {
-  margin-top: 8px;
+/* Shared "solid blue action button" style, used for reward, pagination and details buttons */
+.reward-card button,
+.pagination button,
+.details-btn {
   background: #2b3a8f;
   color: white;
   border: none;
@@ -112,9 +144,57 @@ body {
   cursor: pointer;
 }
 
-.reward-card button:disabled {
+.reward-card button { margin-top: 8px; }
+.details-btn { font-weight: bold; text-decoration: none; }
+
+.reward-card button:disabled,
+.pagination button:disabled {
   background: #aaa;
   cursor: not-allowed;
+}
+
+/* Redemption history (claim receipts) */
+.redemption-item {
+  background: #f4f5fb;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.redemption-header, .redemption-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.redemption-meta {
+  color: #666;
+  font-size: 13px;
+  margin: 8px 0;
+}
+
+.redemption-code {
+  color: #2b3a8f;
+  font-weight: bold;
+}
+
+/* Shared "solid red delete/cancel button" style */
+.like-item button,
+.redemption-item button,
+.feedback-display .delete-btn {
+  background: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.like-item button:hover,
+.redemption-item button:hover {
+  background: #b52b27;
 }
 
 /* Like list (My Likes page) */
@@ -128,19 +208,6 @@ body {
 .like-item > *:nth-child(1) { flex: 2; font-weight: bold; }
 .like-item > *:nth-child(2) { flex: 1; color: #444; }
 .like-item > *:nth-child(3) { flex: 1.3; color: #888; }
-
-.like-item button {
-  background: #d9534f;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 14px;
-  cursor: pointer;
-}
-
-.like-item button:hover {
-  background: #b52b27;
-}
 
 /* Heart-style like button (for the menu items page) */
 .like-btn {
@@ -208,10 +275,6 @@ body {
   cursor: pointer;
 }
 
-.feedback-display .delete-btn {
-  background: #d9534f;
-}
-
 /* Submitted feedback list */
 .feedback-item {
   border-bottom: 1px solid #eee;
@@ -268,20 +331,6 @@ body {
   margin-top: 10px;
 }
 
-.pagination button {
-  background: #2b3a8f;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
-  cursor: pointer;
-}
-
-.pagination button:disabled {
-  background: #aaa;
-  cursor: not-allowed;
-}
-
 .complaint-tag {
   display: inline-block;
   background: #fdecea;
@@ -290,15 +339,4 @@ body {
   padding: 4px 10px;
   margin: 0 6px 6px 0;
   font-size: 13px;
-}
-
-.details-btn {
-  background: #2b3a8f;
-  color: white;
-  font-weight: bold;
-  text-decoration: none;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
-  cursor: pointer;
 }

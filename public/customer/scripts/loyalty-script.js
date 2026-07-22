@@ -1,4 +1,6 @@
+// The login token saved by login.js after a successful login
 const token = localStorage.getItem("token");
+
 const userNameEl = document.getElementById("userName");
 const userEmailEl = document.getElementById("userEmail");
 const userContactEl = document.getElementById("userContact");
@@ -6,6 +8,7 @@ const pointsValueEl = document.getElementById("pointsValue");
 const tierLabelEl = document.getElementById("tierLabel");
 const progressFillEl = document.getElementById("progressFill");
 const rewardGridEl = document.getElementById("rewardGrid");
+const redemptionListEl = document.getElementById("redemptionList");
 const messageEl = document.getElementById("message");
 
 // Points required to REACH each tier (simple fixed thresholds)
@@ -30,7 +33,6 @@ async function loadUserDetails() {
 
     userNameEl.textContent = user.name;
     userEmailEl.textContent = `Email: ${user.email}`;
-    userContactEl.textContent = `Contact: ${user.contact_no}`;
   } catch (error) {
     console.error(error);
     userNameEl.textContent = "Failed to load profile";
@@ -100,7 +102,6 @@ async function loadRewards() {
 
       const useBtn = card.querySelector("button");
 
-      // Grey out (and disable) rewards the user can't afford yet
       if (currentPoints < reward.PointsRequired) {
         useBtn.disabled = true;
       }
@@ -111,6 +112,94 @@ async function loadRewards() {
   } catch (error) {
     console.error(error);
     rewardGridEl.innerHTML = "<p>Failed to load rewards</p>";
+  }
+}
+
+// Load the customer's redemption history (their claim receipts to show in person)
+async function loadRedemptionHistory() {
+  try {
+    redemptionListEl.innerHTML = "Loading your redemptions...";
+
+    const response = await fetch(`/redemptions/customer/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      redemptionListEl.innerHTML = "<p>Authentication failed! Please login.</p>";
+      return;
+    }
+
+    const redemptions = await response.json();
+
+    if (redemptions.length === 0) {
+      redemptionListEl.innerHTML = "<p>You haven't redeemed any rewards yet.</p>";
+      return;
+    }
+
+    redemptionListEl.innerHTML = "";
+
+    redemptions.forEach((redemption) => {
+      const item = document.createElement("div");
+      item.classList.add("redemption-item");
+
+      const redeemedDate = new Date(redemption.RedeemedDate).toLocaleDateString();
+
+      item.innerHTML = `
+        <div class="redemption-header">
+          <strong>${redemption.RewardName}</strong>
+          <span class="redemption-code">Claim Code: #${redemption.RedemptionID}</span>
+        </div>
+        <div class="redemption-meta">
+          <span>${redemption.PointsUsed} points used</span>
+          <span>Redeemed on: ${redeemedDate}</span>
+        </div>
+        <button data-redemption-id="${redemption.RedemptionID}">Cancel</button>
+      `;
+
+      item.querySelector("button").addEventListener("click", handleCancelRedemption);
+      redemptionListEl.appendChild(item);
+    });
+  } catch (error) {
+    console.error(error);
+    redemptionListEl.innerHTML = "<p>Failed to load redemptions</p>";
+  }
+}
+
+// Handle clicking "Cancel" on a redemption - deletes it and refunds the points
+async function handleCancelRedemption(event) {
+  const redemptionId = event.target.getAttribute("data-redemption-id");
+
+  const confirmCancel = confirm("Cancel this redemption? Your points will be refunded.");
+  if (!confirmCancel) return;
+
+  try {
+    const response = await fetch(`/redemptions/${redemptionId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      messageEl.textContent = "Authentication failed! Please login.";
+      messageEl.style.color = "red";
+      return;
+    }
+
+    const data = await response.json();
+
+    if (response.ok) {
+      messageEl.textContent = data.message;
+      messageEl.style.color = "green";
+      await loadLoyaltyPoints();
+      loadRewards();
+      loadRedemptionHistory();
+    } else {
+      messageEl.textContent = data.error;
+      messageEl.style.color = "red";
+    }
+  } catch (error) {
+    console.error(error);
+    messageEl.textContent = "Failed to cancel redemption";
+    messageEl.style.color = "red";
   }
 }
 
@@ -144,10 +233,10 @@ async function handleRedeemClick(event) {
       messageEl.textContent = data.message;
       messageEl.style.color = "green";
 
-      // Update the points shown and re-check which rewards are still affordable
-      currentPoints = data.loyalty.CurrentPoints;
-      pointsValueEl.textContent = currentPoints;
+      // Refresh points, tier, and progress bar together 
+      await loadLoyaltyPoints();
       loadRewards();
+      loadRedemptionHistory();
     } else {
       messageEl.textContent = data.error;
       messageEl.style.color = "red";
@@ -159,7 +248,9 @@ async function handleRedeemClick(event) {
   }
 }
 
-window.addEventListener("load", () => {
-  loadUserDetails();
-  loadLoyaltyPoints().then(loadRewards);
+window.addEventListener("load", async () => {
+  await loadUserDetails();
+  await loadLoyaltyPoints();
+  loadRewards();
+  loadRedemptionHistory();
 });

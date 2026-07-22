@@ -55,6 +55,9 @@ function verifyJWT(req, res, next) {
             "GET /loyalty/[0-9]+": ["customer"],
             "GET /rewards": ["customer"],
             "POST /redeem": ["customer"],
+            "GET /redemptions/customer/[0-9]+": ["customer"],
+            "DELETE /redemptions/[0-9]+": ["customer"],
+            "PUT /redemptions/[0-9]+/claim": ["hawker"],
 
             "GET /profile/[0-9]+": ["customer"],
 
@@ -63,9 +66,13 @@ function verifyJWT(req, res, next) {
             "GET /feedback/customer/[0-9]+": ["customer"],
             "PUT /feedback/[0-9]+": ["customer"],
             "DELETE /feedback/[0-9]+": ["customer"],
+
+            "GET /vendor/satisfaction": ["hawker"],
+            "GET /vendor/complaints": ["hawker"],
+            "PUT /vendor/complaints/[0-9]+/resolve": ["hawker"],
         };
 
-        const requestedEndpoint = `${req.method} ${req.url}`; // Include method in endpointl;
+        const requestedEndpoint = `${req.method} ${req.path}`; // Include method in endpointl;
         const userRole = decoded.role;
 
         const authorizedRole = Object.entries(authorizedRoles).find(

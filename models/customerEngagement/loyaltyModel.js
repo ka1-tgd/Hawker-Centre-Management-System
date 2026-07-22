@@ -2,7 +2,14 @@
 const sql = require("mssql");
 const dbConfig = require("../../dbConfig");
 
-// Get a customer's current points and tier
+// Work out which tier a given point total qualifies for
+function calculateTier(points) {
+  if (points >= 250) return "Gold";
+  if (points >= 100) return "Silver";
+  return "Bronze";
+}
+
+// Get a customer's current points and tier. 
 async function getLoyaltyPoints(userId) {
   let connection;
   try {
@@ -14,12 +21,23 @@ async function getLoyaltyPoints(userId) {
     const result = await request.query(query);
 
     if (result.recordset[0]) {
-      return result.recordset[0];
+      const points = result.recordset[0].CurrentPoints;
+      const correctTier = calculateTier(points);
+
+      // Keep the stored Tier column in sync too, in case it's ever read directly
+      if (correctTier !== result.recordset[0].Tier) {
+        const updateRequest = connection.request();
+        updateRequest.input("userId", userId);
+        updateRequest.input("tier", correctTier);
+        await updateRequest.query(
+          "UPDATE LoyaltyPoints SET Tier = @tier WHERE user_id = @userId"
+        );
+      }
+
+      return { CurrentPoints: points, Tier: correctTier };
     }
 
-    // No record yet - reconnect in case another request closed the shared
-    // pool between the SELECT above and this INSERT
-    connection = await sql.connect(dbConfig);
+    // No record yet - create one with the table's own defaults
     const insertRequest = connection.request();
     insertRequest.input("userId", userId);
     await insertRequest.query(
@@ -129,15 +147,135 @@ async function redeemReward(userId, rewardId, pointsRequired) {
   }
 }
 
+// Get a customer's redemption history (their reward claim receipts to show in person)
+async function getRedemptionHistory(userId) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query = `
+      SELECT rh.RedemptionID, rh.RewardID, r.RewardName, r.DiscountType, r.DiscountValue, r.Description, rh.PointsUsed, rh.RedeemedDate
+      FROM RedemptionHistory rh
+      JOIN Reward r ON rh.RewardID = r.RewardID
+      WHERE rh.user_id = @userId
+      ORDER BY rh.RedeemedDate DESC
+    `;
+    const request = connection.request();
+    request.input("userId", userId);
+    const result = await request.query(query);
+
+    return result.recordset;
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+// Get a single redemption by ID (used to check ownership and get points to refund)
+async function getRedemptionById(redemptionId) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query = "SELECT * FROM RedemptionHistory WHERE RedemptionID = @id";
+    const request = connection.request();
+    request.input("id", redemptionId);
+    const result = await request.query(query);
+
+    return result.recordset[0] || null;
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+// Cancel a redemption: delete it and refund the points used
+async function deleteRedemption(redemptionId, userId, pointsUsed) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+
+    const deleteRequest = connection.request();
+    deleteRequest.input("id", redemptionId);
+    deleteRequest.input("userId", userId);
+    const deleteResult = await deleteRequest.query(
+      "DELETE FROM RedemptionHistory WHERE RedemptionID = @id AND user_id = @userId"
+    );
+
+    if (deleteResult.rowsAffected[0] === 0) {
+      return false;
+    }
+
+    connection = await sql.connect(dbConfig);
+    const refundRequest = connection.request();
+    refundRequest.input("userId", userId);
+    refundRequest.input("points", pointsUsed);
+    await refundRequest.query(
+      "UPDATE LoyaltyPoints SET CurrentPoints = CurrentPoints + @points, LastUpdated = GETDATE() WHERE user_id = @userId"
+    );
+
+    return true;
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+// Mark a redemption as claimed
+async function claimRedemption(redemptionId) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const request = connection.request();
+    request.input("id", redemptionId);
+    const result = await request.query(
+      "DELETE FROM RedemptionHistory WHERE RedemptionID = @id"
+    );
+
+    return result.rowsAffected[0] > 0;
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
 // Get a customer's basic profile info to display on the account page
-// Read-only - the Users table itself belongs to a teammate's module,
-// this just selects the display fields, never writes to it
 async function getUserProfile(userId) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
     const query =
-      "SELECT user_id, name, contact_no, email FROM Users WHERE user_id = @userId";
+      "SELECT user_id, name, email FROM Users WHERE user_id = @userId";
     const request = connection.request();
     request.input("userId", userId);
     const result = await request.query(query);
@@ -162,5 +300,9 @@ module.exports = {
   getActiveRewards,
   getRewardById,
   redeemReward,
+  getRedemptionHistory,
+  getRedemptionById,
+  deleteRedemption,
+  claimRedemption,
   getUserProfile,
 };

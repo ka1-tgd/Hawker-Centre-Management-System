@@ -1,3 +1,6 @@
+// userId is declared inline in feedback.html
+
+// The login token saved by login.js after a successful login 
 const token = localStorage.getItem("token");
 
 const orderSelect = document.getElementById("orderSelect");
@@ -168,9 +171,12 @@ async function handleDeleteFeedback(feedbackId, feedbackElement) {
     });
 
     if (response.ok) {
+      const data = await response.json();
       feedbackElement.remove();
-      messageDiv.textContent = "Feedback deleted";
+      messageDiv.textContent = data.message;
       messageDiv.style.color = "green";
+      // The order this feedback was for is reviewable again now
+      loadEligibleOrders();
     } else if (response.status === 401 || response.status === 403) {
       messageDiv.textContent = "Authentication failed! Please login.";
       messageDiv.style.color = "red";
@@ -219,6 +225,8 @@ feedbackForm.addEventListener("submit", async (event) => {
       messageDiv.style.color = "green";
       feedbackForm.reset();
       loadMyFeedback();
+      // Refresh the dropdown so the order just reviewed disappears from it
+      loadEligibleOrders();
     } else if (response.status === 401 || response.status === 403) {
       messageDiv.textContent = "Authentication failed! Please login.";
       messageDiv.style.color = "red";
@@ -234,7 +242,7 @@ feedbackForm.addEventListener("submit", async (event) => {
   }
 });
 
-window.addEventListener("load", () => {
-  loadEligibleOrders();
+window.addEventListener("load", async () => {
+  await loadEligibleOrders();
   loadMyFeedback();
 });

@@ -22,6 +22,9 @@ async function createFeedback(req, res) {
     });
   } catch (error) {
     console.error("Controller error:", error);
+    if (error.status === 400) {
+      return res.status(400).json({ error: error.message });
+    }
     res.status(500).json({ error: "Error creating feedback" });
   }
 }
@@ -64,8 +67,8 @@ async function deleteFeedback(req, res) {
       return res.status(404).json({ error: "Feedback not found" });
     }
 
-    await feedbackModel.deleteFeedback(id);
-    res.json({ message: "Feedback deleted successfully" });
+    await feedbackModel.deleteFeedback(id, existing.user_id);
+    res.json({ message: "Feedback deleted successfully. Points deducted." });
   } catch (error) {
     console.error("Controller error:", error);
     res.status(500).json({ error: "Error deleting feedback" });

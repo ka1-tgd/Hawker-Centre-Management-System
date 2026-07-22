@@ -120,6 +120,9 @@ app.delete("/likes/:id", verifyJWT, menuItemLikeValidation.validateLikeId, menuI
 app.get("/loyalty/:userId", verifyJWT, loyaltyController.getLoyaltyPoints);
 app.get("/rewards", verifyJWT, loyaltyController.getRewards);
 app.post("/redeem", verifyJWT, loyaltyValidation.validateRedeem, loyaltyController.redeemReward);
+app.get("/redemptions/customer/:userId", verifyJWT, loyaltyController.getRedemptionHistory);
+app.delete("/redemptions/:id", verifyJWT, loyaltyValidation.validateRedemptionId, loyaltyController.deleteRedemption);
+app.put("/redemptions/:id/claim", verifyJWT, loyaltyValidation.validateRedemptionId, loyaltyController.claimRedemption);
  
 // Route for basic profile display on the account page 
 app.get("/profile/:userId", verifyJWT, loyaltyController.getUserProfile);
@@ -132,9 +135,9 @@ app.put("/feedback/:id", verifyJWT, feedbackValidation.validateFeedbackId, feedb
 app.delete("/feedback/:id", verifyJWT, feedbackValidation.validateFeedbackId, feedbackController.deleteFeedback);
 
 // Routes - Vendor Satisfaction Dashboard (per-stall ratings + complaints, SCRUM-72)
-app.get("/vendor/satisfaction", vendorDashboardValidation.validateStallId, vendorDashboardController.getSatisfaction);
-app.get("/vendor/complaints", vendorDashboardValidation.validateStallId, vendorDashboardController.getComplaints);
-app.put("/vendor/complaints/:id/resolve", vendorDashboardValidation.validateComplaintId, vendorDashboardController.resolveComplaint);
+app.get("/vendor/satisfaction", verifyJWT, vendorDashboardValidation.validateStallId, vendorDashboardController.getSatisfaction);
+app.get("/vendor/complaints", verifyJWT, vendorDashboardValidation.validateStallId, vendorDashboardController.getComplaints);
+app.put("/vendor/complaints/:id/resolve", verifyJWT, vendorDashboardValidation.validateComplaintId, vendorDashboardController.resolveComplaint);
 
 // Start server
 app.listen(port, () => {
