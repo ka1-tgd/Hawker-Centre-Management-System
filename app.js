@@ -108,6 +108,7 @@ app.delete("/vendor/stalls/:id", verifyJWT, validateVendorStallId, stallControll
 app.get("/vendor/sales/:stallId/popular-items", verifyJWT, validateSalesStallId, salesController.getPopularItems);
 app.get("/vendor/sales/:stallId/peak-hours", verifyJWT, validateSalesStallId, salesController.getPeakHours);
 app.get("/vendor/sales/:stallId/revenue", verifyJWT, validateSalesStallId, salesController.getRevenueSummary);
+app.get("/vendor/sales/:stallId/chart", verifyJWT, validateSalesStallId, salesController.getPopularItemsChart);
 
 // Routes - Menu Item Likes
 app.post("/likes", verifyJWT, menuItemLikeValidation.validateCreateLike, menuItemLikeController.createLike);

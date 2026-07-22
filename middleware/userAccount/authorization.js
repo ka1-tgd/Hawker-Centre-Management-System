@@ -33,6 +33,7 @@ function verifyJWT(req, res, next) {
             "GET /vendor/sales/[0-9]+/popular-items": ["hawker"],
             "GET /vendor/sales/[0-9]+/peak-hours": ["hawker"],
             "GET /vendor/sales/[0-9]+/revenue": ["hawker"],
+            "GET /vendor/sales/[0-9]+/chart": ["hawker"],
 
             // Customer exclusive
             "GET /customer/order/[0-9]+": ["customer"],
