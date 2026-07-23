@@ -3,8 +3,8 @@ const token = localStorage.getItem("token");
 
 const ratingSummaryEl = document.getElementById("ratingSummary");
 const ratingSummarySubtextEl = document.getElementById("ratingSummarySubtext");
-const ratingBreakdownDiv = document.getElementById("ratingBreakdown");
-const ratingTrendDiv = document.getElementById("ratingTrend");
+const ratingBreakdownCanvas = document.getElementById("ratingBreakdownChart");
+const ratingTrendCanvas = document.getElementById("ratingTrendChart");
 const recentFeedbackDiv = document.getElementById("recentFeedback");
 const complaintSummaryDiv = document.getElementById("complaintSummary");
 const complaintsListDiv = document.getElementById("complaintsList");
@@ -13,12 +13,17 @@ const prevPageBtn = document.getElementById("prevPageBtn");
 const nextPageBtn = document.getElementById("nextPageBtn");
 const messageDiv = document.getElementById("message");
 
+// Chart.js instances 
+let ratingBreakdownChart = null;
+let ratingTrendChart = null;
+
+const CHART_GREEN = "#8fd6ab";
+
 let currentPage = 1;
 let lastRecentFeedbackCount = 0;
 let stallId = null;
 
-// Find the logged-in vendor's own stall, instead of hardcoding one -
-// reuses the same endpoint the Stall Management page is built on
+// Find the logged-in vendor's own stall, instead of hardcoding one 
 async function loadVendorStall() {
   try {
     const response = await fetch("/vendor/stalls", {
@@ -74,7 +79,7 @@ async function loadDashboard(page) {
 
     pageLabel.textContent = `Page ${currentPage}`;
     prevPageBtn.disabled = currentPage <= 1;
-    nextPageBtn.disabled = lastRecentFeedbackCount < 5; 
+    nextPageBtn.disabled = lastRecentFeedbackCount < 5; // pageSize is 5 on the backend
   } catch (error) {
     console.error(error);
     ratingSummaryEl.textContent = "Failed to load";
@@ -100,64 +105,73 @@ function renderRatingSummary(averageRating, totalReviews) {
     : `${totalReviews} review${totalReviews === 1 ? "" : "s"} total`;
 }
 
-// 5-star down to 1-star bars
+// 5-star down to 1-star bars, drawn as a Chart.js bar chart
 function renderRatingBreakdown(ratingBreakdown) {
   const totalReviews = ratingBreakdown.reduce((sum, r) => sum + r.count, 0);
 
-  if (totalReviews === 0) {
-    ratingBreakdownDiv.innerHTML = "<p>No feedback submitted yet.</p>";
-    return;
-  }
-
-  ratingBreakdownDiv.innerHTML = "";
-
-  for (let star = 5; star >= 1; star--) {
+  const counts = [5, 4, 3, 2, 1].map((star) => {
     const found = ratingBreakdown.find((r) => r.Rating === star);
-    const count = found ? found.count : 0;
-    const percent = (count / totalReviews) * 100;
+    return found ? found.count : 0;
+  });
 
-    const row = document.createElement("div");
-    row.style.display = "flex";
-    row.style.alignItems = "center";
-    row.style.gap = "10px";
-    row.style.marginBottom = "8px";
-    row.innerHTML = `
-      <span style="width:50px;">${star} star</span>
-      <div style="flex:1; background:#eee; border-radius:6px; height:10px; overflow:hidden;">
-        <div style="width:${percent}%; background:#26a354; height:100%;"></div>
-      </div>
-      <span style="width:30px; text-align:right;">${count}</span>
-    `;
-    ratingBreakdownDiv.appendChild(row);
+  if (ratingBreakdownChart) {
+    ratingBreakdownChart.destroy();
   }
+
+  ratingBreakdownChart = new Chart(ratingBreakdownCanvas, {
+    type: "bar",
+    data: {
+      labels: ["5 star", "4 star", "3 star", "2 star", "1 star"],
+      datasets: [{
+        label: "Number of Reviews",
+        data: counts,
+        backgroundColor: CHART_GREEN,
+        borderRadius: 4,
+      }],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: totalReviews > 0 },
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1 } },
+      },
+    },
+  });
 }
 
-// Average rating per day over the last 30 days
+// Average rating per day over the last 30 days, drawn as a Chart.js line chart
 function renderRatingTrend(ratingTrend) {
-  if (ratingTrend.length === 0) {
-    ratingTrendDiv.innerHTML = "<p>No feedback in the last 30 days.</p>";
-    return;
+  const labels = ratingTrend.map((entry) => new Date(entry.feedbackDate).toLocaleDateString());
+  const data = ratingTrend.map((entry) => entry.avgRating);
+
+  if (ratingTrendChart) {
+    ratingTrendChart.destroy();
   }
 
-  ratingTrendDiv.innerHTML = "";
-
-  ratingTrend.forEach((entry) => {
-    const date = new Date(entry.feedbackDate).toLocaleDateString();
-    const percent = (entry.avgRating / 5) * 100;
-
-    const row = document.createElement("div");
-    row.style.display = "flex";
-    row.style.alignItems = "center";
-    row.style.gap = "10px";
-    row.style.marginBottom = "8px";
-    row.innerHTML = `
-      <span style="width:100px;">${date}</span>
-      <div style="flex:1; background:#eee; border-radius:6px; height:10px; overflow:hidden;">
-        <div style="width:${percent}%; background:#26a354; height:100%;"></div>
-      </div>
-      <span style="width:30px; text-align:right;">${entry.avgRating.toFixed(1)}</span>
-    `;
-    ratingTrendDiv.appendChild(row);
+  ratingTrendChart = new Chart(ratingTrendCanvas, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{
+        label: "Average Rating",
+        data,
+        borderColor: CHART_GREEN,
+        backgroundColor: CHART_GREEN,
+        tension: 0.3,
+        pointRadius: 4,
+      }],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: ratingTrend.length > 0 },
+      },
+      scales: {
+        y: { beginAtZero: true, suggestedMax: 5 },
+      },
+    },
   });
 }
 

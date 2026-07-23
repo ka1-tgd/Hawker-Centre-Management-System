@@ -50,15 +50,15 @@
         <div class="page-header">
             <h1 style="font-size:24px;">Rating Breakdown</h1>
         </div>
-        <div id="ratingBreakdown" style="background:white; border-radius:10px; padding:20px; box-shadow:0 3px 12px rgba(0,0,0,.08); margin-bottom:35px;">
-            Loading rating breakdown...
+        <div style="background:white; border-radius:10px; padding:20px; box-shadow:0 3px 12px rgba(0,0,0,.08); margin-bottom:35px;">
+            <canvas id="ratingBreakdownChart" height="120"></canvas>
         </div>
 
         <div class="page-header">
             <h1 style="font-size:24px;">Rating Trend (last 30 days)</h1>
         </div>
-        <div id="ratingTrend" style="background:white; border-radius:10px; padding:20px; box-shadow:0 3px 12px rgba(0,0,0,.08); margin-bottom:35px;">
-            Loading rating trend...
+        <div style="background:white; border-radius:10px; padding:20px; box-shadow:0 3px 12px rgba(0,0,0,.08); margin-bottom:35px;">
+            <canvas id="ratingTrendChart" height="120"></canvas>
         </div>
 
         <div class="page-header">
@@ -79,6 +79,7 @@
         <p id="message" style="margin-top:20px; font-weight:bold;"></p>
     </main>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <script src="../scripts/satisfaction-dashboard-script.js"></script>
 </body>
 
