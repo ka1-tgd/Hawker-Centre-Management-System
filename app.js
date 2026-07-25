@@ -17,6 +17,7 @@ const loyaltyController = require("./controllers/customerEngagement/loyaltyContr
 const feedbackController = require("./controllers/customerEngagement/feedbackController");
 const vendorDashboardController = require("./controllers/customerEngagement/vendorDashboardController");
 const salesController = require("./controllers/vendor/salesController");
+const complaintController = require("./controllers/customer/complaintController");
 
 // Require middleware functions
 const {
@@ -49,6 +50,12 @@ const {
   validateStallId: validateSalesStallId,
 } = require("./middleware/vendor/salesValidation.js");
 
+const {
+  validateComplaint,
+  validateStatusUpdate,
+  validateUserId: validateComplaintUserId,
+  validateComplaintId,
+} = require("./middleware/customer/complaintValidation.js");
 
 const menuItemLikeValidation = require("./middleware/customerEngagement/menuItemLikeValidation");
 const loyaltyValidation = require("./middleware/customerEngagement/loyaltyValidation");
@@ -134,6 +141,12 @@ app.post("/feedback", verifyJWT, feedbackValidation.validateCreateFeedback, feed
 app.get("/feedback/customer/:userId", verifyJWT, feedbackController.getFeedbackByUser);
 app.put("/feedback/:id", verifyJWT, feedbackValidation.validateFeedbackId, feedbackValidation.validateUpdateFeedback, feedbackController.updateFeedback);
 app.delete("/feedback/:id", verifyJWT, feedbackValidation.validateFeedbackId, feedbackController.deleteFeedback);
+
+// Routes - Complaint Management
+app.post("/complaints", verifyJWT, validateComplaint, complaintController.createComplaint);
+app.get("/complaints/customer/:userId", verifyJWT, validateComplaintUserId, complaintController.getComplaintsByUser);
+app.put("/complaints/:id/status", verifyJWT, validateComplaintId, validateStatusUpdate, complaintController.updateComplaintStatus);
+app.delete("/complaints/:id", verifyJWT, validateComplaintId, complaintController.deleteComplaint);
 
 // Routes - Vendor Satisfaction Dashboard (per-stall ratings + complaints, SCRUM-72)
 app.get("/vendor/satisfaction", verifyJWT, vendorDashboardValidation.validateStallId, vendorDashboardController.getSatisfaction);

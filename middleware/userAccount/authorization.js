@@ -68,6 +68,11 @@ function verifyJWT(req, res, next) {
             "PUT /feedback/[0-9]+": ["customer"],
             "DELETE /feedback/[0-9]+": ["customer"],
 
+            "POST /complaints": ["customer"],
+            "GET /complaints/customer/[0-9]+": ["customer"],
+            "PUT /complaints/[0-9]+/status": ["customer"],
+            "DELETE /complaints/[0-9]+": ["customer"],
+
             "GET /vendor/satisfaction": ["hawker"],
             "GET /vendor/complaints": ["hawker"],
             "PUT /vendor/complaints/[0-9]+/resolve": ["hawker"],
