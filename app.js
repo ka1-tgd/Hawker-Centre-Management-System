@@ -122,6 +122,7 @@ app.get("/rewards", verifyJWT, loyaltyController.getRewards);
 app.post("/redeem", verifyJWT, loyaltyValidation.validateRedeem, loyaltyController.redeemReward);
 app.get("/redemptions/customer/:userId", verifyJWT, loyaltyController.getRedemptionHistory);
 app.delete("/redemptions/:id", verifyJWT, loyaltyValidation.validateRedemptionId, loyaltyController.deleteRedemption);
+app.get("/redemptions/:id/details", verifyJWT, loyaltyValidation.validateRedemptionId, loyaltyController.getRedemptionDetails);
 app.put("/redemptions/:id/claim", verifyJWT, loyaltyValidation.validateRedemptionId, loyaltyController.claimRedemption);
  
 // Route for basic profile display on the account page 

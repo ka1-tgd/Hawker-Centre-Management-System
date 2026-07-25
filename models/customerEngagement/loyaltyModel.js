@@ -243,6 +243,37 @@ async function deleteRedemption(redemptionId, userId, pointsUsed) {
   }
 }
 
+// Get a redemption's full details, including the reward info
+async function getRedemptionWithRewardDetails(redemptionId) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query = `
+      SELECT rh.RedemptionID, rh.RewardID, rh.PointsUsed, rh.RedeemedDate,
+             r.RewardName, r.DiscountType, r.DiscountValue, r.Description
+      FROM RedemptionHistory rh
+      JOIN Reward r ON rh.RewardID = r.RewardID
+      WHERE rh.RedemptionID = @redemptionId
+    `;
+    const request = connection.request();
+    request.input("redemptionId", redemptionId);
+    const result = await request.query(query);
+
+    return result.recordset[0] || null;
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
 // Mark a redemption as claimed
 async function claimRedemption(redemptionId) {
   let connection;
@@ -302,6 +333,7 @@ module.exports = {
   redeemReward,
   getRedemptionHistory,
   getRedemptionById,
+  getRedemptionWithRewardDetails,
   deleteRedemption,
   claimRedemption,
   getUserProfile,

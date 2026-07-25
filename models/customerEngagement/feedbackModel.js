@@ -3,7 +3,7 @@ const sql = require("mssql");
 const dbConfig = require("../../dbConfig");
 
 // Points awarded to a customer each time they submit feedback
-const FEEDBACK_POINTS = 10;
+const FEEDBACK_POINTS = 20;
 
 // Get a customer's past orders that are eligible for feedback
 async function getEligibleOrders(userId) {

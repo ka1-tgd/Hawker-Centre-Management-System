@@ -102,6 +102,23 @@ async function deleteRedemption(req, res) {
   }
 }
 
+// Vendor looks up a claim code before confirming
+async function getRedemptionDetails(req, res) {
+  try {
+    const id = parseInt(req.params.id);
+    const redemption = await loyaltyModel.getRedemptionWithRewardDetails(id);
+
+    if (!redemption) {
+      return res.status(404).json({ error: "Claim code not found or already used" });
+    }
+
+    res.json(redemption);
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error retrieving redemption details" });
+  }
+}
+
 // Vendor marks a redemption as claimed after the customer shows their claim code
 async function claimRedemption(req, res) {
   try {
@@ -144,6 +161,7 @@ module.exports = {
   redeemReward,
   getRedemptionHistory,
   deleteRedemption,
+  getRedemptionDetails,
   claimRedemption,
   getUserProfile,
 };
