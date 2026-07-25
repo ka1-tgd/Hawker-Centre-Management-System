@@ -7,6 +7,10 @@ const path = require("path");
 // Load environment variables
 dotenv.config();
 
+// Swagger API documentation
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger-output.json");
+
 // Require contollers
 const customerController = require("./controllers/customer/customerController.js");
 const inspectionController = require("./controllers/nea-officer/inspectionController");
@@ -72,6 +76,9 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bo
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "public")));
+
+// Swagger documentation route
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // ROUTES //
 
