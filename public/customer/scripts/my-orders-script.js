@@ -66,6 +66,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (status === 'COMPLETED' || status === 'DELIVERED') statusColor = '#27ae60';
         if (status === 'CANCELLED') statusColor = '#c0392b';
 
+        //cancel button, only show if the order status is 'Pending'.
+        const showCancelButton = status === 'PENDING' 
+          ? `<button class="cancel-order-btn" data-id="${order.order_id}" style="background-color: #f11800; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85em;">Cancel Order</button>`
+          : '';
+
         return `
           <div class="orderCard" 
                onclick="window.location.href='my-order-items.html?order_id=${order.order_id}'"
@@ -86,8 +91,14 @@ document.addEventListener("DOMContentLoaded", () => {
               <span style="color: #555;">Payment Method: <span style="font-weight: normal; color: #333;">${order.payment_type || 'Cash'}</span></span>
               <span style="font-size: 1.1em; color: #2c3e50;">Total: $${Number(order.total_amount || 0).toFixed(2)}</span>
             </div>
-            <div style="text-align: right; margin-top: 10px; font-size: 0.85em; color: #2b3a8f; font-weight: bold;">
-              View Details →
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+              <div>                                                                        
+                ${showCancelButton}
+              </div>
+              <div style="text-align: right; margin-top: 10px; font-size: 0.85em; color: #2b3a8f; font-weight: bold;">
+                View Details →
+              </div>
             </div>
           </div>
         `;
@@ -100,6 +111,8 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
 
+      setupCancelButtonListeners();
+
     } catch (error) {
       console.error("Failed to load orders:", error);
       contentContainer.innerHTML = `
@@ -107,6 +120,39 @@ document.addEventListener("DOMContentLoaded", () => {
         <p style="padding: 20px; color: red;">Failed to retrieve your order history. Please try again later.</p>
       `;
     }
+  }
+
+  function setupCancelButtonListeners() {
+    const cancelButtons = document.querySelectorAll(".cancel-order-btn");
+    
+    cancelButtons.forEach(button => {
+      button.addEventListener("click", async (event) => {
+        event.stopPropagation();
+        const orderId = button.getAttribute("data-id");
+        if (confirm(`Are you sure you want to cancel Order #${orderId}?`)) {
+          try {
+            const response = await fetch(`http://localhost:3000/customer/orders/${orderId}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            });
+
+            if (response.ok) {
+              alert("Order successfully cancelled!");
+              fetchAndRenderOrders();
+            } else {
+              const errData = await response.json();
+              alert(`Error: ${errData.message || 'Could not cancel order.'}`);
+            }
+          } catch (err) {
+            console.error("Error cancelling order:", err);
+            alert("Failed to connect to server. Try again later.");
+          }
+        }
+      });
+    });
   }
 
   fetchAndRenderOrders();
