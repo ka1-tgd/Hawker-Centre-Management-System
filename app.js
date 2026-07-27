@@ -101,6 +101,7 @@ app.delete("/customer/orders/:order_id/items/:order_item_no", verifyJWT, validat
 app.put("/customer/orders/:order_id/items/:order_item_no", verifyJWT, validateOrderItemQuantity, customerController.updateOrderItemQuantity);
 // Routes for hawker to interact with customer orders
 app.get("/vendor/stalls/orders/:stall_id", verifyJWT, validateStallIdForHawker, ordersController.getOrdersOfStall);
+app.get("/vendor/stalls/order/:order_id", verifyJWT, validateOrderId, customerController.getOrderById);
 
 // Routes for inspections
 app.get("/nea/inspections/stall/:stallId", verifyJWT, validateStallId, inspectionController.getInspectionsByStall);
