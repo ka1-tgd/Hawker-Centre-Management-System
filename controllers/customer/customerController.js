@@ -85,6 +85,28 @@ async function createOrder(req, res) {
   }
 }
 
+// Delete order
+async function deleteOrder(req, res) {
+  try{
+    const order_id = parseInt(req.params.order_id);
+    const deleteOrder = await customerModel.deleteOrder(order_id)
+
+    if(!deleteOrder) {
+      return res.status(404).json({ error: "order not found" });
+    }
+
+    res.json(deleteOrder);
+  } catch (error) {
+    console.error("Controller error:", error);
+
+    if (error.message && error.message.includes("Cannot cancel order")){
+      return res.status(400).json({ error: error.message });
+    }
+    
+    res.status(500).json({ error: "Error deleting order" });
+  }
+}
+
 // Get order item by order_item_no
 async function getOrderItemByNo(req, res) {
   try {
@@ -165,6 +187,7 @@ module.exports = {
   getHawkerCentresWithStalls,
   getMenuItemsOfStall,
   createOrder,
+  deleteOrder,
   getOrderItemByNo,
   createOrderItem,
   deleteOrderItem,

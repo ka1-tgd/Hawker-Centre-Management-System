@@ -635,6 +635,7 @@ module.exports = {
   getHawkerCentresWithStalls,
   getMenuItemsOfStall,
   createOrder,
+  deleteOrder,
   getOrderItemByNo,
   createOrderItem,
   deleteOrderItem,
