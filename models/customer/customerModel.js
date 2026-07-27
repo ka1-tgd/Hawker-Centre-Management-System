@@ -345,10 +345,11 @@ async function createOrder(CustOrder) {
 async function deleteOrder(order_id, status = 'Cancelled'){
   let connection;
   try{
-    const currentOrder = await getOrderById(order_id);
-    if (!currentOrder) {
+    const orderList = await getOrderById(order_id);
+    if (!orderList || orderList.length === 0) {
       return null;  //order not found.
     }
+    const currentOrder = orderList[0];
     if (currentOrder.status !== 'Pending') {  //only allow customer to cancel when the order is not prepare yet or not complete.
       throw new Error(`Cannot cancel order. Current status is '${currentOrder.status}'.`);
     }
@@ -362,7 +363,7 @@ async function deleteOrder(order_id, status = 'Cancelled'){
 
     await request.query(query);
     const deletedOrder = await getOrderById(order_id);
-    return deletedOrder;
+    return deletedOrder ? deletedOrder[0] : null;
 
   } catch (error) {
     console.error("Database error:", error);
