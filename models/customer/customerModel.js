@@ -341,6 +341,43 @@ async function createOrder(CustOrder) {
   }
 }
 
+//Delete an order from order record - updating the status to 'Cancelled' instead of removing the record.
+async function deleteOrder(order_id, status = 'Cancelled'){
+  let connection;
+  try{
+    const currentOrder = await getOrderById(order_id);
+    if (!currentOrder) {
+      return null;  //order not found.
+    }
+    if (currentOrder.status !== 'Pending') {  //only allow customer to cancel when the order is not prepare yet or not complete.
+      throw new Error(`Cannot cancel order. Current status is '${currentOrder.status}'.`);
+    }
+
+    connection = await sql.connect(dbConfig);
+    const query = "UPDATE CustOrder SET status = @status WHERE order_id = @order_id;";
+    
+    const request = connection.request();
+    request.input("order_id", order_id);
+    request.input("status", sql.VarChar, status);
+
+    await request.query(query);
+    const deletedOrder = await getOrderById(order_id);
+    return deletedOrder;
+
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
 //-----------------------------order items-----------------------------//
 
 //Get order item by order_item_no
@@ -589,8 +626,7 @@ async function updateOrderItemQuantity(order_id, order_item_no, newQuantity) {
 
 /*
 Left with
-1) DELETE - UPDATE CustOrder status to 'Cancelled' for customer
-2) PUT - UPDATE CustOrder status to ('Preparing'/'Completed'/'Cancelled') but for hawkers
+1) PUT - UPDATE CustOrder status to ('Preparing'/'Completed'/'Cancelled') but for hawkers
 */
 
 module.exports = {
