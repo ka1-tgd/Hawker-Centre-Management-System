@@ -88,6 +88,7 @@ app.get("/customer/orders/:user_id", verifyJWT, validateUserIdForCustomer, custo
 app.get("/customer/hawkerCentres/with-stalls", verifyJWT, customerController.getHawkerCentresWithStalls);
 app.get("/customer/stall/:stall_id", verifyJWT, validateStallIdForCustomer, customerController.getMenuItemsOfStall);
 app.post("/customer/orders", verifyJWT, validateOrder, customerController.createOrder);
+app.delete("/customer/orders/:order_id", verifyJWT, validateOrderId, customerController.deleteOrder);
 // Routes for customer ordering and checkouts - order item
 app.get("/customer/orders/orderItem/:order_item_no", verifyJWT, validateOrderItemNo, customerController.getOrderItemByNo);
 app.post("/customer/orders/items", verifyJWT, validateCreateOrderItem, customerController.createOrderItem);
