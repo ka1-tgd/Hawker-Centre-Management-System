@@ -66,9 +66,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (status === 'COMPLETED' || status === 'DELIVERED') statusColor = '#27ae60';
         if (status === 'CANCELLED') statusColor = '#c0392b';
 
-        //cancel button, only show if the order status is 'Pending'.
+        //delete button, only show if the order status is 'Pending'.
         const showCancelButton = status === 'PENDING' 
-          ? `<button class="cancel-order-btn" data-id="${order.order_id}" style="background-color: #f11800; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85em;">Cancel Order</button>`
+          ? `<button class="delete-order-btn" data-id="${order.order_id}" style="background-color: #f11800; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85em;">Cancel Order</button>`
           : '';
 
         return `
@@ -123,13 +123,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function setupCancelButtonListeners() {
-    const cancelButtons = document.querySelectorAll(".cancel-order-btn");
+    const deleteButtons = document.querySelectorAll(".delete-order-btn");
     
-    cancelButtons.forEach(button => {
+    deleteButtons.forEach(button => {
       button.addEventListener("click", async (event) => {
         event.stopPropagation();
         const orderId = button.getAttribute("data-id");
-        if (confirm(`Are you sure you want to cancel Order #${orderId}?`)) {
+        if (confirm(`Are you sure you want to delete Order #${orderId}?`)) {
           try {
             const response = await fetch(`http://localhost:3000/customer/orders/${orderId}`, {
               method: 'DELETE',
