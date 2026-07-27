@@ -103,7 +103,7 @@ app.put("/customer/orders/:order_id/items/:order_item_no", verifyJWT, validateOr
 // Routes for hawker to interact with customer orders
 app.get("/vendor/stalls/orders/:stall_id", verifyJWT, validateStallIdForHawker, ordersController.getOrdersOfStall);
 app.get("/vendor/stalls/order/:order_id", verifyJWT, validateOrderId, customerController.getOrderById);
-app.update("/vendor/stalls/orders/:order_id", verifyJWT, validateOrderStatus, ordersController.updateOrderStatus);
+app.put("/vendor/stalls/orders/:order_id", verifyJWT, validateOrderStatus, ordersController.updateOrderStatus);
 
 // Routes for inspections
 app.get("/nea/inspections/stall/:stallId", verifyJWT, validateStallId, inspectionController.getInspectionsByStall);
