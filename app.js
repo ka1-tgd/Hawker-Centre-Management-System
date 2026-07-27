@@ -13,6 +13,7 @@ const swaggerDocument = require("./swagger-output.json");
 
 // Require contollers
 const customerController = require("./controllers/customer/customerController.js");
+const ordersController = require("./controllers/vendor/ordersController.js");
 const inspectionController = require("./controllers/nea-officer/inspectionController");
 const userController = require("./controllers/userAccount/userController.js");
 const stallController = require("./controllers/vendor/StallController.js");
@@ -33,6 +34,10 @@ const {
   validateCreateOrderItem,
   validateOrderItemQuantity,
 } = require("./middleware/customer/orderingValidation.js");
+
+const {
+  validateStallIdForHawker,
+} = require("./middleware/vendor/ordersValidation.js");
 
 const {
   validateInspection,
@@ -94,6 +99,8 @@ app.get("/customer/orders/orderItem/:order_item_no", verifyJWT, validateOrderIte
 app.post("/customer/orders/items", verifyJWT, validateCreateOrderItem, customerController.createOrderItem);
 app.delete("/customer/orders/:order_id/items/:order_item_no", verifyJWT, validateOrderId, validateOrderItemNo, customerController.deleteOrderItem);
 app.put("/customer/orders/:order_id/items/:order_item_no", verifyJWT, validateOrderItemQuantity, customerController.updateOrderItemQuantity);
+// Routes for hawker to interact with customer orders
+app.get("/vendor/stalls/orders/:stall_id", verifyJWT, validateStallIdForHawker, ordersController.getOrdersOfStall);
 
 // Routes for inspections
 app.get("/nea/inspections/stall/:stallId", verifyJWT, validateStallId, inspectionController.getInspectionsByStall);
