@@ -67,8 +67,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (status === 'CANCELLED') statusColor = '#c0392b';
 
         //delete button, only show if the order status is 'Pending'.
-        const showCancelButton = status === 'PENDING' 
-          ? `<button class="delete-order-btn" data-id="${order.order_id}" style="background-color: #f11800; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85em;">Cancel Order</button>`
+        const showDeleteButton = status === 'PENDING' 
+          ? `<button class="delete-order-btn" data-id="${order.order_id}" style="background-color: #f11800; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85em;">Delete Order</button>`
           : '';
 
         return `
@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
               <div>                                                                        
-                ${showCancelButton}
+                ${showDeleteButton}
               </div>
               <div style="text-align: right; margin-top: 10px; font-size: 0.85em; color: #2b3a8f; font-weight: bold;">
                 View Details →
@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
 
-      setupCancelButtonListeners();
+      setupDeleteButtonListeners();
 
     } catch (error) {
       console.error("Failed to load orders:", error);
@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function setupCancelButtonListeners() {
+  function setupDeleteButtonListeners() {
     const deleteButtons = document.querySelectorAll(".delete-order-btn");
     
     deleteButtons.forEach(button => {
