@@ -1,6 +1,7 @@
 // Require Node modules and dbConfig
 const sql = require("mssql");
 const dbConfig = require("../../dbConfig");
+const { getOrderById } = require("../customer/customerModel");  //for update order status
 
 //Get all orders that a stall received by stall_id
 async function getOrdersOfStall(stall_id) {
@@ -71,9 +72,62 @@ async function getOrdersOfStall(stall_id) {
     }
   }
 }
-// 2) get order items in an order by order_id
-// 3) update CustOrder status to ('Preparing'/'Completed'/'Cancelled')
+
+//PUT - Update CustOrder status to ('Preparing'/'Completed'/'Cancelled')
+async function updateOrderStatus(order_id, newStatus) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+
+    const statusCheckQuery = "SELECT order_id, status FROM CustOrder WHERE order_id = @order_id;";
+    const checkResult = await connection.request()
+      .input("order_id", sql.Int, order_id)
+      .query(statusCheckQuery);
+
+    if (checkResult.recordset.length === 0) {
+      throw new Error(`Order not found.`);
+    }
+    const currentStatus = checkResult.recordset[0].status;
+
+    //conditions for different type of status updates.
+    if (newStatus === 'Pending') {
+      throw new Error("Cannot change status back to 'Pending'.");
+    }
+
+    if (currentStatus === 'Pending') {
+      if (newStatus !== 'Preparing' && newStatus !== 'Cancelled') {
+        throw new Error("Pending orders can only be changed to 'Preparing' or 'Cancelled'.");
+      }
+    } else if (currentStatus === 'Preparing') {
+      if (newStatus !== 'Completed') {
+        throw new Error("Preparing orders can only be changed to 'Completed'.");
+      }
+    } else if (currentStatus === 'Completed' || currentStatus === 'Cancelled') {
+      throw new Error(`Cannot update order because it is already '${currentStatus}'.`);
+    }
+
+    const updateStatusQuery = "UPDATE CustOrder SET status = @newStatus WHERE order_id = @order_id;";
+    await connection.request()
+      .input("newStatus", sql.VarChar, newStatus)
+      .input("order_id", sql.Int, order_id)
+      .query(updateStatusQuery);
+
+    return await getOrderById(order_id);
+  } catch (error) {
+    console.error("Database error in updateOrderStatus:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection after updateOrderStatus:", err);
+      }
+    }
+  }
+}
 
 module.exports = {
   getOrdersOfStall,
+  updateOrderStatus,
 };
