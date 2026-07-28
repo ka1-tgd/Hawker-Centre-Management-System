@@ -1,6 +1,12 @@
+// ============================================================
+// Complaint Controller
+// Receives HTTP requests for the Complaint Management feature
+// and delegates the work to complaintModel.
+// ============================================================
+
 const complaintModel = require("../../models/customer/complaintModel");
 
-// Create a new complaint
+// POST /complaints
 async function createComplaint(req, res) {
   try {
     const newComplaint = await complaintModel.createComplaint(req.body);
@@ -11,7 +17,7 @@ async function createComplaint(req, res) {
   }
 }
 
-// Get all complaints for a customer
+// GET /complaints/customer/:userId
 async function getComplaintsByUser(req, res) {
   try {
     const userId = parseInt(req.params.userId);
@@ -23,7 +29,7 @@ async function getComplaintsByUser(req, res) {
   }
 }
 
-// Update complaint status
+// PUT /complaints/:id/status
 async function updateComplaintStatus(req, res) {
   try {
     const complaintId = parseInt(req.params.id);
@@ -42,7 +48,10 @@ async function updateComplaintStatus(req, res) {
   }
 }
 
-// Delete a complaint (only if still Pending)
+// DELETE /complaints/:id
+// The customer's user id is taken from the verified JWT (req.user.id),
+// not from the request body, so a customer can never delete someone
+// else's complaint by guessing an id.
 async function deleteComplaint(req, res) {
   try {
     const complaintId = parseInt(req.params.id);

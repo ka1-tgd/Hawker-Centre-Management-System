@@ -1,6 +1,12 @@
+// ============================================================
+// Sales Controller
+// Receives HTTP requests for the Sales Analytics Dashboard
+// feature and delegates the work to salesModel.
+// ============================================================
+
 const salesModel = require("../../models/vendor/salesModel");
 
-// Get top-selling items for a stall
+// GET /vendor/sales/:stallId/popular-items
 async function getPopularItems(req, res) {
   try {
     const stallId = parseInt(req.params.stallId);
@@ -12,7 +18,7 @@ async function getPopularItems(req, res) {
   }
 }
 
-// Get peak hours for a stall
+// GET /vendor/sales/:stallId/peak-hours
 async function getPeakHours(req, res) {
   try {
     const stallId = parseInt(req.params.stallId);
@@ -24,7 +30,7 @@ async function getPeakHours(req, res) {
   }
 }
 
-// Get revenue summary for a stall
+// GET /vendor/sales/:stallId/revenue
 async function getRevenueSummary(req, res) {
   try {
     const stallId = parseInt(req.params.stallId);
@@ -36,7 +42,8 @@ async function getRevenueSummary(req, res) {
   }
 }
 
-// Get chart image URL for popular items
+// GET /vendor/sales/:stallId/chart
+// Returns a QuickChart image URL of the stall's top-selling items.
 async function getPopularItemsChart(req, res) {
   try {
     const stallId = parseInt(req.params.stallId);

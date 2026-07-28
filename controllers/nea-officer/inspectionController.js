@@ -1,6 +1,14 @@
+// ============================================================
+// Inspection Controller
+// Receives HTTP requests for the Inspection Management feature,
+// delegates the actual database work to inspectionModel, and
+// sends back the appropriate HTTP response.
+// ============================================================
+
 const inspectionModel = require("../../models/nea-officer/inspectionModel");
 
-// Get all inspections for a stall
+// GET /nea/inspections/stall/:stallId
+// Return every inspection recorded for one stall.
 async function getInspectionsByStall(req, res) {
   try {
     const stallId = parseInt(req.params.stallId);
@@ -12,7 +20,9 @@ async function getInspectionsByStall(req, res) {
   }
 }
 
-// Create new inspection
+// POST /nea/inspections
+// Create a new inspection record. The model automatically works
+// out and saves the resulting hygiene grade.
 async function createInspection(req, res) {
   try {
     const newInspection = await inspectionModel.createInspection(req.body);
@@ -23,7 +33,9 @@ async function createInspection(req, res) {
   }
 }
 
-// Update an inspection
+// PUT /nea/inspections/:id
+// Update the score/remarks of an inspection that was entered
+// by mistake or needs correcting.
 async function updateInspection(req, res) {
   try {
     const inspectionId = parseInt(req.params.id);
@@ -40,7 +52,8 @@ async function updateInspection(req, res) {
   }
 }
 
-// Delete an inspection
+// DELETE /nea/inspections/:id
+// Remove an inspection that was logged in error.
 async function deleteInspection(req, res) {
   try {
     const inspectionId = parseInt(req.params.id);
@@ -57,7 +70,9 @@ async function deleteInspection(req, res) {
   }
 }
 
-// Get grade distribution summary
+// GET /nea/inspections/summary/grades
+// Return the count of stalls currently holding each grade (A/B/C/D),
+// used to draw the dashboard's grade distribution table.
 async function getGradeDistribution(req, res) {
   try {
     const distribution = await inspectionModel.getGradeDistribution();
@@ -68,7 +83,8 @@ async function getGradeDistribution(req, res) {
   }
 }
 
-// Get stalls expiring soon
+// GET /nea/inspections/summary/expiring
+// Return stalls whose current grade will expire within 30 days.
 async function getExpiringSoon(req, res) {
   try {
     const expiring = await inspectionModel.getExpiringSoon();
@@ -79,7 +95,8 @@ async function getExpiringSoon(req, res) {
   }
 }
 
-// Get recent inspections
+// GET /nea/inspections/summary/recent
+// Return the 10 most recently logged inspections across all stalls.
 async function getRecentInspections(req, res) {
   try {
     const recent = await inspectionModel.getRecentInspections();

@@ -1,7 +1,14 @@
+// ============================================================
+// Complaint Model
+// Handles all database operations for the Complaint Management
+// feature: submitting, viewing, updating the status of, and
+// deleting complaints.
+// ============================================================
+
 const sql = require("mssql");
 const dbConfig = require("../../dbConfig");
 
-// Create a new complaint
+// Insert a new complaint submitted by a customer.
 async function createComplaint(complaintData) {
   let connection;
   try {
@@ -34,7 +41,8 @@ async function createComplaint(complaintData) {
   }
 }
 
-// Get all complaints submitted by a customer
+// Get every complaint a specific customer has submitted, along
+// with the name of the stall each complaint was made against.
 async function getComplaintsByUser(userId) {
   let connection;
   try {
@@ -66,7 +74,9 @@ async function getComplaintsByUser(userId) {
   }
 }
 
-// Update complaint status (used by vendor/operator)
+// Update a complaint's status (e.g. Pending -> In Progress -> Resolved).
+// ResolvedDate is only stamped once the complaint reaches a final
+// state (Resolved or Rejected).
 async function updateComplaintStatus(complaintId, status) {
   let connection;
   try {
@@ -97,7 +107,9 @@ async function updateComplaintStatus(complaintId, status) {
   }
 }
 
-// Delete a complaint (only allowed while still Pending)
+// Delete a complaint. Business rule: a customer may only delete
+// their own complaint, and only while it is still "Pending" -
+// once it is being processed, it must stay on record.
 async function deleteComplaint(complaintId, userId) {
   let connection;
   try {

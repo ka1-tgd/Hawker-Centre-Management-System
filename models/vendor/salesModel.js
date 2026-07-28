@@ -1,8 +1,15 @@
+// ============================================================
+// Sales Model
+// Handles the database queries and third-party chart generation
+// for the Sales Analytics Dashboard feature.
+// ============================================================
+
 const sql = require("mssql");
 const dbConfig = require("../../dbConfig");
 const axios = require("axios");
 
-// Get top 5 best-selling menu items for a stall
+// Get the top 5 best-selling menu items for a stall, ranked by
+// total quantity sold across all of that stall's orders.
 async function getPopularItems(stallId) {
   let connection;
   try {
@@ -34,7 +41,8 @@ async function getPopularItems(stallId) {
   }
 }
 
-// Get order counts grouped by hour of day for a stall
+// Get the number of orders placed at each hour of the day for a
+// stall, used to identify the stall's peak business hours.
 async function getPeakHours(stallId) {
   let connection;
   try {
@@ -66,7 +74,8 @@ async function getPeakHours(stallId) {
   }
 }
 
-// Get total revenue and order count summary for a stall
+// Get the total revenue and total number of orders for a stall,
+// used for the summary cards at the top of the dashboard.
 async function getRevenueSummary(stallId) {
   let connection;
   try {
@@ -96,7 +105,9 @@ async function getRevenueSummary(stallId) {
   }
 }
 
-// Generate a bar chart image URL for popular items using QuickChart API
+// Build a bar chart of the stall's top-selling items and send it
+// to the QuickChart third-party API, which returns a hosted image
+// URL that the front-end can display directly in an <img> tag.
 async function generatePopularItemsChart(stallId) {
   try {
     const items = await getPopularItems(stallId);
@@ -118,6 +129,8 @@ async function generatePopularItemsChart(stallId) {
           display: true,
           text: "Top Selling Items",
         },
+        // Force whole-number ticks on the Y axis so small values
+        // don't render as decimals like 0.2, 0.4
         scales: {
           yAxes: [
             {
