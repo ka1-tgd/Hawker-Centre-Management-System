@@ -227,6 +227,14 @@ INSERT INTO Menu (menu_id, stall_id)
     (2, 2),
     (3, 3);
 
+INSERT INTO Menu (menu_id, stall_id)
+VALUES
+(4,4),
+(5,6),
+(6,7),
+(7,9),
+(8,10);
+
 INSERT INTO MenuItem (menu_id, item_name, description, price, category, availability)
     VALUES
     -- Ah Heng Chicken Rice (Menu 1)

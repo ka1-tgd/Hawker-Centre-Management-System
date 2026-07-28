@@ -45,43 +45,73 @@ async function getStallById(stallId, userId) {
 
 // Create Stall
 async function createStall(userId, stallData) {
+
     let connection;
 
     try {
+
         connection = await sql.connect(dbConfig);
 
-        // Generate the next stall_id
-        const idResult = await connection.request().query("SELECT ISNULL(MAX(stall_id), 0) + 1 AS stall_id FROM Stall");
+        // Generate next stall_id
+        const stallIdResult = await connection
+            .request()
+            .query("SELECT ISNULL(MAX(stall_id),0)+1 AS stall_id FROM Stall");
 
-        const newStallId = idResult.recordset[0].stall_id;
+        const newStallId = stallIdResult.recordset[0].stall_id;
 
-        // SQL Query
-        const query = "INSERT INTO Stall(stall_id, user_id, hawker_centre_id, stall_name, description, operating_hours, contact_number, status) VALUES (@stall_id, @user_id, @hawker_centre_id, @stall_name,@description, @operating_hours, @contact_number, @status);";
+        // Insert Stall
+        const insertStallQuery = `
+            INSERT INTO Stall(stall_id, user_id, hawker_centre_id, stall_name, description, operating_hours, contact_number,status)
+            VALUES
+            (@stall_id, @user_id, @hawker_centre_id, @stall_name, @description, @operating_hours, @contact_number, @status);`;
+        const stallRequest = connection.request();
 
-        const request = connection.request();
+        stallRequest.input("stall_id", newStallId);
+        stallRequest.input("user_id", userId);
+        stallRequest.input("hawker_centre_id", stallData.hawker_centre_id);
+        stallRequest.input("stall_name", stallData.stall_name);
+        stallRequest.input("description", stallData.description);
+        stallRequest.input("operating_hours", stallData.operating_hours);
+        stallRequest.input("contact_number", stallData.contact_number);
+        stallRequest.input("status", stallData.status);
 
-        request.input("stall_id", newStallId);
-        request.input("user_id", userId);
-        request.input("hawker_centre_id", stallData.hawker_centre_id);
-        request.input("stall_name", stallData.stall_name);
-        request.input("description", stallData.description);
-        request.input("operating_hours", stallData.operating_hours);
-        request.input("contact_number", stallData.contact_number);
-        request.input("status", stallData.status);
+        await stallRequest.query(insertStallQuery);
 
-        await request.query(query);
-
-        // Return the newly created stall
+        // Generate next menu_id
+        const menuIdResult = await connection
+            .request()
+            .query("SELECT ISNULL(MAX(menu_id),0)+1 AS menu_id FROM Menu");
+        const newMenuId = menuIdResult.recordset[0].menu_id;
+        // Automatically create Menu for this Stall
+        const insertMenuQuery = `
+            INSERT INTO Menu
+            (
+                menu_id,
+                stall_id
+            )
+            VALUES
+            (
+                @menu_id,
+                @stall_id
+            );
+        `;
+        const menuRequest = connection.request();
+        menuRequest.input("menu_id", newMenuId);
+        menuRequest.input("stall_id", newStallId);
+        await menuRequest.query(insertMenuQuery);
+        // Return newly created Stall
         return await getStallById(newStallId, userId);
-
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Database error:", error);
         throw error;
-    } finally {
+    }
+    finally {
         if (connection) {
             try {
                 await connection.close();
-            } catch (err) {
+            }
+            catch (err) {
                 console.error("Error closing connection:", err);
             }
         }

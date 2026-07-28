@@ -23,6 +23,7 @@ const feedbackController = require("./controllers/customerEngagement/feedbackCon
 const vendorDashboardController = require("./controllers/customerEngagement/vendorDashboardController");
 const salesController = require("./controllers/vendor/salesController");
 const complaintController = require("./controllers/customer/complaintController");
+const menuController = require("./controllers/vendor/menuController");
 
 // Require middleware functions
 const {
@@ -59,6 +60,13 @@ const {
 const {
   validateStallId: validateSalesStallId,
 } = require("./middleware/vendor/salesValidation.js");
+
+const {
+
+    validateMenuItem,
+    validateMenuItemId
+
+} = require("./middleware/vendor/menuValidation");
 
 const {
   validateComplaint,
@@ -128,6 +136,13 @@ app.get("/vendor/stalls/:id", verifyJWT, validateVendorStallId, stallController.
 app.post("/vendor/stalls", verifyJWT, validateStall, stallController.createStall);
 app.put("/vendor/stalls/:id", verifyJWT, validateVendorStallId, validateStall, stallController.updateStall);
 app.delete("/vendor/stalls/:id", verifyJWT, validateVendorStallId, stallController.deleteStall);
+
+// Routes for vendor menu management
+app.get("/vendor/stalls/:stallId/menu", verifyJWT, menuController.getMenuItemsByStall);
+app.get("/vendor/stalls/:stallId/menu/:id", verifyJWT, validateMenuItemId, menuController.getMenuItemById);
+app.post("/vendor/stalls/:stallId/menu", verifyJWT, validateMenuItem, menuController.createMenuItem);
+app.put("/vendor/stalls/:stallId/menu/:id", verifyJWT, validateMenuItemId, validateMenuItem, menuController.updateMenuItem);
+app.delete("/vendor/stalls/:stallId/menu/:id", verifyJWT, validateMenuItemId, menuController.deleteMenuItem);
 
 // Routes - Sales Analytics Dashboard
 app.get("/vendor/sales/:stallId/popular-items", verifyJWT, validateSalesStallId, salesController.getPopularItems);
