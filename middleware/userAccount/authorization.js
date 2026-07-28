@@ -34,6 +34,9 @@ function verifyJWT(req, res, next) {
             "GET /vendor/sales/[0-9]+/peak-hours": ["hawker"],
             "GET /vendor/sales/[0-9]+/revenue": ["hawker"],
             "GET /vendor/sales/[0-9]+/chart": ["hawker"],
+            "GET /vendor/stalls/orders/[0-9]+": ["hawker"],
+            "GET /vendor/stalls/order/[0-9]+": ["hawker"],
+            "PUT /vendor/stalls/orders/[0-9]+": ["hawker"],
 
             // Customer exclusive
             "GET /customer/order/[0-9]+": ["customer"],
@@ -41,6 +44,7 @@ function verifyJWT(req, res, next) {
             "GET /customer/hawkerCentres/with-stalls": ["customer"],
             "GET /customer/stall/[0-9]+": ["customer"],
             "POST /customer/orders": ["customer"],
+            "DELETE /customer/orders/[0-9]+": ["customer"],
             "GET /customer/orders/orderItem/[0-9]+": ["customer"],
             "POST /customer/orders/items": ["customer"],
             "DELETE /customer/orders/[0-9]+/items/[0-9]+": ["customer"],

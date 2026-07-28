@@ -327,6 +327,7 @@ async function getUserProfile(userId) {
 }
 
 module.exports = {
+  calculateTier,
   getLoyaltyPoints,
   getActiveRewards,
   getRewardById,
