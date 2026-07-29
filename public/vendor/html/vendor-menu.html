@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Menu Management</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/vendor-menu.css">
+
+</head>
+
+<body>
+    <header class="topbar">
+
+        <div class="logo">
+
+            HawkerHub
+
+        </div>
+        <nav>
+            <ul>
+                <li>
+                    <a href="vendor-home.html">
+                        Home
+                    </a>
+                </li>
+
+                <li>
+                    <a href="vendor-stall.html">
+                        Stalls
+                    </a>
+                </li>
+
+                <li>
+                    <a
+                        href="vendor-menu.html"
+                        class="active">
+                        Menus
+                    </a>
+                </li>
+
+                <li>
+                    <a href="vendor-sales.html">
+                        Sales
+                    </a>
+                </li>
+
+                <li>
+                    <a href="claim-redemption.html">
+                        Rewards
+                    </a>
+                </li>
+
+                <li>
+                    <a href="satisfaction-dashboard.html">
+                        Reviews
+                    </a>
+                </li>
+
+            </ul>
+
+        </nav>
+
+    </header>
+
+    <main class="container">
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+
+                    Menu Management
+
+                </h1>
+
+                <p>
+
+                    Select one of your stalls to manage its menu.
+
+                </p>
+
+            </div>
+
+            <button id="btnAddMenuItem">
+
+                + Add Menu Item
+
+            </button>
+
+        </div>
+
+        <div class="current-stall">
+
+            Current Stall :
+
+            <span id="currentStallName">
+
+                None Selected
+
+            </span>
+
+        </div>
+
+        <div class="content">
+            <aside class="sidebar">
+
+                <h2>
+
+                    My Stalls
+
+                </h2>
+
+                <div id="stallList">
+                </div>
+            </aside>
+
+            <section class="menu-content">
+
+                <div class="search-box">
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search menu item...">
+
+                </div>
+
+                <div
+                    id="menuGrid"
+                    class="menu-grid">
+
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div
+        id="menuModal"
+        class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">
+
+                    Add Menu Item
+
+                </h2>
+
+                <span id="closeModal">
+
+                    &times;
+
+                </span>
+            </div>
+
+            <form id="menuForm">
+                <input
+                    type="hidden"
+                    id="menu_item_id">
+
+                <div class="form-group">
+
+                    <label>
+
+                        Item Name
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="item_name"
+                        required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+
+                        Description
+
+                    </label>
+
+                    <textarea
+                        id="description"
+                        rows="3"></textarea>
+
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Price
+                    </label>
+
+                    <input
+                        type="number"
+                        step="0.01"
+                        id="price"
+                        required>
+
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Category
+                    </label>
+
+                    <select id="category">
+                        <option value="Main Course">
+                            Main Course
+                        </option>
+
+                        <option value="Side Dish">
+                            Side Dish
+                        </option>
+
+                        <option value="Drink">
+                            Drink
+                        </option>
+
+                        <option value="Dessert">
+                            Dessert
+                        </option>
+                        <option value="Snack">
+                            Snack
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Availability
+                    </label>
+
+                    <select id="availability">
+                        <option value="Y">
+                            Available
+                        </option>
+
+                        <option value="N">
+
+                            Unavailable
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="button-group">
+
+                    <button
+                        type="submit"
+                        id="saveButton">
+
+                        Save
+
+                    </button>
+
+                    <button
+                        type="button"
+                        id="cancelButton">
+
+                        Cancel
+
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="../scripts/vendor-menu.js"></script>
+</body>
+</html>

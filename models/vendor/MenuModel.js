@@ -45,11 +45,8 @@ async function getMenuItemsByStall(stallId, userId) {
 // Get menu item by ID
 
 async function getMenuItemById(stallId, menuItemId, userId) {
-
     let connection;
-
     try {
-
         connection = await sql.connect(dbConfig);
 
         const query = `
@@ -164,7 +161,6 @@ async function createMenuItem(stallId, userId, menuItemData) {
 }
 
 // Update Menu Item
-
 
 async function updateMenuItem(stallId, menuItemId, userId, menuItemData) {
     let connection;
