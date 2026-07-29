@@ -40,25 +40,50 @@ async function loadUser() {
     }
 }
 
-loadUser();
+// Call load user when page loads
+window.addEventListener("load", loadUser);
 
 // Button listeners
 document.getElementById("editButton").addEventListener("click", () => {
+    // Redirect to edit details page
     window.location.href = "../html/edit_details.html";
 });
 document.getElementById("changePasswordButton").addEventListener("click", () => {
+    // Redirect to edit password page
     window.location.href = "../html/edit_password.html";
 });
 document.getElementById("logOutButton").addEventListener("click", () => {
+    // Clear localstorage and redirect to log in page
     localStorage.clear();
     window.location.href = "index.html";
 });
-document.getElementById("deleteButton").addEventListener("click", () => {
-    const confirmDelete = confirm(
-        "Are you sure you want to delete you account?"
-    );
+document.getElementById("deleteButton").addEventListener("click", async () => {
+    try {
+        // Ask for confirmation
+        const confirmDelete = confirm(
+            "Are you sure you want to delete your account?"
+        );
 
-    if (confirmDelete) {
-        alert("Delete function to be implemented");
+        if (confirmDelete) {
+            // Send DELETE request to API
+            const response = await fetch(`/users/${localStorage.getItem("userId")}`, {
+                method: "DELETE",
+            });
+
+            // Check response
+            if (!response.ok) {
+                // If not ok, throw error
+                throw new Error("Failed to delete user");
+            }
+
+            // Clear local storage, alert and redirect to log in
+            localStorage.clear();
+            alert("Account deleted successfully");
+            window.location.href = "../html/index.html";
+        };
+    } catch (error) {
+        // Log error in console alert
+        console.error("Error deleting account:", error);
+        alert("Unable to delete account");
     }
 });

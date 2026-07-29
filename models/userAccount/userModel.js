@@ -222,14 +222,20 @@ async function deleteUser(id) {
         // Connect to database
         connection = await sql.connect(dbConfig);
 
-        // SQL Query
-        const query = `DELETE FROM Users WHERE user_id = @id`;
-        const request = connection.request();
-        request.input("id", id);
-        const result = await request.query(query);
+        // SQL Query to delete user's loyalty points
+        const loyalPtsQuery = `DELETE FROM LoyaltyPoints WHERE user_id = @id`;
+        const loyalPtsRequest = connection.request();
+        loyalPtsRequest.input("id", id);
+        const loyalPtsResult = await loyalPtsRequest.query(loyalPtsQuery);
+
+        // SQL Query to delete user
+        const userQuery = `DELETE FROM Users WHERE user_id = @id`;
+        const userRequest = connection.request();
+        userRequest.input("id", id);
+        const userResult = await userRequest.query(userQuery);
 
         // Check if any was deleted
-        if (result.rowsAffected[0] === 0) {
+        if (userResult.rowsAffected[0] === 0) {
             // If nothing was deleted, return false
             return false;
         };
