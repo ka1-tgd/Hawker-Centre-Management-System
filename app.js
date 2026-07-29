@@ -80,7 +80,7 @@ const loyaltyValidation = require("./middleware/customerEngagement/loyaltyValida
 const feedbackValidation = require("./middleware/customerEngagement/feedbackValidation");
 const vendorDashboardValidation = require("./middleware/customerEngagement/vendorDashboardValidation");
 
-const { validateRentalStallId } = require("./middlewares/vendor/RentalValidation");
+const { validateRentalStallId } = require("./middleware/vendor/RentalValidation");
 // Create Express app
 const app = express();
 const port = process.env.PORT || 3000;
