@@ -24,7 +24,7 @@ const vendorDashboardController = require("./controllers/customerEngagement/vend
 const salesController = require("./controllers/vendor/salesController");
 const complaintController = require("./controllers/customer/complaintController");
 const menuController = require("./controllers/vendor/menuController");
-
+const rentalController = require("./controllers/vendor/RentalController");
 // Require middleware functions
 const {
   validateOrderId,
@@ -80,6 +80,7 @@ const loyaltyValidation = require("./middleware/customerEngagement/loyaltyValida
 const feedbackValidation = require("./middleware/customerEngagement/feedbackValidation");
 const vendorDashboardValidation = require("./middleware/customerEngagement/vendorDashboardValidation");
 
+const { validateRentalStallId } = require("./middlewares/RentalValidation");
 // Create Express app
 const app = express();
 const port = process.env.PORT || 3000;
@@ -143,6 +144,11 @@ app.get("/vendor/stalls/:stallId/menu/:id", verifyJWT, validateMenuItemId, menuC
 app.post("/vendor/stalls/:stallId/menu", verifyJWT, validateMenuItem, menuController.createMenuItem);
 app.put("/vendor/stalls/:stallId/menu/:id", verifyJWT, validateMenuItemId, validateMenuItem, menuController.updateMenuItem);
 app.delete("/vendor/stalls/:stallId/menu/:id", verifyJWT, validateMenuItemId, menuController.deleteMenuItem);
+
+// Routes for Rental agreement
+// Routes for vendor rental agreement
+app.get("/vendor/stalls/:stallId/rental", verifyJWT, validateRentalStallId, rentalController.getRentalAgreementByStall);
+app.put("/vendor/stalls/:stallId/rental/pay", verifyJWT, validateRentalStallId, rentalController.payRentalAgreement);
 
 // Routes - Sales Analytics Dashboard
 app.get("/vendor/sales/:stallId/popular-items", verifyJWT, validateSalesStallId, salesController.getPopularItems);

@@ -78,27 +78,72 @@ async function createStall(userId, stallData) {
         await stallRequest.query(insertStallQuery);
 
         // Generate next menu_id
-        const menuIdResult = await connection
-            .request()
-            .query("SELECT ISNULL(MAX(menu_id),0)+1 AS menu_id FROM Menu");
-        const newMenuId = menuIdResult.recordset[0].menu_id;
-        // Automatically create Menu for this Stall
-        const insertMenuQuery = `
-            INSERT INTO Menu
-            (
-                menu_id,
-                stall_id
-            )
-            VALUES
-            (
-                @menu_id,
-                @stall_id
-            );
-        `;
-        const menuRequest = connection.request();
-        menuRequest.input("menu_id", newMenuId);
-        menuRequest.input("stall_id", newStallId);
-        await menuRequest.query(insertMenuQuery);
+const menuIdResult = await connection
+    .request()
+    .query("SELECT ISNULL(MAX(menu_id),0)+1 AS menu_id FROM Menu");
+
+const newMenuId = menuIdResult.recordset[0].menu_id;
+
+// Automatically create Menu for this Stall
+const insertMenuQuery = `
+    INSERT INTO Menu
+    (
+        menu_id,
+        stall_id
+    )
+    VALUES
+    (
+        @menu_id,
+        @stall_id
+    );
+`;
+
+const menuRequest = connection.request();
+
+menuRequest.input("menu_id", newMenuId);
+menuRequest.input("stall_id", newStallId);
+
+await menuRequest.query(insertMenuQuery);
+
+
+// Generate next agreement_id
+const agreementIdResult = await connection
+    .request()
+    .query("SELECT ISNULL(MAX(agreement_id),0)+1 AS agreement_id FROM RentalAgreement");
+
+const newAgreementId = agreementIdResult.recordset[0].agreement_id;
+
+
+// Automatically create Rental Agreement
+const insertRentalQuery = `
+    INSERT INTO RentalAgreement
+    (
+        agreement_id,
+        stall_id,
+        start_date,
+        end_date,
+        monthly_rent,
+        payment_status,
+        agreement_status
+    )
+    VALUES
+    (
+        @agreement_id,
+        @stall_id,
+        GETDATE(),
+        DATEADD(YEAR, 1, GETDATE()),
+        1200.00,
+        'Unpaid',
+        'Pending'
+    );
+`;
+
+const rentalRequest = connection.request();
+
+rentalRequest.input("agreement_id", newAgreementId);
+rentalRequest.input("stall_id", newStallId);
+
+await rentalRequest.query(insertRentalQuery);
         // Return newly created Stall
         return await getStallById(newStallId, userId);
     }
