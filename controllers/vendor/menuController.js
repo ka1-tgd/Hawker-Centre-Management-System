@@ -56,9 +56,6 @@ async function createMenuItem(req, res) {
         const userId = req.user.id;
         const stallId = parseInt(req.params.stallId);
 
-        console.log("STALL ID:", stallId);
-        console.log("USER ID:", userId);
-
         const menuItem = await menuModel.createMenuItem(
             stallId,
             userId,
