@@ -8,13 +8,13 @@ async function getMenuItemsByStall(stallId, userId) {
     try {
         connection = await sql.connect(dbConfig);
         const query = `
-        SELECT
-            MenuItem.menu_item_id,
-            MenuItem.item_name,
-            MenuItem.description,
-            MenuItem.price,
-            MenuItem.category,
-            MenuItem.availability
+        SELECT 
+        MenuItem.menu_item_id, 
+        MenuItem.item_name, 
+        MenuItem.description, 
+        MenuItem.price, 
+        MenuItem.category, 
+        MenuItem.availability
         FROM Menu
         INNER JOIN MenuItem
             ON Menu.menu_id = MenuItem.menu_id

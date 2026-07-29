@@ -42,6 +42,8 @@ function verifyJWT(req, res, next) {
             "POST /vendor/stalls/[0-9]+/menu": ["hawker"], 
             "PUT /vendor/stalls/[0-9]+/menu/[0-9]+": ["hawker"], 
             "DELETE /vendor/stalls/[0-9]+/menu/[0-9]+": ["hawker"],
+            "GET /vendor/stalls/[0-9]+/rental": ["hawker"],
+            "PUT /vendor/stalls/[0-9]+/rental/pay": ["hawker"],
 
             // Customer exclusive
             "GET /customer/order/[0-9]+": ["customer"],
