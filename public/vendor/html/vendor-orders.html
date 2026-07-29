@@ -4,161 +4,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vendor Stall Management</title>
-
+    <title>Customer Order Management</title>
     <link rel="stylesheet" href="../css/vendor-stall.css">
 </head>
 
 <body>
     <header>
-        <div class="logo">
-            HawkerHub
-        </div>
-       <nav>
+        <div class="logo">HawkerHub</div>
+        <nav>
             <ul>
                 <li><a href="vendor-home.html">Home</a></li>
-                <li><a href="vendor-stall.html" class="active">Stalls</a></li>
-                <li><a href="#">Menus</a></li>
-                <li><a href="#">Menu Items</a></li>
+                <li><a href="vendor-stall.html">Stalls</a></li>
                 <li><a href="vendor-sales.html">Sales</a></li>
                 <li><a href="claim-redemption.html">Rewards</a></li>
                 <li><a href="satisfaction-dashboard.html">Reviews</a></li>
             </ul>
         </nav>
-
     </header>
+
     <main class="container">
         <div class="page-header">
             <div>
-                <h1>Stall Management</h1>
-                <p>
-                    Manage your stalls here.
-                </p>
+                <h1>Customer Order Management</h1>
+                <p>View and manage incoming orders for your stalls.</p>
             </div>
-            <button id="btnAddStall">
-                + Add Stall
-            </button>
+            <!-- Stall Selector if vendor has multiple stalls -->
+            <div class="filter-group">
+                <label for="stallSelect">Select Stall: </label>
+                <select id="stallSelect">
+                    <option value="">-- Choose a Stall --</option>
+                </select>
+            </div>
         </div>
-        <div class="search-section">
-            <input
-                type="text"
-                id="searchInput"
-                placeholder="Search Stall Name">
-        </div>
-        <table id="stallTable">
+
+        <table id="orderTable">
             <thead>
                 <tr>
-                    <th>Stall ID</th>
-                    <th>Stall Name</th>
-                    <th>Hawker Centre</th>
-                    <th>Description</th>
-                    <th>Operating Hours</th>
-                    <th>Contact Number</th>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Ordered Items</th>
+                    <th>Total Amount</th>
+                    <th>Payment</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="stallTableBody">
+            <tbody id="orderTableBody">
+                <tr>
+                    <td colspan="8" style="text-align: center;">Please select a stall to view orders.</td>
+                </tr>
             </tbody>
         </table>
     </main>
-    <div id="stallModal" class="modal">
+
+    <!-- Modal for Updating Status -->
+    <div id="orderModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle">
-                    Add Stall
-                </h2>
-                <span id="closeModal">
-                    &times;
-                </span>
+                <h2 id="modalTitle">Update Order Status</h2>
+                <span id="closeModal">&times;</span>
             </div>
-            <form id="stallForm">
-                <input
-                    type="hidden"
-                    id="stall_id">
+            <form id="orderForm">
+                <input type="hidden" id="modal_order_id">
                 <div class="form-group">
-                    <label>
-                        Hawker Centre ID
-                    </label>
-                    <input
-                        type="number"
-                        id="hawker_centre_id"
-                        required>
+                    <label>Current Status</label>
+                    <input type="text" id="current_status" readonly>
                 </div>
                 <div class="form-group">
-                    <label>
-                        Stall Name
-                    </label>
-                    <input
-                        type="text"
-                        id="stall_name"
-                        maxlength="100"
-                        required>
-
-                </div>
-                <div class="form-group">
-                    <label>
-                        Description
-                    </label>
-                    <textarea
-                        id="description"
-                        rows="4"
-                        maxlength="255"
-                        required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>
-                        Operating Hours
-                    </label>
-                    <input
-                        type="text"
-                        id="operating_hours"
-                        placeholder="e.g. 9AM - 9PM"
-                        required>
-                </div>
-                <div class="form-group">
-                    <label>
-                        Contact Number
-                    </label>
-                    <input
-                        type="text"
-                        id="contact_number"
-                        maxlength="8"
-                        required>
-                </div>
-                <div class="form-group">
-                    <label>
-                        Status
-                    </label>
-                    <select id="status">
-                        <option value="Open">
-                            Open
-                        </option>
-                        <option value="Close">
-                            Close
-                        </option>
+                    <label>New Status</label>
+                    <select id="new_status" required>
+                        <option value="Preparing">Preparing</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
                     </select>
                 </div>
                 <div class="form-buttons">
-                    <button
-                        type="submit"
-                        id="saveButton">
-
-                        Save
-
-                    </button>
-                    <button
-                        type="button"
-                        id="cancelButton">
-
-                        Cancel
-
-                    </button>
+                    <button type="submit" id="saveButton">Update Status</button>
+                    <button type="button" id="cancelButton">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
-    <script src="../scripts/vendor-stall.js"></script>
+
+    <script src="../scripts/vendor-orders.js"></script>
 </body>
 
 </html>
