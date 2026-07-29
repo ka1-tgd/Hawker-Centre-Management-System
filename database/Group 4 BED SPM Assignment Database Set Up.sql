@@ -196,6 +196,20 @@ CREATE TABLE Complaint (
 );
 GO
 
+CREATE TABLE RentalAgreement (
+    agreement_id INT NOT NULL,
+    stall_id INT NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    monthly_rent DECIMAL(10,2) NOT NULL,
+    payment_status VARCHAR(20) NOT NULL,
+    agreement_status VARCHAR(20) NOT NULL,
+    CONSTRAINT PK_RentalAgreement PRIMARY KEY (agreement_id),
+    CONSTRAINT FK_RentalAgreement_Stall FOREIGN KEY (stall_id) REFERENCES Stall(stall_id),
+    CONSTRAINT CK_RentalAgreement_Payment CHECK (payment_status IN ('Paid', 'Unpaid')),
+    CONSTRAINT CK_RentalAgreement_Status CHECK (agreement_status IN ('Active', 'Pending', 'Expired'))
+);
+
 -- Insert Values
 
 INSERT INTO Users (name, contact_no, email, passwordHash, role)
@@ -334,4 +348,15 @@ INSERT INTO Complaint (order_id, user_id, stall_id, Category, Description, Statu
     (2, 5, 3, 'Hygiene', 'The stall looks completely unsanitary.', 'Pending', '2026-07-02', NULL),
     (3, 6, 1, 'Long Waiting Time', 'Foods were served slow.', 'Pending', '2026-07-02', NULL);
 
+INSERT INTO RentalAgreement (agreement_id, stall_id, start_date, end_date, monthly_rent, payment_status, agreement_status)
+VALUES
+    (1, 1, '2026-01-01', '2026-12-31', 1200.00, 'Paid', 'Active'),
+    (2, 2, '2026-01-01', '2026-12-31', 1350.00, 'Paid', 'Active'),
+    (3, 3, '2026-01-01', '2026-12-31', 1100.00, 'Unpaid', 'Active'),
+    (4, 4, '2026-01-01', '2026-12-31', 1250.00, 'Paid', 'Active'),
+    (5, 6, '2026-01-01', '2026-12-31', 1400.00, 'Paid', 'Active'),
+    (6, 7, '2026-01-01', '2026-12-31', 1150.00, 'Unpaid', 'Pending'),
+    (7, 9, '2026-01-01', '2026-12-31', 1500.00, 'Paid', 'Active'),
+    (8, 10, '2026-01-01', '2026-12-31', 1300.00, 'Paid', 'Active'),
+    (9, 11, '2026-01-01', '2026-12-31', 1000.00, 'Unpaid', 'Pending');
 SELECT * FROM Inspection
