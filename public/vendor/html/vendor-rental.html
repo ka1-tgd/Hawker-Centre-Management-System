@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rental Agreement</title>
+    <link rel="stylesheet" href="../css/vendor-rental.css">
+</head>
+
+<body>
+    <header>
+
+        <div class="logo">
+            <h2>Gruberoo Hawker</h2>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="vendor-home.html">Home</a></li>
+                <li><a href="vendor-stall.html">Stalls</a></li>
+                <li><a href="vendor-menu.html">Menus</a></li>
+                <li><a href="vendor-rental.html" class="active">Rental</a></li>
+                <li><a href="vendor-sales.html">Sales</a></li>
+                <li><a href="claim-redemption.html">Rewards</a></li>
+                <li><a href="satisfaction-dashboard.html">Reviews</a></li>
+            </ul>
+        </nav>
+
+    </header>
+    <main>
+        <div class="page-header">
+
+            <h1>Rental Agreements</h1>
+
+        </div>
+
+        <div class="table-container">
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Stall Name</th>
+                        <th>Monthly Rent</th>
+                        <th>Payment Status</th>
+                        <th>Agreement Status</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+                <tbody id="rentalTableBody">
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <div id="rentalModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Rental Agreement</h2>
+            <div class="modal-info">
+                <p><strong>Stall Name:</strong> <span id="modalStall"></span></p>
+                <p><strong>Monthly Rent:</strong> $<span id="modalRent"></span></p>
+                <p><strong>Start Date:</strong> <span id="modalStart"></span></p>
+                <p><strong>End Date:</strong> <span id="modalEnd"></span></p>
+                <p><strong>Payment Status:</strong> <span id="modalPayment"></span></p>
+                <p><strong>Agreement Status:</strong> <span id="modalAgreement"></span></p>
+            </div>
+            <div class="modal-buttons">
+                <button id="closeBtn" class="cancel-btn">
+                    Close
+                </button>
+                <button id="payBtn" class="pay-btn">
+                    Pay Rental
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="../scripts/vendor-rental.js"></script>
+</body>
+</html>
