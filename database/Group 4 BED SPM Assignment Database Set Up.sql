@@ -302,6 +302,11 @@ INSERT INTO Reward
     ('10% Discount Voucher', 150, 'Percentage', 10, 'Receive 10% discount on your next order.', 'Active'),
     ('$5 Meal Voucher', 200, 'Fixed Amount', 5, 'Redeem a $5 meal voucher from selected stalls.', 'Active'),
     ('Free Meal Set', 300, 'Free Item', 0, 'Redeem a complete meal set from participating stalls.', 'Inactive');
+
+-- Reworded reward descriptions
+UPDATE Reward SET Description = 'Show this at the stall to receive 5% off your order.' WHERE RewardName = '5% Discount Voucher';
+UPDATE Reward SET Description = 'Show this at the stall to receive 10% off your order.' WHERE RewardName = '10% Discount Voucher';
+UPDATE Reward SET Description = 'Show this at the stall to receive $5 off your meal.' WHERE RewardName = '$5 Meal Voucher';
  
 INSERT INTO RedemptionHistory (user_id, RewardID, PointsUsed)
     VALUES
