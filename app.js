@@ -145,9 +145,9 @@ app.post("/vendor/stalls/:stallId/menu", verifyJWT, validateMenuItem, menuContro
 app.put("/vendor/stalls/:stallId/menu/:id", verifyJWT, validateMenuItemId, validateMenuItem, menuController.updateMenuItem);
 app.delete("/vendor/stalls/:stallId/menu/:id", verifyJWT, validateMenuItemId, menuController.deleteMenuItem);
 
-// Routes for Rental agreement
 // Routes for vendor rental agreement
-app.get("/vendor/stalls/:stallId/rental", verifyJWT, validateRentalStallId, rentalController.getRentalAgreementByStall);
+app.get("/vendor/rentals", verifyJWT, rentalController.getLoginUserRentalAgreements);
+app.get("/vendor/stalls/:stallId/rental", verifyJWT,  validateRentalStallId, rentalController.getRentalAgreementByStall);
 app.put("/vendor/stalls/:stallId/rental/pay", verifyJWT, validateRentalStallId, rentalController.payRentalAgreement);
 
 // Routes - Sales Analytics Dashboard
