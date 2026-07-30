@@ -252,6 +252,19 @@ body {
   margin-top: 8px;
 }
 
+#complaintForm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 400px;
+}
+
+#complaintForm label {
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+
 #feedbackForm select,
 #feedbackForm textarea,
 .feedback-edit select,
@@ -340,3 +353,43 @@ body {
   margin: 0 6px 6px 0;
   font-size: 13px;
 }
+
+#feedbackForm select,
+#feedbackForm textarea,
+#complaintForm select,
+#complaintForm textarea,
+.feedback-edit select,
+.feedback-edit textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: inherit;
+}
+
+#feedbackForm button,
+#complaintForm button,
+.feedback-display button,
+.feedback-edit button {
+  margin-top: 8px;
+  margin-right: 6px;
+  background: #2b3a8f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+
+.like-item button,
+.redemption-item button,
+.complaint-item button,
+.feedback-display .delete-btn {
+  background: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
