@@ -200,18 +200,49 @@ async function deleteStall(stallId, userId) {
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const query = "DELETE FROM Stall WHERE stall_id = @stall_id AND user_id = @user_id";
+        // Delete Menu Items
+        let request = connection.request();
+        request.input("stall_id", stallId);
+        await request.query(`
+            DELETE MenuItem
+            FROM MenuItem
+            INNER JOIN Menu
+                ON MenuItem.menu_id = Menu.menu_id
+            WHERE Menu.stall_id = @stall_id;
+        `);
+        // Delete Menu
+        request = connection.request();
+        request.input("stall_id", stallId);
+        await request.query(`
+            DELETE FROM Menu
+            WHERE stall_id = @stall_id;
+        `);
+        // Delete Rental Agreement
+        request = connection.request();
+        request.input("stall_id", stallId);
+        await request.query(`
+            DELETE FROM RentalAgreement
+            WHERE stall_id = @stall_id;
+        `);
 
-        const request = connection.request();
+        // Delete Stall
+        request = connection.request();
         request.input("stall_id", stallId);
         request.input("user_id", userId);
-        const result = await request.query(query);
+        const result = await request.query(`
+            DELETE FROM Stall
+            WHERE stall_id = @stall_id
+            AND user_id = @user_id;`);
         return result.rowsAffected[0] > 0;
-    } catch (error) {
+
+    }
+    catch (error) {
         console.error("Database error:", error);
         throw error;
-    } finally {
-        if (connection) await connection.close();
+    }
+    finally {
+        if (connection)
+            await connection.close();
     }
 }
 
