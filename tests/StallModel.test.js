@@ -9,9 +9,9 @@ describe("StallModel", () => {
         jest.clearAllMocks();
     });
 
-    // ===============================
+    // ============================================
     // getLoginUserStalls
-    // ===============================
+    // ============================================
 
     describe("getLoginUserStalls", () => {
 
@@ -45,17 +45,10 @@ describe("StallModel", () => {
             const stalls = await StallModel.getLoginUserStalls(9);
 
             expect(sql.connect).toHaveBeenCalled();
-
-            expect(mockRequest.input)
-                .toHaveBeenCalledWith("user_id", 9);
-
+            expect(mockRequest.input).toHaveBeenCalledWith("user_id", 9);
             expect(stalls).toHaveLength(2);
-
-            expect(stalls[0].stall_name)
-                .toBe("Chicken Rice");
-
-            expect(mockConnection.close)
-                .toHaveBeenCalled();
+            expect(stalls[0].stall_name).toBe("Chicken Rice");
+            expect(mockConnection.close).toHaveBeenCalled();
 
         });
 
@@ -73,9 +66,9 @@ describe("StallModel", () => {
 
     });
 
-    // ===============================
+    // ============================================
     // getStallById
-    // ===============================
+    // ============================================
 
     describe("getStallById", () => {
 
@@ -103,9 +96,8 @@ describe("StallModel", () => {
             const stall = await StallModel.getStallById(1, 9);
 
             expect(stall.stall_id).toBe(1);
-
-            expect(stall.stall_name)
-                .toBe("Chicken Rice");
+            expect(stall.stall_name).toBe("Chicken Rice");
+            expect(mockConnection.close).toHaveBeenCalled();
 
         });
 
@@ -128,14 +120,15 @@ describe("StallModel", () => {
             const stall = await StallModel.getStallById(1, 9);
 
             expect(stall).toBeNull();
+            expect(mockConnection.close).toHaveBeenCalled();
 
         });
 
     });
 
-    // ===============================
+    // ============================================
     // createStall
-    // ===============================
+    // ============================================
 
     describe("createStall", () => {
 
@@ -152,20 +145,32 @@ describe("StallModel", () => {
 
             const mockRequest = {
                 input: jest.fn().mockReturnThis(),
-                query: jest
-                    .fn()
+                query: jest.fn()
+                    // MAX stall_id
                     .mockResolvedValueOnce({
                         recordset: [{ stall_id: 10 }]
                     })
+
+                    // INSERT Stall
                     .mockResolvedValueOnce({})
+
+                    // MAX menu_id
                     .mockResolvedValueOnce({
                         recordset: [{ menu_id: 10 }]
                     })
+
+                    // INSERT Menu
                     .mockResolvedValueOnce({})
+
+                    // MAX agreement_id
                     .mockResolvedValueOnce({
                         recordset: [{ agreement_id: 10 }]
                     })
+
+                    // INSERT Rental
                     .mockResolvedValueOnce({})
+
+                    // getStallById()
                     .mockResolvedValueOnce({
                         recordset: [{
                             stall_id: 10,
@@ -181,27 +186,21 @@ describe("StallModel", () => {
 
             sql.connect.mockResolvedValue(mockConnection);
 
-            jest.spyOn(StallModel, "getStallById")
-                .mockResolvedValue({
-                    stall_id: 10,
-                    stall_name: "New Stall"
-                });
-
             const stall = await StallModel.createStall(9, stallData);
 
-            expect(stall.stall_name)
-                .toBe("New Stall");
+            expect(stall.stall_id).toBe(10);
+            expect(stall.stall_name).toBe("New Stall");
 
-            expect(mockConnection.close)
-                .toHaveBeenCalled();
+            expect(mockRequest.query).toHaveBeenCalledTimes(7);
+            expect(mockConnection.close).toHaveBeenCalled();
 
         });
 
     });
 
-    // ===============================
+    // ============================================
     // updateStall
-    // ===============================
+    // ============================================
 
     describe("updateStall", () => {
 
@@ -209,9 +208,20 @@ describe("StallModel", () => {
 
             const mockRequest = {
                 input: jest.fn().mockReturnThis(),
-                query: jest.fn().mockResolvedValue({
-                    rowsAffected: [1]
-                })
+                query: jest.fn()
+
+                    // UPDATE
+                    .mockResolvedValueOnce({
+                        rowsAffected: [1]
+                    })
+
+                    // getStallById()
+                    .mockResolvedValueOnce({
+                        recordset: [{
+                            stall_id: 1,
+                            stall_name: "Updated Stall"
+                        }]
+                    })
             };
 
             const mockConnection = {
@@ -220,12 +230,6 @@ describe("StallModel", () => {
             };
 
             sql.connect.mockResolvedValue(mockConnection);
-
-            jest.spyOn(StallModel, "getStallById")
-                .mockResolvedValue({
-                    stall_id: 1,
-                    stall_name: "Updated Stall"
-                });
 
             const result = await StallModel.updateStall(
                 1,
@@ -239,8 +243,9 @@ describe("StallModel", () => {
                 }
             );
 
-            expect(result.stall_name)
-                .toBe("Updated Stall");
+            expect(result.stall_name).toBe("Updated Stall");
+            expect(mockRequest.query).toHaveBeenCalledTimes(2);
+            expect(mockConnection.close).toHaveBeenCalled();
 
         });
 
@@ -267,14 +272,15 @@ describe("StallModel", () => {
             );
 
             expect(result).toBeNull();
+            expect(mockConnection.close).toHaveBeenCalled();
 
         });
 
     });
 
-    // ===============================
+    // ============================================
     // deleteStall
-    // ===============================
+    // ============================================
 
     describe("deleteStall", () => {
 
@@ -282,11 +288,18 @@ describe("StallModel", () => {
 
             const mockRequest = {
                 input: jest.fn().mockReturnThis(),
-                query: jest
-                    .fn()
+                query: jest.fn()
+
+                    // Delete MenuItem
                     .mockResolvedValueOnce({})
+
+                    // Delete Menu
                     .mockResolvedValueOnce({})
+
+                    // Delete RentalAgreement
                     .mockResolvedValueOnce({})
+
+                    // Delete Stall
                     .mockResolvedValueOnce({
                         rowsAffected: [1]
                     })
@@ -299,21 +312,20 @@ describe("StallModel", () => {
 
             sql.connect.mockResolvedValue(mockConnection);
 
-            const deleted = await StallModel.deleteStall(
-                1,
-                9
-            );
+            const deleted = await StallModel.deleteStall(1, 9);
 
             expect(deleted).toBe(true);
+            expect(mockRequest.query).toHaveBeenCalledTimes(4);
+            expect(mockConnection.close).toHaveBeenCalled();
 
         });
 
-        it("should return false when stall does not exist", async () => {
+        it("should return false if stall does not exist", async () => {
 
             const mockRequest = {
                 input: jest.fn().mockReturnThis(),
-                query: jest
-                    .fn()
+                query: jest.fn()
+
                     .mockResolvedValueOnce({})
                     .mockResolvedValueOnce({})
                     .mockResolvedValueOnce({})
@@ -329,12 +341,11 @@ describe("StallModel", () => {
 
             sql.connect.mockResolvedValue(mockConnection);
 
-            const deleted = await StallModel.deleteStall(
-                100,
-                9
-            );
+            const deleted = await StallModel.deleteStall(999, 9);
 
             expect(deleted).toBe(false);
+            expect(mockRequest.query).toHaveBeenCalledTimes(4);
+            expect(mockConnection.close).toHaveBeenCalled();
 
         });
 
