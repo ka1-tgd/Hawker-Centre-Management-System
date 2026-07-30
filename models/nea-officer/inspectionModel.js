@@ -300,4 +300,5 @@ module.exports = {
   getGradeDistribution,
   getExpiringSoon,
   getRecentInspections,
+  calculateGrade,
 };
