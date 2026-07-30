@@ -6,6 +6,18 @@
 
 const complaintModel = require("../../models/customer/complaintModel");
 
+async function getCustomerOrders(req, res) {
+  try {
+    const userId = parseInt(req.params.userId);
+    const orders = await complaintModel.getCustomerOrders(userId);
+    res.json(orders);
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error retrieving orders" });
+  }
+}
+
+
 // POST /complaints
 async function createComplaint(req, res) {
   try {
@@ -75,4 +87,5 @@ module.exports = {
   getComplaintsByUser,
   updateComplaintStatus,
   deleteComplaint,
+  getCustomerOrders,
 };

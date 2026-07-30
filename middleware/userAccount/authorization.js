@@ -84,6 +84,7 @@ function verifyJWT(req, res, next) {
             "GET /complaints/customer/[0-9]+": ["customer"],
             "PUT /complaints/[0-9]+/status": ["customer"],
             "DELETE /complaints/[0-9]+": ["customer"],
+            "GET /complaints/orders/[0-9]+": ["customer"],
 
             "GET /vendor/satisfaction": ["hawker"],
             "GET /vendor/complaints": ["hawker"],

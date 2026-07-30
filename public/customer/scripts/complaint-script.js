@@ -29,7 +29,7 @@ async function loadEligibleOrders() {
   }
 
   try {
-    const response = await fetch(`/feedback/orders/${userId}`, {
+    const response = await fetch(`/complaints/orders/${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 

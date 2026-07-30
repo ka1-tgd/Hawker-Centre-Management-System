@@ -182,6 +182,8 @@ app.put("/feedback/:id", verifyJWT, feedbackValidation.validateFeedbackId, feedb
 app.delete("/feedback/:id", verifyJWT, feedbackValidation.validateFeedbackId, feedbackController.deleteFeedback);
 
 // Routes - Complaint Management
+// Routes - Complaint Management
+app.get("/complaints/orders/:userId", verifyJWT, validateComplaintUserId, complaintController.getCustomerOrders);
 app.post("/complaints", verifyJWT, validateComplaint, complaintController.createComplaint);
 app.get("/complaints/customer/:userId", verifyJWT, validateComplaintUserId, complaintController.getComplaintsByUser);
 app.put("/complaints/:id/status", verifyJWT, validateComplaintId, validateStatusUpdate, complaintController.updateComplaintStatus);

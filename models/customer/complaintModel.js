@@ -8,6 +8,43 @@
 const sql = require("mssql");
 const dbConfig = require("../../dbConfig");
 
+// Get all orders placed by a customer, for the complaint form dropdown
+// (unlike feedback's eligible-orders, this does NOT exclude orders
+// that already have feedback, since a complaint is unrelated to that)
+async function getCustomerOrders(userId) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query = `
+      SELECT DISTINCT co.order_id, oi.stall_id, s.stall_name, co.order_date
+      FROM CustOrder co
+      JOIN OrderItem oi ON co.order_id = oi.order_id
+      JOIN Stall s ON oi.stall_id = s.stall_id
+      WHERE co.user_id = @userId
+      ORDER BY co.order_date DESC
+    `;
+    const request = connection.request();
+    request.input("userId", userId);
+    const result = await request.query(query);
+
+    return result.recordset;
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
+
+
+
 // Insert a new complaint submitted by a customer.
 async function createComplaint(complaintData) {
   let connection;
@@ -143,4 +180,5 @@ module.exports = {
   getComplaintsByUser,
   updateComplaintStatus,
   deleteComplaint,
+  getCustomerOrders,
 };
