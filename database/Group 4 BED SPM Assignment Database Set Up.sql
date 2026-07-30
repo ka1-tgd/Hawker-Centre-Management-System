@@ -196,6 +196,20 @@ CREATE TABLE Complaint (
 );
 GO
 
+CREATE TABLE RentalAgreement (
+    agreement_id INT NOT NULL,
+    stall_id INT NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    monthly_rent DECIMAL(10,2) NOT NULL,
+    payment_status VARCHAR(20) NOT NULL,
+    agreement_status VARCHAR(20) NOT NULL,
+    CONSTRAINT PK_RentalAgreement PRIMARY KEY (agreement_id),
+    CONSTRAINT FK_RentalAgreement_Stall FOREIGN KEY (stall_id) REFERENCES Stall(stall_id),
+    CONSTRAINT CK_RentalAgreement_Payment CHECK (payment_status IN ('Paid', 'Unpaid')),
+    CONSTRAINT CK_RentalAgreement_Status CHECK (agreement_status IN ('Active', 'Pending', 'Expired'))
+);
+
 -- Insert Values
 
 INSERT INTO Users (name, contact_no, email, passwordHash, role)
@@ -226,6 +240,14 @@ INSERT INTO Menu (menu_id, stall_id)
     (1, 1),
     (2, 2),
     (3, 3);
+
+INSERT INTO Menu (menu_id, stall_id)
+VALUES
+(4,4),
+(5,6),
+(6,7),
+(7,9),
+(8,10);
 
 INSERT INTO MenuItem (menu_id, item_name, description, price, category, availability)
     VALUES
@@ -294,6 +316,11 @@ INSERT INTO Reward
     ('10% Discount Voucher', 150, 'Percentage', 10, 'Receive 10% discount on your next order.', 'Active'),
     ('$5 Meal Voucher', 200, 'Fixed Amount', 5, 'Redeem a $5 meal voucher from selected stalls.', 'Active'),
     ('Free Meal Set', 300, 'Free Item', 0, 'Redeem a complete meal set from participating stalls.', 'Inactive');
+
+-- Reworded reward descriptions
+UPDATE Reward SET Description = 'Show this at the stall to receive 5% off your order.' WHERE RewardName = '5% Discount Voucher';
+UPDATE Reward SET Description = 'Show this at the stall to receive 10% off your order.' WHERE RewardName = '10% Discount Voucher';
+UPDATE Reward SET Description = 'Show this at the stall to receive $5 off your meal.' WHERE RewardName = '$5 Meal Voucher';
  
 INSERT INTO RedemptionHistory (user_id, RewardID, PointsUsed)
     VALUES
@@ -321,4 +348,15 @@ INSERT INTO Complaint (order_id, user_id, stall_id, Category, Description, Statu
     (2, 5, 3, 'Hygiene', 'The stall looks completely unsanitary.', 'Pending', '2026-07-02', NULL),
     (3, 6, 1, 'Long Waiting Time', 'Foods were served slow.', 'Pending', '2026-07-02', NULL);
 
+INSERT INTO RentalAgreement (agreement_id, stall_id, start_date, end_date, monthly_rent, payment_status, agreement_status)
+VALUES
+    (1, 1, '2026-01-01', '2026-12-31', 1200.00, 'Paid', 'Active'),
+    (2, 2, '2026-01-01', '2026-12-31', 1350.00, 'Paid', 'Active'),
+    (3, 3, '2026-01-01', '2026-12-31', 1100.00, 'Unpaid', 'Active'),
+    (4, 4, '2026-01-01', '2026-12-31', 1250.00, 'Paid', 'Active'),
+    (5, 6, '2026-01-01', '2026-12-31', 1400.00, 'Paid', 'Active'),
+    (6, 7, '2026-01-01', '2026-12-31', 1150.00, 'Unpaid', 'Pending'),
+    (7, 9, '2026-01-01', '2026-12-31', 1500.00, 'Paid', 'Active'),
+    (8, 10, '2026-01-01', '2026-12-31', 1300.00, 'Paid', 'Active'),
+    (9, 11, '2026-01-01', '2026-12-31', 1000.00, 'Unpaid', 'Pending');
 SELECT * FROM Inspection

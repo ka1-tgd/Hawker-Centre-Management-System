@@ -1,5 +1,7 @@
+// Get sign up form
 const form = document.getElementById("signup-form");
 
+// Add event listener for form submission
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -11,12 +13,13 @@ form.addEventListener("submit", async (e) => {
     const contactNo = document.getElementById("contact-no").value;
     const userType = document.querySelector('input[name="userType"]:checked').value;
 
-    // Check password
+    // Check if passwords match
     if (confirmPassword !== password) {
         alert("Password do not match!");
         return;
     }
 
+    // Store user data in JSON
     const newUserData = {
         name: username,
         email: email,
@@ -26,9 +29,9 @@ form.addEventListener("submit", async (e) => {
     };
 
     try {
-        // Make a POST request to your API endpoint
+        // Make a POST request to API
         const response = await fetch(`/register`, {
-            method: "POST", // Specify the HTTP method
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -42,12 +45,15 @@ form.addEventListener("submit", async (e) => {
             ? await response.json()
             : { message: response.statusText };
 
+        // If response is ok
         if (response.status === 201) {
             alert("Account created successfully!");
+
+            // Reset form and redirect to log in page
             form.reset();
             window.location.href = "index.html";
         } else if (response.status === 400) {
-            // Handle validation errors from the API (from Practical 04 validation middleware)
+            // Handle validation errors from the API
             messageDiv.textContent = `Validation Error: ${responseBody.message}`;
             messageDiv.style.color = "red";
             console.error("Validation Error:", responseBody);

@@ -23,7 +23,8 @@ const feedbackController = require("./controllers/customerEngagement/feedbackCon
 const vendorDashboardController = require("./controllers/customerEngagement/vendorDashboardController");
 const salesController = require("./controllers/vendor/salesController");
 const complaintController = require("./controllers/customer/complaintController");
-
+const menuController = require("./controllers/vendor/menuController");
+const rentalController = require("./controllers/vendor/RentalController");
 // Require middleware functions
 const {
   validateOrderId,
@@ -61,6 +62,13 @@ const {
 } = require("./middleware/vendor/salesValidation.js");
 
 const {
+
+    validateMenuItem,
+    validateMenuItemId
+
+} = require("./middleware/vendor/menuValidation");
+
+const {
   validateComplaint,
   validateStatusUpdate,
   validateUserId: validateComplaintUserId,
@@ -72,6 +80,7 @@ const loyaltyValidation = require("./middleware/customerEngagement/loyaltyValida
 const feedbackValidation = require("./middleware/customerEngagement/feedbackValidation");
 const vendorDashboardValidation = require("./middleware/customerEngagement/vendorDashboardValidation");
 
+const { validateRentalStallId } = require("./middleware/vendor/RentalValidation");
 // Create Express app
 const app = express();
 const port = process.env.PORT || 3000;
@@ -128,6 +137,18 @@ app.get("/vendor/stalls/:id", verifyJWT, validateVendorStallId, stallController.
 app.post("/vendor/stalls", verifyJWT, validateStall, stallController.createStall);
 app.put("/vendor/stalls/:id", verifyJWT, validateVendorStallId, validateStall, stallController.updateStall);
 app.delete("/vendor/stalls/:id", verifyJWT, validateVendorStallId, stallController.deleteStall);
+
+// Routes for vendor menu management
+app.get("/vendor/stalls/:stallId/menu", verifyJWT, menuController.getMenuItemsByStall);
+app.get("/vendor/stalls/:stallId/menu/:id", verifyJWT, validateMenuItemId, menuController.getMenuItemById);
+app.post("/vendor/stalls/:stallId/menu", verifyJWT, validateMenuItem, menuController.createMenuItem);
+app.put("/vendor/stalls/:stallId/menu/:id", verifyJWT, validateMenuItemId, validateMenuItem, menuController.updateMenuItem);
+app.delete("/vendor/stalls/:stallId/menu/:id", verifyJWT, validateMenuItemId, menuController.deleteMenuItem);
+
+// Routes for vendor rental agreement
+app.get("/vendor/rentals", verifyJWT, rentalController.getLoginUserRentalAgreements);
+app.get("/vendor/stalls/:stallId/rental", verifyJWT,  validateRentalStallId, rentalController.getRentalAgreementByStall);
+app.put("/vendor/stalls/:stallId/rental/pay", verifyJWT, validateRentalStallId, rentalController.payRentalAgreement);
 
 // Routes - Sales Analytics Dashboard
 app.get("/vendor/sales/:stallId/popular-items", verifyJWT, validateSalesStallId, salesController.getPopularItems);
