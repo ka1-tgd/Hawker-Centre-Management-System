@@ -3,13 +3,13 @@
 -- Ang Yi Kai (S10272677A)
 --     Tables: Users
 -- Goh Yi Xuan (S10273687C)
---     Tables: Rewards, LoyaltyPoints, RedemptionHistory, Feedback, Complaints, MenuItemLikes
+--     Tables: Rewards, LoyaltyPoints, RedemptionHistory, Feedback,MenuItemLikes
 -- Ryan Melvin Rajah (S10275110B)
 --     Tables: Stall, Menu, MenuItem
 -- Tham Shao Heng (S10275177C)
 --     Tables: HawkerCentre, CustOrder, OrderItem
 -- Zeng Wen Shuang (S10275183K) 
---     Tables: Inspection, Hygiene_Grade
+--     Tables: Inspection, Hygiene_Grade,Complaints
 
 -- Create Database
 CREATE DATABASE BEDSPMAssignment_db;
