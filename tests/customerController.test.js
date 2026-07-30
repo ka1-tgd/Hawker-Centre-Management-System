@@ -14,7 +14,7 @@ describe("customerController - Core Order Tests", () => {
   });
 
   // 1. getOrderById
-  describe("getOrderById", () => {
+  describe("customerController.getOrderById", () => {
     it("should return an order with status 200 when found", async () => {
       const mockOrder = { order_id: 1, total: 50 };
       customerModel.getOrderById.mockResolvedValue(mockOrder);
@@ -54,7 +54,7 @@ describe("customerController - Core Order Tests", () => {
   });
 
   // 2. createOrder
-  describe("createOrder", () => {
+  describe("customerController.createOrder", () => {
     it("should create an order and return 201", async () => {
       const newOrderData = { order_id: 10, stall_id: 1 };
       customerModel.createOrder.mockResolvedValue(newOrderData);
@@ -94,7 +94,7 @@ describe("customerController - Core Order Tests", () => {
   });
 
   // 3. deleteOrder
-  describe("deleteOrder", () => {
+  describe("customerController.deleteOrder", () => {
     it("should delete an order and return the result", async () => {
       customerModel.deleteOrder.mockResolvedValue({ success: true });
 
@@ -144,7 +144,7 @@ describe("customerController - Core Order Tests", () => {
   });
 
   // 4. updateOrderItemQuantity
-  describe("updateOrderItemQuantity", () => {
+  describe("customerController.updateOrderItemQuantity", () => {
     it("should update quantity and return 200", async () => {
       const mockUpdated = { order_id: 1, order_item_no: 2, quantity: 5 };
       customerModel.updateOrderItemQuantity.mockResolvedValue(mockUpdated);
