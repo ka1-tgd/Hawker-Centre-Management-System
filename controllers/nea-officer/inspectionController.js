@@ -20,12 +20,16 @@ async function getInspectionsByStall(req, res) {
   }
 }
 
-// POST /nea/inspections
-// Create a new inspection record. The model automatically works
-// out and saves the resulting hygiene grade.
 async function createInspection(req, res) {
   try {
-    const newInspection = await inspectionModel.createInspection(req.body);
+    // Officer id always comes from the verified JWT, never trusted
+    // from the request body — this prevents one officer from
+    // submitting an inspection under another officer's name.
+    const inspectionData = {
+      ...req.body,
+      officer_id: req.user.id,
+    };
+    const newInspection = await inspectionModel.createInspection(inspectionData);
     res.status(201).json(newInspection);
   } catch (error) {
     console.error("Controller error:", error);

@@ -55,18 +55,19 @@ describe("inspectionController.createInspection", () => {
     jest.clearAllMocks();
   });
 
-  it("should create an inspection and return 201 with the new record", async () => {
+  it("should create an inspection using the logged-in officer's id from the JWT, ignoring any officer_id sent in the body", async () => {
     const mockNewInspection = { inspection_id: 5, grade: "B" };
     inspectionModel.createInspection.mockResolvedValue(mockNewInspection);
 
     const req = {
       body: {
         stall_id: 1,
-        officer_id: 3,
+        officer_id: 999, // attempting to impersonate another officer
         inspection_date: "2026-07-20",
         score: 82,
         remarks: "Test remarks",
       },
+      user: { id: 3, role: "officer" }, // the actual logged-in officer
     };
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -75,7 +76,11 @@ describe("inspectionController.createInspection", () => {
 
     await inspectionController.createInspection(req, res);
 
-    expect(inspectionModel.createInspection).toHaveBeenCalledWith(req.body);
+    // The model should have been called with officer_id 3 (from the
+    // token), not 999 (the spoofed value from the request body)
+    expect(inspectionModel.createInspection).toHaveBeenCalledWith(
+      expect.objectContaining({ officer_id: 3 })
+    );
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith(mockNewInspection);
   });
@@ -83,7 +88,7 @@ describe("inspectionController.createInspection", () => {
   it("should return a 500 status when creation fails", async () => {
     inspectionModel.createInspection.mockRejectedValue(new Error("Database error"));
 
-    const req = { body: {} };
+    const req = { body: {}, user: { id: 3, role: "officer" } };
     const res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
