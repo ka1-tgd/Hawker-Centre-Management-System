@@ -95,12 +95,25 @@ async function loadMyComplaints() {
       const createdDate = new Date(complaint.CreatedDate).toLocaleDateString();
       const canDelete = complaint.Status === "Pending";
 
-      item.innerHTML = `
-        <p><strong>${complaint.stall_name}</strong> — <span class="complaint-tag">${complaint.Category}</span></p>
-        <p class="feedback-comment">${complaint.Description}</p>
-        <p class="feedback-date">Submitted: ${createdDate} · Status: <strong>${complaint.Status}</strong></p>
-        ${canDelete ? `<button class="delete-complaint-btn" data-id="${complaint.ComplaintID}">Delete</button>` : ""}
-      `;
+      const statusClassMap = {
+  "Pending": "status-pending",
+  "In Progress": "status-in-progress",
+  "Resolved": "status-resolved",
+  "Rejected": "status-rejected",
+};
+const statusClass = statusClassMap[complaint.Status] || "status-pending";
+
+  item.className = "complaint-card";
+  item.innerHTML = `
+    <div class="complaint-card-header">
+      <strong>${complaint.stall_name}</strong>
+      <span class="status-badge ${statusClass}">${complaint.Status}</span>
+    </div>
+    <span class="complaint-tag">${complaint.Category}</span>
+    <p class="feedback-comment">${complaint.Description}</p>
+    <p class="feedback-date">Submitted: ${createdDate}</p>
+    ${canDelete ? `<button class="delete-complaint-btn" data-id="${complaint.ComplaintID}">Delete</button>` : ""}
+  `;
 
       complaintListDiv.appendChild(item);
     });

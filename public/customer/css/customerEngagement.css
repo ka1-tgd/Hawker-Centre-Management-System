@@ -409,3 +409,32 @@ body {
   font-size: medium;
   color: white;
 }
+
+/* Complaint status badges */
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.status-pending { background: #fff4e0; color: #b8860b; }
+.status-in-progress { background: #e0edff; color: #2b3a8f; }
+.status-resolved { background: #e6f7ec; color: #1e7e34; }
+.status-rejected { background: #fdecea; color: #b00020; }
+
+.complaint-card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.complaint-card:hover {
+  border-color: #2b3a8f;
+}
+.complaint-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
