@@ -88,3 +88,20 @@ body {
   margin: 10px 0px 6px 0px;
   color: white;
 }
+
+.sidebar .my-account-div{
+  background: #2b3a8f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 6px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+}
+
+.sidebar .my-account-div .my-account {
+  font-weight: bold;
+  font-size: medium;
+  color: white;
+}
