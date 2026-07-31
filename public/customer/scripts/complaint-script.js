@@ -1,5 +1,25 @@
 const token = localStorage.getItem("token");
 
+function showPopup(message, isSuccess = true) {
+  const overlay = document.getElementById("popupOverlay");
+  const icon = document.getElementById("popupIcon");
+  const messageEl = document.getElementById("popupMessage");
+
+  if (!overlay) {
+    alert(message);
+    return;
+  }
+
+  icon.textContent = isSuccess ? "✅" : "❌";
+  messageEl.textContent = message;
+  overlay.classList.add("show");
+}
+
+function closePopup() {
+  const overlay = document.getElementById("popupOverlay");
+  if (overlay) overlay.classList.remove("show");
+}
+
 // Derive userId from the JWT token payload instead of relying on a separate localStorage value
 function getUserIdFromToken() {
   if (!token) return null;
@@ -19,9 +39,8 @@ const categorySelect = document.getElementById("categorySelect");
 const descriptionInput = document.getElementById("descriptionInput");
 const complaintForm = document.getElementById("complaintForm");
 const complaintListDiv = document.getElementById("complaintList");
-const messageDiv = document.getElementById("message");
 
-// Load the customer's past orders into the dropdown (reuses the same eligible-orders endpoint as feedback)
+// ============ Load orders eligible for a complaint ============
 async function loadEligibleOrders() {
   if (!userId) {
     orderSelect.innerHTML = '<option value="">Please login first.</option>';
@@ -38,15 +57,15 @@ async function loadEligibleOrders() {
       return;
     }
 
-    const eligibleOrders = await response.json();
+    const orders = await response.json();
 
-    if (eligibleOrders.length === 0) {
+    if (orders.length === 0) {
       orderSelect.innerHTML = '<option value="">No past orders found</option>';
       return;
     }
 
     orderSelect.innerHTML = "";
-    eligibleOrders.forEach((order) => {
+    orders.forEach((order) => {
       const option = document.createElement("option");
       option.value = `${order.order_id}-${order.stall_id}`;
       const orderDate = new Date(order.order_date).toLocaleDateString();
@@ -60,7 +79,7 @@ async function loadEligibleOrders() {
   }
 }
 
-// Load the customer's previously submitted complaints
+// ============ Load the customer's previously submitted complaints ============
 async function loadMyComplaints() {
   if (!userId) {
     complaintListDiv.innerHTML = "<p>Please login first.</p>";
@@ -88,37 +107,34 @@ async function loadMyComplaints() {
 
     complaintListDiv.innerHTML = "";
 
+    const statusClassMap = {
+      "Pending": "status-pending",
+      "In Progress": "status-in-progress",
+      "Resolved": "status-resolved",
+      "Rejected": "status-rejected",
+    };
+
     complaints.forEach((complaint) => {
       const item = document.createElement("div");
-      item.className = "feedback-item";
-
       const createdDate = new Date(complaint.CreatedDate).toLocaleDateString();
       const canDelete = complaint.Status === "Pending";
+      const statusClass = statusClassMap[complaint.Status] || "status-pending";
 
-      const statusClassMap = {
-  "Pending": "status-pending",
-  "In Progress": "status-in-progress",
-  "Resolved": "status-resolved",
-  "Rejected": "status-rejected",
-};
-const statusClass = statusClassMap[complaint.Status] || "status-pending";
-
-  item.className = "complaint-card";
-  item.innerHTML = `
-    <div class="complaint-card-header">
-      <strong>${complaint.stall_name}</strong>
-      <span class="status-badge ${statusClass}">${complaint.Status}</span>
-    </div>
-    <span class="complaint-tag">${complaint.Category}</span>
-    <p class="feedback-comment">${complaint.Description}</p>
-    <p class="feedback-date">Submitted: ${createdDate}</p>
-    ${canDelete ? `<button class="delete-complaint-btn" data-id="${complaint.ComplaintID}">Delete</button>` : ""}
-  `;
+      item.className = "complaint-card";
+      item.innerHTML = `
+        <div class="complaint-card-header">
+          <strong>${complaint.stall_name}</strong>
+          <span class="status-badge ${statusClass}">${complaint.Status}</span>
+        </div>
+        <span class="complaint-tag">${complaint.Category}</span>
+        <p class="feedback-comment">${complaint.Description}</p>
+        <p class="feedback-date">Submitted: ${createdDate}</p>
+        ${canDelete ? `<button class="delete-complaint-btn" data-id="${complaint.ComplaintID}">Delete</button>` : ""}
+      `;
 
       complaintListDiv.appendChild(item);
     });
 
-    // Attach delete handlers
     document.querySelectorAll(".delete-complaint-btn").forEach((btn) => {
       btn.addEventListener("click", async function () {
         const confirmDelete = confirm("Are you sure you want to delete this complaint?");
@@ -138,11 +154,12 @@ const statusClass = statusClassMap[complaint.Status] || "status-pending";
             throw new Error(result.error || "Failed to delete complaint");
           }
 
+          showPopup("Complaint deleted successfully.", true);
           loadMyComplaints();
 
         } catch (error) {
           console.error(error);
-          alert(`Error: ${error.message}`);
+          showPopup(`Error: ${error.message}`, false);
         }
       });
     });
@@ -153,18 +170,18 @@ const statusClass = statusClassMap[complaint.Status] || "status-pending";
   }
 }
 
-// Handle complaint form submission
+// ============ Handle complaint form submission ============
 complaintForm.addEventListener("submit", async function (event) {
   event.preventDefault();
 
   if (!userId) {
-    messageDiv.textContent = "Please login first.";
+    showPopup("Please login first.", false);
     return;
   }
 
   const selectedValue = orderSelect.value;
   if (!selectedValue) {
-    messageDiv.textContent = "Please select an order.";
+    showPopup("Please select an order.", false);
     return;
   }
 
@@ -194,15 +211,13 @@ complaintForm.addEventListener("submit", async function (event) {
       throw new Error(result.error || "Failed to submit complaint");
     }
 
-    messageDiv.style.color = "green";
-    messageDiv.textContent = "Complaint submitted successfully.";
+    showPopup("Complaint submitted successfully.", true);
     complaintForm.reset();
     loadMyComplaints();
 
   } catch (error) {
     console.error(error);
-    messageDiv.style.color = "#b00020";
-    messageDiv.textContent = `Error: ${error.message}`;
+    showPopup(`Error: ${error.message}`, false);
   }
 });
 

@@ -9,6 +9,40 @@ function getAuthHeaders() {
   };
 }
 
+// Get the logged-in officer's user id from the JWT token
+function getLoggedInUserId() {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.id;
+  } catch (error) {
+    console.error("Failed to decode token:", error);
+    return null;
+  }
+}
+
+// ============ Custom popup (replaces browser alert) ============
+function showPopup(message, isSuccess = true) {
+  const overlay = document.getElementById("popupOverlay");
+  const icon = document.getElementById("popupIcon");
+  const messageEl = document.getElementById("popupMessage");
+
+  if (!overlay) {
+    alert(message);
+    return;
+  }
+
+  icon.textContent = isSuccess ? "✅" : "❌";
+  messageEl.textContent = message;
+  overlay.classList.add("show");
+}
+
+function closePopup() {
+  const overlay = document.getElementById("popupOverlay");
+  if (overlay) overlay.classList.remove("show");
+}
+
 // ============ New Inspection page ============
 const inspectionForm = document.getElementById("inspectionForm");
 
@@ -16,12 +50,9 @@ if (inspectionForm) {
   inspectionForm.addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    const messageDiv = document.getElementById("message");
-    messageDiv.textContent = "Submitting...";
-
     const inspectionData = {
       stall_id: parseInt(document.getElementById("stall").value),
-      officer_id: parseInt(document.getElementById("officer").value),
+      officer_id: getLoggedInUserId(),
       inspection_date: document.getElementById("date").value,
       score: parseInt(document.getElementById("score").value),
       remarks: document.getElementById("remarks").value,
@@ -40,17 +71,39 @@ if (inspectionForm) {
         throw new Error(result.error || result.message || "Failed to create inspection");
       }
 
-      messageDiv.style.color = "green";
-      messageDiv.textContent = `Inspection saved. Grade: ${result.grade}`;
+      showPopup(`Inspection saved successfully. Grade: ${result.grade}`, true);
       inspectionForm.reset();
 
     } catch (error) {
-      console.error("Error creating inspection:", error);
-      messageDiv.style.color = "red";
-      messageDiv.textContent = `Error: ${error.message}`;
+      showPopup(`Error: ${error.message}`, false);
     }
   });
 }
+
+// Display the logged-in officer's name on the New Inspection page
+async function showLoggedInOfficer() {
+  const nameDisplay = document.getElementById("loggedInOfficerName");
+  if (!nameDisplay) return;
+
+  const userId = getLoggedInUserId();
+  if (!userId) {
+    nameDisplay.textContent = "Not logged in";
+    return;
+  }
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/nea/officers`, {
+      headers: getAuthHeaders(),
+    });
+    const officers = await response.json();
+    const currentOfficer = officers.find((o) => o.user_id === userId);
+    nameDisplay.textContent = currentOfficer ? currentOfficer.name : `Officer #${userId}`;
+  } catch (error) {
+    nameDisplay.textContent = `Officer #${userId}`;
+  }
+}
+
+showLoggedInOfficer();
 
 // ============ Stall History page ============
 const loadHistoryBtn = document.getElementById("loadHistoryBtn");
@@ -62,7 +115,7 @@ if (loadHistoryBtn) {
     const currentGrade = document.getElementById("currentGrade");
 
     if (!stallId) {
-      alert("Please enter a stall ID");
+      showPopup("Please select a stall", false);
       return;
     }
 
@@ -94,10 +147,12 @@ if (loadHistoryBtn) {
           <td>${record.score}</td>
           <td><span class="grade grade-${record.grade.toLowerCase()}">${record.grade}</span></td>
           <td>${record.remarks || ""}</td>
-          <td>${record.user_id}</td>
+          <td>${record.officer_name || record.user_id}</td>
           <td>
-            <button class="btn btn-secondary edit-btn" data-id="${record.inspection_id}" data-score="${record.score}" data-remarks="${record.remarks || ""}">Edit</button>
-            <button class="btn btn-secondary delete-btn" data-id="${record.inspection_id}">Delete</button>
+            <div class="row-actions">
+              <button class="btn btn-secondary edit-btn" data-id="${record.inspection_id}" data-score="${record.score}" data-remarks="${record.remarks || ""}">Edit</button>
+              <button class="btn btn-secondary delete-btn" data-id="${record.inspection_id}">Delete</button>
+            </div>
           </td>
         `;
         tableBody.appendChild(row);
@@ -129,12 +184,11 @@ if (loadHistoryBtn) {
               throw new Error("Failed to delete inspection");
             }
 
-            alert("Inspection deleted successfully");
+            showPopup("Inspection deleted successfully", true);
             loadHistoryBtn.click();
 
           } catch (error) {
-            console.error("Error deleting inspection:", error);
-            alert(`Error: ${error.message}`);
+            showPopup(`Error: ${error.message}`, false);
           }
         });
       });
@@ -171,13 +225,13 @@ if (saveEditBtn) {
         throw new Error(result.error || result.message || "Failed to update inspection");
       }
 
-      alert(`Inspection updated. New grade: ${result.grade || "unchanged"}`);
+      showPopup(`Inspection updated. New grade: ${result.grade || "unchanged"}`, true);
       document.getElementById("editSection").style.display = "none";
       document.getElementById("loadHistoryBtn").click();
 
     } catch (error) {
       console.error("Error updating inspection:", error);
-      alert(`Error: ${error.message}`);
+      showPopup(`Error: ${error.message}`, false);
     }
   });
 }
@@ -187,7 +241,6 @@ if (cancelEditBtn) {
     document.getElementById("editSection").style.display = "none";
   });
 }
-
 
 // ============ Dashboard page ============
 const gradeDistributionBody = document.getElementById("gradeDistributionBody");
@@ -214,13 +267,11 @@ async function loadGradeDistribution() {
 
     const distribution = await response.json();
 
-    // Reset counts to 0 first
     document.getElementById("countA").textContent = "0";
     document.getElementById("countB").textContent = "0";
     document.getElementById("countC").textContent = "0";
     document.getElementById("countD").textContent = "0";
 
-    // Fill in actual counts
     distribution.forEach((row) => {
       const cell = document.getElementById(`count${row.grade}`);
       if (cell) {
@@ -271,7 +322,49 @@ async function loadExpiringSoon() {
     console.error("Error loading expiring grades:", error);
   }
 }
-// Load all stalls into any dropdown with id="stall" or id="stallIdInput"
+
+async function loadRecentInspections() {
+  const tableBody = document.getElementById("recentInspectionsBody");
+  const emptyState = document.getElementById("recentEmptyState");
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/nea/inspections/summary/recent`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch recent inspections");
+    }
+
+    const recent = await response.json();
+
+    tableBody.innerHTML = "";
+
+    if (recent.length === 0) {
+      emptyState.style.display = "block";
+      return;
+    }
+
+    emptyState.style.display = "none";
+
+    recent.forEach((row) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${row.stall_name}</td>
+        <td>${new Date(row.inspection_date).toLocaleDateString()}</td>
+        <td>${row.score}</td>
+        <td><span class="grade grade-${row.grade.toLowerCase()}">${row.grade}</span></td>
+        <td>${row.officer_name || row.user_id}</td>
+      `;
+      tableBody.appendChild(tr);
+    });
+
+  } catch (error) {
+    console.error("Error loading recent inspections:", error);
+  }
+}
+
+// ============ Load stall dropdown options (shared across pages) ============
 async function loadStallOptions() {
   const stallDropdown = document.getElementById("stall");
   const stallHistoryDropdown = document.getElementById("stallIdInput");
@@ -307,43 +400,3 @@ async function loadStallOptions() {
 }
 
 loadStallOptions();
-async function loadRecentInspections() {
-  const tableBody = document.getElementById("recentInspectionsBody");
-  const emptyState = document.getElementById("recentEmptyState");
-
-  try {
-    const response = await fetch(`${apiBaseUrl}/nea/inspections/summary/recent`, {
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch recent inspections");
-    }
-
-    const recent = await response.json();
-
-    tableBody.innerHTML = "";
-
-    if (recent.length === 0) {
-      emptyState.style.display = "block";
-      return;
-    }
-
-    emptyState.style.display = "none";
-
-    recent.forEach((row) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${row.stall_name}</td>
-        <td>${new Date(row.inspection_date).toLocaleDateString()}</td>
-        <td>${row.score}</td>
-        <td><span class="grade grade-${row.grade.toLowerCase()}">${row.grade}</span></td>
-        <td>${row.user_id}</td>
-      `;
-      tableBody.appendChild(tr);
-    });
-
-  } catch (error) {
-    console.error("Error loading recent inspections:", error);
-  }
-}

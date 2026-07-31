@@ -82,10 +82,23 @@ async function deleteComplaint(req, res) {
   }
 }
 
+// GET /complaints/stall/:stallId - vendor views complaints made against their stall
+async function getComplaintsByStall(req, res) {
+  try {
+    const stallId = parseInt(req.params.stallId);
+    const complaints = await complaintModel.getComplaintsByStall(stallId);
+    res.json(complaints);
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error retrieving complaints" });
+  }
+}
+
 module.exports = {
   createComplaint,
   getComplaintsByUser,
   updateComplaintStatus,
   deleteComplaint,
   getCustomerOrders,
+  getComplaintsByStall,
 };

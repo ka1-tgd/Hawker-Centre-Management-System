@@ -15,7 +15,6 @@ function verifyJWT(req, res, next) {
         // Set authorized roles and paths
         const authorizedRoles = {
             // Officer exclusive
-            // Officer exclusive
             "POST /nea/inspections": ["officer"],
             "GET /nea/inspections/stall/[0-9]+": ["officer"],
             "PUT /nea/inspections/[0-9]+": ["officer"],
@@ -24,6 +23,7 @@ function verifyJWT(req, res, next) {
             "GET /nea/inspections/summary/expiring": ["officer"],
             "GET /nea/inspections/summary/recent": ["officer"],
             "GET /nea/stalls": ["officer"],
+            "GET /nea/officers": ["officer"],
 
             // Hawker exclusive
             "POST /vendor/stalls": ["hawker"],
@@ -83,13 +83,14 @@ function verifyJWT(req, res, next) {
 
             "POST /complaints": ["customer"],
             "GET /complaints/customer/[0-9]+": ["customer"],
-            "PUT /complaints/[0-9]+/status": ["customer"],
             "DELETE /complaints/[0-9]+": ["customer"],
             "GET /complaints/orders/[0-9]+": ["customer"],
 
             "GET /vendor/satisfaction": ["hawker"],
             "GET /vendor/complaints": ["hawker"],
             "PUT /vendor/complaints/[0-9]+/resolve": ["hawker"],
+            "GET /complaints/stall/[0-9]+": ["hawker"],
+            "PUT /complaints/[0-9]+/status": ["hawker"],
         };
 
         const requestedEndpoint = `${req.method} ${req.path}`; // Include method in endpointl;

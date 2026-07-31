@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Complaints - Vendor Dashboard</title>
+    <link rel="stylesheet" href="../css/vendor-stall.css">
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            HawkerHub
+        </div>
+        <nav>
+            <ul>
+                 <li><a href="vendor-home.html">Home</a></li>
+                <li><a href="vendor-stall.html">Stalls</a></li>
+                <li><a href="vendor-menu.html">Menus</a></li>
+                <li><a href="vendor-orders.html">Orders</a></li>
+                <li><a href="vendor-sales.html">Sales</a></li>
+                <li><a class="active">Complaints</a></li>
+                <li><a href="claim-redemption.html">Rewards</a></li>
+                <li><a href="satisfaction-dashboard.html">Reviews</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <div>
+                <h1>Manage Complaints</h1>
+                <p>
+                    Review and update the status of complaints made against your stall.
+                </p>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="complaintsTableBody">
+                <tr><td colspan="5">Loading complaints...</td></tr>
+            </tbody>
+        </table>
+
+    </main>
+
+    <div class="popup-overlay" id="popupOverlay">
+      <div class="popup-box">
+        <div class="popup-icon" id="popupIcon">✅</div>
+        <div class="popup-message" id="popupMessage"></div>
+        <button class="popup-close-btn" onclick="closePopup()">OK</button>
+      </div>
+    </div>
+
+    <script src="../scripts/vendor-complaints.js"></script>
+</body>
+
+</html>

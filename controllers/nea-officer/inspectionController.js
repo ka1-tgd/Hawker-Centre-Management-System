@@ -116,6 +116,15 @@ async function getAllStalls(req, res) {
     res.status(500).json({ error: "Error retrieving stalls" });
   }
 }
+async function getAllOfficers(req, res) {
+  try {
+    const officers = await inspectionModel.getAllOfficers();
+    res.json(officers);
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error retrieving officers" });
+  }
+}
 module.exports = {
   getInspectionsByStall,
   createInspection,
@@ -125,4 +134,5 @@ module.exports = {
   getExpiringSoon,
   getRecentInspections,
   getAllStalls,
+  getAllOfficers,
 };

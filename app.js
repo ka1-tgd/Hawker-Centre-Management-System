@@ -123,6 +123,7 @@ app.get("/nea/inspections/summary/grades", verifyJWT, inspectionController.getGr
 app.get("/nea/inspections/summary/expiring", verifyJWT, inspectionController.getExpiringSoon);
 app.get("/nea/inspections/summary/recent", verifyJWT, inspectionController.getRecentInspections);
 app.get("/nea/stalls", verifyJWT, inspectionController.getAllStalls);
+app.get("/nea/officers", verifyJWT, inspectionController.getAllOfficers);
 
 // Routes for user account management
 app.post("/register", userController.createUser);
@@ -186,8 +187,9 @@ app.delete("/feedback/:id", verifyJWT, feedbackValidation.validateFeedbackId, fe
 app.get("/complaints/orders/:userId", verifyJWT, validateComplaintUserId, complaintController.getCustomerOrders);
 app.post("/complaints", verifyJWT, validateComplaint, complaintController.createComplaint);
 app.get("/complaints/customer/:userId", verifyJWT, validateComplaintUserId, complaintController.getComplaintsByUser);
-app.put("/complaints/:id/status", verifyJWT, validateComplaintId, validateStatusUpdate, complaintController.updateComplaintStatus);
+app.get("/complaints/stall/:stallId", verifyJWT, validateSalesStallId, complaintController.getComplaintsByStall);
 app.delete("/complaints/:id", verifyJWT, validateComplaintId, complaintController.deleteComplaint);
+app.put("/complaints/:id/status", verifyJWT, validateComplaintId, validateStatusUpdate, complaintController.updateComplaintStatus);
 
 // Routes - Vendor Satisfaction Dashboard (per-stall ratings + complaints, SCRUM-72)
 app.get("/vendor/satisfaction", verifyJWT, vendorDashboardValidation.validateStallId, vendorDashboardController.getSatisfaction);

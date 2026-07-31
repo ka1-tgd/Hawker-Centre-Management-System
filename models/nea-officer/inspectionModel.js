@@ -25,9 +25,11 @@ async function getInspectionsByStall(stallId) {
     connection = await sql.connect(dbConfig);
     const query = `
       SELECT i.inspection_id, i.inspection_date, i.score, i.remarks, i.user_id,
-             hg.grade, hg.valid_from, hg.expiry
+       u.name AS officer_name,
+       hg.grade, hg.valid_from, hg.expiry
       FROM Inspection i
       LEFT JOIN Hygiene_Grade hg ON hg.inspection_id = i.inspection_id
+      LEFT JOIN Users u ON u.user_id = i.user_id
       WHERE i.stall_id = @stallId
       ORDER BY i.inspection_date DESC
     `;
@@ -270,12 +272,14 @@ async function getRecentInspections() {
     connection = await sql.connect(dbConfig);
     const query = `
       SELECT TOP 10 i.inspection_id, i.inspection_date, i.score, i.user_id,
-             s.stall_name, hg.grade
+       u.name AS officer_name,
+       s.stall_name, hg.grade
       FROM Inspection i
       INNER JOIN Stall s ON s.stall_id = i.stall_id
       LEFT JOIN Hygiene_Grade hg ON hg.inspection_id = i.inspection_id
+      LEFT JOIN Users u ON u.user_id = i.user_id
       ORDER BY i.inspection_date DESC
-    `;
+      `;
     const result = await connection.request().query(query);
     return result.recordset;
   } catch (error) {
@@ -317,6 +321,34 @@ async function getAllStalls() {
     }
   }
 }
+
+// Get all officers (id + name), used to populate officer selection
+// dropdowns instead of asking the user to type an ID
+async function getAllOfficers() {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query = `
+      SELECT user_id, name
+      FROM Users
+      WHERE role = 'officer'
+      ORDER BY name ASC
+    `;
+    const result = await connection.request().query(query);
+    return result.recordset;
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
 module.exports = {
   getInspectionsByStall,
   createInspection,
@@ -327,4 +359,5 @@ module.exports = {
   getRecentInspections,
   calculateGrade,
   getAllStalls,
+  getAllOfficers,
 };

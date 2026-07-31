@@ -30,10 +30,10 @@
   </select>
 </div>
 
-    <div class="field">
-      <label for="officer">Officer ID</label>
-      <input id="officer" type="number" class="input" placeholder="Enter officer ID">
-    </div>
+  <div class="field">
+  <label>Inspecting Officer</label>
+  <p id="loggedInOfficerName" style="padding: 11px 13px; background: var(--purple-50); border-radius: var(--radius-sm); font-weight: 600;"></p>
+  </div>
 
     <div class="field">
       <label for="date">Inspection Date</label>
@@ -57,7 +57,13 @@
 
   </form>
 </div>
-
+<div class="popup-overlay" id="popupOverlay">
+  <div class="popup-box">
+    <div class="popup-icon" id="popupIcon">✅</div>
+    <div class="popup-message" id="popupMessage"></div>
+    <button class="popup-close-btn" onclick="closePopup()">OK</button>
+  </div>
+</div>
 <script src="../scripts/nea-script.js"></script>
 </body>
 </html>
