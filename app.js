@@ -122,6 +122,7 @@ app.delete("/nea/inspections/:id", verifyJWT, validateInspectionId, inspectionCo
 app.get("/nea/inspections/summary/grades", verifyJWT, inspectionController.getGradeDistribution);
 app.get("/nea/inspections/summary/expiring", verifyJWT, inspectionController.getExpiringSoon);
 app.get("/nea/inspections/summary/recent", verifyJWT, inspectionController.getRecentInspections);
+app.get("/nea/stalls", verifyJWT, inspectionController.getAllStalls);
 
 // Routes for user account management
 app.post("/register", userController.createUser);

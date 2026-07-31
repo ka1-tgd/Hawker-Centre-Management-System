@@ -291,7 +291,32 @@ async function getRecentInspections() {
     }
   }
 }
-
+// Get all stalls (id + name), used to populate stall selection
+// dropdowns for the officer instead of asking them to type an ID
+async function getAllStalls() {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query = `
+      SELECT stall_id, stall_name
+      FROM Stall
+      ORDER BY stall_name ASC
+    `;
+    const result = await connection.request().query(query);
+    return result.recordset;
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
 module.exports = {
   getInspectionsByStall,
   createInspection,
@@ -301,4 +326,5 @@ module.exports = {
   getExpiringSoon,
   getRecentInspections,
   calculateGrade,
+  getAllStalls,
 };

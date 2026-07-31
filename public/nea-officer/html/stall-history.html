@@ -13,6 +13,7 @@
     <a href="dashboard.html">Dashboard</a>
     <a href="new-inspection.html">New Inspection</a>
     <a href="stall-history.html" class="active">Stall History</a>
+    <a href="../../user-account/html/account.html">Account</a>
   </nav>
 </div>
 
@@ -21,10 +22,12 @@
   <p class="subtitle">View past inspections and hygiene grade for a stall.</p>
 
   <div class="card">
-    <label for="stallIdInput">Stall ID</label>
-    <input id="stallIdInput" type="number" class="input" placeholder="Enter stall ID" style="margin-top:10px;">
+    <label for="stallIdInput">Select Stall</label>
+    <select id="stallIdInput" class="select" style="margin-top:10px;">
+        <option value="">Loading stalls...</option>
+    </select>
     <button id="loadHistoryBtn" class="btn btn-primary" style="margin-top:10px;">Load History</button>
-  </div>
+</div>
 
   <div class="card">
     <h3>Current Grade</h3>

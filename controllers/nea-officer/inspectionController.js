@@ -106,7 +106,16 @@ async function getRecentInspections(req, res) {
     res.status(500).json({ error: "Error retrieving recent inspections" });
   }
 }
-
+// GET /nea/stalls - list all stalls for the dropdown
+async function getAllStalls(req, res) {
+  try {
+    const stalls = await inspectionModel.getAllStalls();
+    res.json(stalls);
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.status(500).json({ error: "Error retrieving stalls" });
+  }
+}
 module.exports = {
   getInspectionsByStall,
   createInspection,
@@ -115,4 +124,5 @@ module.exports = {
   getGradeDistribution,
   getExpiringSoon,
   getRecentInspections,
+  getAllStalls,
 };

@@ -360,3 +360,13 @@ VALUES
     (8, 10, '2026-01-01', '2026-12-31', 1300.00, 'Paid', 'Active'),
     (9, 11, '2026-01-01', '2026-12-31', 1000.00, 'Unpaid', 'Pending');
 SELECT * FROM Inspection
+
+INSERT INTO Inspection (stall_id, user_id, inspection_date, score, remarks)
+VALUES (3, 3, '2026-07-20', 70, 'Routine inspection, satisfactory condition');
+
+INSERT INTO Hygiene_Grade (stall_id, inspection_id, grade, valid_from, expiry)
+VALUES (3, (SELECT MAX(inspection_id) FROM Inspection WHERE stall_id = 3), 'C', '2026-07-20', DATEADD(DAY, 15, GETDATE()));
+
+UPDATE CustOrder SET order_date = '2026-07-14 12:30:00' WHERE order_id = 1;
+UPDATE CustOrder SET order_date = '2026-07-14 18:45:00' WHERE order_id = 3;
+UPDATE CustOrder SET order_date = '2026-07-14 09:15:00' WHERE order_id = 4;

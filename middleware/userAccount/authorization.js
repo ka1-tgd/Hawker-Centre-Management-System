@@ -23,6 +23,7 @@ function verifyJWT(req, res, next) {
             "GET /nea/inspections/summary/grades": ["officer"],
             "GET /nea/inspections/summary/expiring": ["officer"],
             "GET /nea/inspections/summary/recent": ["officer"],
+            "GET /nea/stalls": ["officer"],
 
             // Hawker exclusive
             "POST /vendor/stalls": ["hawker"],

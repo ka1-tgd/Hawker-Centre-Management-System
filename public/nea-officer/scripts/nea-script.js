@@ -271,7 +271,42 @@ async function loadExpiringSoon() {
     console.error("Error loading expiring grades:", error);
   }
 }
+// Load all stalls into any dropdown with id="stall" or id="stallIdInput"
+async function loadStallOptions() {
+  const stallDropdown = document.getElementById("stall");
+  const stallHistoryDropdown = document.getElementById("stallIdInput");
 
+  if (!stallDropdown && !stallHistoryDropdown) return;
+
+  try {
+    const response = await fetch(`${apiBaseUrl}/nea/stalls`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to load stalls");
+    }
+
+    const stalls = await response.json();
+    const optionsHtml = stalls
+      .map((s) => `<option value="${s.stall_id}">${s.stall_name}</option>`)
+      .join("");
+
+    if (stallDropdown) {
+      stallDropdown.innerHTML = `<option value="">Select a stall</option>${optionsHtml}`;
+    }
+    if (stallHistoryDropdown) {
+      stallHistoryDropdown.innerHTML = `<option value="">Select a stall</option>${optionsHtml}`;
+    }
+
+  } catch (error) {
+    console.error("Error loading stalls:", error);
+    if (stallDropdown) stallDropdown.innerHTML = '<option value="">Failed to load stalls</option>';
+    if (stallHistoryDropdown) stallHistoryDropdown.innerHTML = '<option value="">Failed to load stalls</option>';
+  }
+}
+
+loadStallOptions();
 async function loadRecentInspections() {
   const tableBody = document.getElementById("recentInspectionsBody");
   const emptyState = document.getElementById("recentEmptyState");
