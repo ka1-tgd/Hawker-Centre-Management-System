@@ -198,3 +198,18 @@ function renderRecentFeedback(recentFeedback) {
     recentFeedbackDiv.appendChild(row);
   });
 }
+
+prevPageBtn.addEventListener("click", () => {
+  if (currentPage > 1) loadDashboard(currentPage - 1);
+});
+
+nextPageBtn.addEventListener("click", () => {
+  if (lastRecentFeedbackCount >= 5) loadDashboard(currentPage + 1);
+});
+
+window.addEventListener("load", async () => {
+  const hasStall = await loadVendorStall();
+  if (!hasStall) return;
+
+  await loadDashboard(1);
+});
