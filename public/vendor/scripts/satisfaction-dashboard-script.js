@@ -6,8 +6,6 @@ const ratingSummarySubtextEl = document.getElementById("ratingSummarySubtext");
 const ratingBreakdownCanvas = document.getElementById("ratingBreakdownChart");
 const ratingTrendCanvas = document.getElementById("ratingTrendChart");
 const recentFeedbackDiv = document.getElementById("recentFeedback");
-const complaintSummaryDiv = document.getElementById("complaintSummary");
-const complaintsListDiv = document.getElementById("complaintsList");
 const pageLabel = document.getElementById("pageLabel");
 const prevPageBtn = document.getElementById("prevPageBtn");
 const nextPageBtn = document.getElementById("nextPageBtn");
@@ -75,7 +73,6 @@ async function loadDashboard(page) {
     renderRatingBreakdown(data.ratingBreakdown);
     renderRatingTrend(data.ratingTrend);
     renderRecentFeedback(data.recentFeedback);
-    renderComplaintSummary(data.complaintSummary);
 
     pageLabel.textContent = `Page ${currentPage}`;
     prevPageBtn.disabled = currentPage <= 1;
@@ -202,92 +199,6 @@ function renderRecentFeedback(recentFeedback) {
   });
 }
 
-// Open complaint counts by category
-function renderComplaintSummary(complaintSummary) {
-  if (complaintSummary.length === 0) {
-    complaintSummaryDiv.innerHTML = "<p>No open complaints.</p>";
-    return;
-  }
-
-  complaintSummaryDiv.innerHTML = complaintSummary
-    .map((c) => `<span style="display:inline-block; background:#fdecea; color:#c62828; border-radius:20px; padding:4px 12px; margin:2px; font-size:0.85em;">${c.Category}: ${c.count}</span>`)
-    .join(" ");
-}
-
-// Load the actual list of open complaints (with a "Mark Resolved" button each)
-async function loadComplaints() {
-  try {
-    const response = await fetch(`/vendor/complaints?stallId=${stallId}&status=open`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (response.status === 401 || response.status === 403) {
-      complaintsListDiv.innerHTML = "<p>Authentication failed! Please login.</p>";
-      return;
-    }
-
-    const complaints = await response.json();
-
-    if (complaints.length === 0) {
-      complaintsListDiv.innerHTML = "<p>No open complaints.</p>";
-      return;
-    }
-
-    complaintsListDiv.innerHTML = "";
-
-    complaints.forEach((complaint) => {
-      const complaintDate = new Date(complaint.CreatedDate).toLocaleDateString();
-
-      const row = document.createElement("div");
-      row.style.background = "white";
-      row.style.borderRadius = "10px";
-      row.style.padding = "16px";
-      row.style.marginBottom = "10px";
-      row.style.boxShadow = "0 3px 12px rgba(0,0,0,.08)";
-      row.innerHTML = `
-        <strong>${complaint.Category}</strong> - ${complaint.Status}
-        <p style="margin:6px 0; color:#333;">${complaint.Description}</p>
-        <span style="font-size:0.85em; color:#666;">Order #${complaint.order_id} - ${complaintDate}</span>
-        <br>
-        <button data-complaint-id="${complaint.ComplaintID}" style="margin-top:10px; background:#26a354; color:white; border:none; padding:8px 16px; border-radius:5px; cursor:pointer;">Mark Resolved</button>
-      `;
-
-      row.querySelector("button").addEventListener("click", () => handleResolveComplaint(complaint.ComplaintID));
-      complaintsListDiv.appendChild(row);
-    });
-  } catch (error) {
-    console.error(error);
-    complaintsListDiv.innerHTML = "<p>Failed to load complaints</p>";
-  }
-}
-
-// Mark a complaint as resolved
-async function handleResolveComplaint(complaintId) {
-  const confirmResolve = confirm("Mark this complaint as resolved?");
-  if (!confirmResolve) return;
-
-  try {
-    const response = await fetch(`/vendor/complaints/${complaintId}/resolve`, {
-      method: "PUT",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (response.ok) {
-      messageDiv.textContent = "Complaint marked as resolved";
-      messageDiv.style.color = "green";
-      loadComplaints();
-      loadDashboard(currentPage);
-    } else {
-      messageDiv.textContent = "Failed to resolve complaint";
-      messageDiv.style.color = "red";
-    }
-  } catch (error) {
-    console.error(error);
-    messageDiv.textContent = "Failed to resolve complaint";
-    messageDiv.style.color = "red";
-  }
-}
-
 prevPageBtn.addEventListener("click", () => {
   if (currentPage > 1) loadDashboard(currentPage - 1);
 });
@@ -301,5 +212,4 @@ window.addEventListener("load", async () => {
   if (!hasStall) return;
 
   await loadDashboard(1);
-  loadComplaints();
 });

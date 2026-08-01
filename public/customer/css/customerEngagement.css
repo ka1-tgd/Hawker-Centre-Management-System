@@ -180,18 +180,6 @@ body {
   font-weight: bold;
 }
 
-/* Shared "solid red delete/cancel button" style */
-.like-item button,
-.redemption-item button,
-.feedback-display .delete-btn {
-  background: #d9534f;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 14px;
-  cursor: pointer;
-}
-
 .like-item button:hover,
 .redemption-item button:hover {
   background: #b52b27;
@@ -262,30 +250,6 @@ body {
 #complaintForm label {
   font-weight: bold;
   margin-top: 8px;
-}
-
-
-#feedbackForm select,
-#feedbackForm textarea,
-.feedback-edit select,
-.feedback-edit textarea {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-family: inherit;
-}
-
-#feedbackForm button,
-.feedback-display button,
-.feedback-edit button {
-  margin-top: 8px;
-  margin-right: 6px;
-  background: #2b3a8f;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 14px;
-  cursor: pointer;
 }
 
 /* Submitted feedback list */
@@ -379,7 +343,6 @@ body {
   padding: 8px 14px;
   cursor: pointer;
 }
-
 
 .like-item button,
 .redemption-item button,
