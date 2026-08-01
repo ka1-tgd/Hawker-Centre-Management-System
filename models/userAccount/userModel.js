@@ -10,7 +10,7 @@ async function getUserById(id) {
         connection = await sql.connect(dbConfig);
 
         // SQL Query
-        const query = `SELECT user_id, name, contact_no, email, role FROM Users WHERE user_id = @id;`;
+        const query = `SELECT user_id, name, contact_no, email, role FROM Users WHERE user_id = @id AND status = 'active';`;
         const request = connection.request();
         request.input("id", id);
         const result = await request.query(query);
@@ -48,7 +48,7 @@ async function getUserByUsername(username) {
         connection = await sql.connect(dbConfig);
 
         // SQL Query
-        const query = `SELECT user_id, name, contact_no, email, passwordHash, role FROM Users WHERE name = @name;`;
+        const query = `SELECT user_id, name, contact_no, email, passwordHash, role FROM Users WHERE name = @name AND status = 'active';`;
         const request = connection.request();
         request.input("name", username);
         const result = await request.query(query);
@@ -129,7 +129,7 @@ async function updateUser(id, updatedUserData) {
 
         // SQL Query
         const query = 
-            `UPDATE Users SET name = @name, contact_no = @contact_no, email = @email WHERE user_id = @id;`;
+            `UPDATE Users SET name = @name, contact_no = @contact_no, email = @email WHERE user_id = @id AND status = 'active';`;
         const request = connection.request();
         request.input("id", id);
         request.input("name", updatedUserData.name);
@@ -178,7 +178,7 @@ async function updatePassword(id, updatedPassword) {
 
         // SQL Query
         const query = 
-            `UPDATE Users SET passwordHash = @passwordHash WHERE user_id = @id;`;
+            `UPDATE Users SET passwordHash = @passwordHash WHERE user_id = @id AND status = 'active';`;
         const request = connection.request();
         request.input("id", id);
         request.input("passwordHash", updatedPassword);
@@ -222,26 +222,59 @@ async function deleteUser(id) {
         // Connect to database
         connection = await sql.connect(dbConfig);
 
-        // SQL Query to delete user's loyalty points
-        const loyalPtsQuery = `DELETE FROM LoyaltyPoints WHERE user_id = @id`;
-        const loyalPtsRequest = connection.request();
-        loyalPtsRequest.input("id", id);
-        const loyalPtsResult = await loyalPtsRequest.query(loyalPtsQuery);
+        // Get user account type
+        const getAccTypeQuery = `SELECT role FROM Users WHERE user_id = @id`;
+        const getAccTypeRequest = connection.request();
+        getAccTypeRequest.input("id", id);
+        const getAccTypeResult = await getAccTypeRequest.query(getAccTypeQuery);
 
-        // SQL Query to delete user
-        const userQuery = `DELETE FROM Users WHERE user_id = @id`;
-        const userRequest = connection.request();
-        userRequest.input("id", id);
-        const userResult = await userRequest.query(userQuery);
-
-        // Check if any was deleted
-        if (userResult.rowsAffected[0] === 0) {
-            // If nothing was deleted, return false
+        // Check result
+        if (getAccTypeResult.recordset.length === 0) {
             return false;
-        };
+        }
 
-        // If user was deleted, return true
-        return true;
+        // Assign role to constant
+        const role = getAccTypeResult.recordset[0]?.role;
+
+        // Check user's account type
+        if (role === "customer") {
+            // Delete customer from database
+            // SQL Query to delete user's loyalty points
+            const loyalPtsQuery = `DELETE FROM LoyaltyPoints WHERE user_id = @id`;
+            const loyalPtsRequest = connection.request();
+            loyalPtsRequest.input("id", id);
+            const loyalPtsResult = await loyalPtsRequest.query(loyalPtsQuery);
+
+            // SQL Query to delete user
+            const userQuery = `DELETE FROM Users WHERE user_id = @id`;
+            const userRequest = connection.request();
+            userRequest.input("id", id);
+            const userResult = await userRequest.query(userQuery);
+
+            // Check if any was deleted
+            if (userResult.rowsAffected[0] === 0) {
+                // If nothing was deleted, return false
+                return false;
+            };
+
+            // If user was deleted, return true
+            return true;
+        } else {
+            // Update status to "deleted" for hawker/officer
+            const updateToDeleteQuery = `UPDATE Users SET status = 'deleted' WHERE user_id = @id AND status = 'active'`;
+            const updateToDeleteRequest = connection.request();
+            updateToDeleteRequest.input("id", id);
+            const updateToDeleteResult = await updateToDeleteRequest.query(updateToDeleteQuery);
+
+            // Check for update
+            if (updateToDeleteResult.rowsAffected[0] === 0) {
+                // If nothing was updated, return null
+                return null;
+            };
+
+            // If status was updated to deleted, return true
+            return true;
+        };
     } catch (error) {
         // If error, throw error
         console.error("Database error:", error);
