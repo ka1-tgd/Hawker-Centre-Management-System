@@ -193,8 +193,6 @@ app.put("/complaints/:id/status", verifyJWT, validateComplaintId, validateStatus
 
 // Routes - Vendor Satisfaction Dashboard (per-stall ratings + complaints, SCRUM-72)
 app.get("/vendor/satisfaction", verifyJWT, vendorDashboardValidation.validateStallId, vendorDashboardController.getSatisfaction);
-app.get("/vendor/complaints", verifyJWT, vendorDashboardValidation.validateStallId, vendorDashboardController.getComplaints);
-app.put("/vendor/complaints/:id/resolve", verifyJWT, vendorDashboardValidation.validateComplaintId, vendorDashboardController.resolveComplaint);
 
 // Start server
 app.listen(port, () => {

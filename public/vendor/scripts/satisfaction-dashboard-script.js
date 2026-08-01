@@ -6,7 +6,6 @@ const ratingSummarySubtextEl = document.getElementById("ratingSummarySubtext");
 const ratingBreakdownCanvas = document.getElementById("ratingBreakdownChart");
 const ratingTrendCanvas = document.getElementById("ratingTrendChart");
 const recentFeedbackDiv = document.getElementById("recentFeedback");
-const complaintSummaryDiv = document.getElementById("complaintSummary");
 const pageLabel = document.getElementById("pageLabel");
 const prevPageBtn = document.getElementById("prevPageBtn");
 const nextPageBtn = document.getElementById("nextPageBtn");
@@ -74,7 +73,6 @@ async function loadDashboard(page) {
     renderRatingBreakdown(data.ratingBreakdown);
     renderRatingTrend(data.ratingTrend);
     renderRecentFeedback(data.recentFeedback);
-    renderComplaintSummary(data.complaintSummary);
 
     pageLabel.textContent = `Page ${currentPage}`;
     prevPageBtn.disabled = currentPage <= 1;
@@ -200,30 +198,3 @@ function renderRecentFeedback(recentFeedback) {
     recentFeedbackDiv.appendChild(row);
   });
 }
-
-// Open complaint counts by category
-function renderComplaintSummary(complaintSummary) {
-  if (complaintSummary.length === 0) {
-    complaintSummaryDiv.innerHTML = "<p>No open complaints.</p>";
-    return;
-  }
-
-  complaintSummaryDiv.innerHTML = complaintSummary
-    .map((c) => `<span style="display:inline-block; background:#fdecea; color:#c62828; border-radius:20px; padding:4px 12px; margin:2px; font-size:0.85em;">${c.Category}: ${c.count}</span>`)
-    .join(" ");
-}
-
-prevPageBtn.addEventListener("click", () => {
-  if (currentPage > 1) loadDashboard(currentPage - 1);
-});
-
-nextPageBtn.addEventListener("click", () => {
-  if (lastRecentFeedbackCount >= 5) loadDashboard(currentPage + 1);
-});
-
-window.addEventListener("load", async () => {
-  const hasStall = await loadVendorStall();
-  if (!hasStall) return;
-
-  await loadDashboard(1);
-});
