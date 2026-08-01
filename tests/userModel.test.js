@@ -92,14 +92,23 @@ describe("User.deleteUser", () => {
     it("should delete an existing user", async () => {
         // Arrange
         // Mock requests
-        const mockRequest1 = {
+        const roleRequest = {
+            input: jest.fn().mockReturnThis(),
+            query: jest.fn().mockResolvedValue({
+                recordset: [
+                    { role: "customer" }
+                ]
+            })
+        };
+
+        const loyaltyRequest = {
             input: jest.fn().mockReturnThis(),
             query: jest.fn().mockResolvedValue({
                 rowsAffected: [1]
             })
         };
 
-        const mockRequest2 = {
+        const deleteRequest = {
             input: jest.fn().mockReturnThis(),
             query: jest.fn().mockResolvedValue({
                 rowsAffected: [1]
@@ -108,10 +117,10 @@ describe("User.deleteUser", () => {
 
         // Mock connection
         const mockConnection = {
-            request: jest
-                .fn()
-                .mockReturnValueOnce(mockRequest1)
-                .mockReturnValueOnce(mockRequest2),
+            request: jest.fn()
+                .mockReturnValueOnce(roleRequest)
+                .mockReturnValueOnce(loyaltyRequest)
+                .mockReturnValueOnce(deleteRequest),
             close: jest.fn()
         };
 
@@ -125,6 +134,7 @@ describe("User.deleteUser", () => {
         // Check result
         expect(result).toBe(true);
         expect(mockConnection.close).toHaveBeenCalled();
+        expect(mockConnection.request).toHaveBeenCalledTimes(3);
     });
 });
 
