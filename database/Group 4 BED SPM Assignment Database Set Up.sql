@@ -23,8 +23,10 @@ CREATE TABLE Users (
 	email VARCHAR(255) NOT NULL,
 	passwordHash VARCHAR(255) NOT NULL,
 	role VARCHAR(50) NOT NULL,
+    status VARCHAR(10) NOT NULL DEFAULT 'active',
 	CONSTRAINT PK_Users PRIMARY KEY (user_id),
-	CONSTRAINT CK_Users CHECK (role in ('customer','hawker','officer'))
+	CONSTRAINT CK_Role_Users CHECK (role in ('customer','hawker','officer')),
+    CONSTRAINT CK_Status_Users CHECK (status in ('active', 'deleted'))
 );
 
 CREATE TABLE HawkerCentre (
