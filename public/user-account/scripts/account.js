@@ -4,6 +4,7 @@ const role = localStorage.getItem("role");
 // Get header and buttons
 const header = document.querySelector(".header-box");
 const buttons = document.querySelectorAll(".button");
+const backButton = document.querySelector(".back-button");
 
 // Default colour
 let themeColour = "#ea5656";
@@ -22,6 +23,7 @@ header.style.backgroundColor = themeColour;
 buttons.forEach(button => {
     button.style.backgroundColor = themeColour;
 });
+backButton.style.backgroundColor = themeColour;
 
 // Load user details
 const username = localStorage.getItem("username");
@@ -86,4 +88,14 @@ document.getElementById("deleteButton").addEventListener("click", async () => {
         console.error("Error deleting account:", error);
         alert("Unable to delete account");
     }
+});
+document.getElementById("backButton").addEventListener("click", async () => {
+    // Redirect based on role
+    if (role === "customer") {
+        window.location.href = "../../customer/html/HCs-and-stalls.html";
+    } else if (role === "hawker") {
+        window.location.href = "../../vendor/html/vendor-home.html";
+    } else if (role === "officer") {
+        window.location.href = "../../nea-officer/html/dashboard.html";
+    };
 });
