@@ -90,10 +90,7 @@ async function deleteRedemption(req, res) {
       return res.status(403).json({ error: "You can only cancel your own redemptions" });
     }
 
-    const cancelled = await loyaltyModel.deleteRedemption(id, userId, redemption.PointsUsed);
-    if (!cancelled) {
-      return res.status(404).json({ error: "Redemption not found" });
-    }
+    await loyaltyModel.deleteRedemption(id, userId, redemption.PointsUsed);
 
     res.json({ message: "Redemption cancelled and points refunded" });
   } catch (error) {

@@ -24,7 +24,7 @@ async function getEligibleOrders(userId) {
     request.input("userId", userId);
     const result = await request.query(query);
 
-    // One row per item comes back from SQL
+    // One row per item comes back from SQL - group them under their order
     const orders = [];
     const orderPositions = {};
     result.recordset.forEach((row) => {
@@ -157,7 +157,7 @@ async function getFeedbackByUser(userId) {
     request.input("userId", userId);
     const result = await request.query(query);
 
-    // One row per item comes back from SQL 
+    // One row per item comes back from SQL - group them under their feedback entry
     const feedbackList = [];
     const feedbackPositions = {};
     result.recordset.forEach((row) => {

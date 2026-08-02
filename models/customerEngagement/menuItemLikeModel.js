@@ -1,6 +1,7 @@
+// Require Node modules and dbConfig
 const sql = require("mssql");
 const dbConfig = require("../../dbConfig");
- 
+
 // Create a new like
 async function createLike(likeData) {
   let connection;
@@ -12,7 +13,7 @@ async function createLike(likeData) {
     request.input("user_id", likeData.user_id);
     request.input("menu_item_id", likeData.menu_item_id);
     const result = await request.query(query);
- 
+
     const newLikeId = result.recordset[0].id;
     return await getLikeById(newLikeId);
   } catch (error) {
@@ -28,7 +29,7 @@ async function createLike(likeData) {
     }
   }
 }
- 
+
 // Get like by LikeID
 async function getLikeById(id) {
   let connection;
@@ -38,11 +39,11 @@ async function getLikeById(id) {
     const request = connection.request();
     request.input("id", id);
     const result = await request.query(query);
- 
+
     if (result.recordset.length === 0) {
       return null;
     }
- 
+
     return result.recordset[0];
   } catch (error) {
     console.error("Database error:", error);
@@ -57,23 +58,23 @@ async function getLikeById(id) {
     }
   }
 }
- 
+
 // Check if a customer already liked a specific menu item
-async function findLike(user_id, menu_item_id) {
+async function findLike(userId, menuItemId) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
     const query =
       "SELECT * FROM MenuItemLike WHERE user_id = @user_id AND menu_item_id = @menu_item_id";
     const request = connection.request();
-    request.input("user_id", user_id);
-    request.input("menu_item_id", menu_item_id);
+    request.input("user_id", userId);
+    request.input("menu_item_id", menuItemId);
     const result = await request.query(query);
- 
+
     if (result.recordset.length === 0) {
       return null;
     }
- 
+
     return result.recordset[0];
   } catch (error) {
     console.error("Database error:", error);
@@ -88,9 +89,9 @@ async function findLike(user_id, menu_item_id) {
     }
   }
 }
- 
+
 // Get all likes for a menu item, joined with Users for the name
-async function getLikesByMenuItem(menu_item_id) {
+async function getLikesByMenuItem(menuItemId) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
@@ -101,9 +102,9 @@ async function getLikesByMenuItem(menu_item_id) {
       WHERE l.menu_item_id = @menu_item_id
     `;
     const request = connection.request();
-    request.input("menu_item_id", menu_item_id);
+    request.input("menu_item_id", menuItemId);
     const result = await request.query(query);
- 
+
     return result.recordset;
   } catch (error) {
     console.error("Database error:", error);
@@ -118,9 +119,9 @@ async function getLikesByMenuItem(menu_item_id) {
     }
   }
 }
- 
+
 // Get all items liked by a customer
-async function getLikesByUser(user_id) {
+async function getLikesByUser(userId) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
@@ -131,9 +132,9 @@ async function getLikesByUser(user_id) {
       WHERE l.user_id = @user_id
     `;
     const request = connection.request();
-    request.input("user_id", user_id);
+    request.input("user_id", userId);
     const result = await request.query(query);
- 
+
     return result.recordset;
   } catch (error) {
     console.error("Database error:", error);
@@ -148,7 +149,7 @@ async function getLikesByUser(user_id) {
     }
   }
 }
- 
+
 // Delete a like by LikeID
 async function deleteLike(id) {
   let connection;
@@ -158,11 +159,11 @@ async function deleteLike(id) {
     const request = connection.request();
     request.input("id", id);
     const result = await request.query(query);
- 
+
     if (result.rowsAffected[0] === 0) {
       return null;
     }
- 
+
     return true;
   } catch (error) {
     console.error("Database error:", error);
@@ -177,7 +178,7 @@ async function deleteLike(id) {
     }
   }
 }
- 
+
 module.exports = {
   createLike,
   getLikeById,

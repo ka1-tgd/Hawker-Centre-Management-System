@@ -1,6 +1,6 @@
 const vendorDashboardModel = require("../../models/customerEngagement/vendorDashboardModel.js");
 
-// GET /vendor/satisfaction?stallId=xxx&page=1
+// Get the full satisfaction dashboard data for a stall (ratings, breakdown, trend, recent feedback)
 async function getSatisfaction(req, res) {
   try {
     const stallId = parseInt(req.query.stallId);

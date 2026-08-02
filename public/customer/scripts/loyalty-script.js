@@ -1,9 +1,10 @@
+// userId is declared inline in account.html
+
 // The login token saved by login.js after a successful login
 const token = localStorage.getItem("token");
 
 const userNameEl = document.getElementById("userName");
 const userEmailEl = document.getElementById("userEmail");
-const userContactEl = document.getElementById("userContact");
 const pointsValueEl = document.getElementById("pointsValue");
 const tierLabelEl = document.getElementById("tierLabel");
 const progressFillEl = document.getElementById("progressFill");
@@ -17,7 +18,7 @@ const tierOrder = ["Bronze", "Silver", "Gold"];
 
 let currentPoints = 0;
 
-// Load the user's profile details (name, email, contact)
+// Load the user's profile details (name and email)
 async function loadUserDetails() {
   try {
     const response = await fetch(`/profile/${userId}`, {
@@ -233,7 +234,7 @@ async function handleRedeemClick(event) {
       messageEl.textContent = data.message;
       messageEl.style.color = "green";
 
-      // Refresh points, tier, and progress bar together 
+      // Refresh points, tier, and progress bar together
       await loadLoyaltyPoints();
       loadRewards();
       loadRedemptionHistory();

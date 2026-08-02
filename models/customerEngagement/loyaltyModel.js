@@ -9,7 +9,8 @@ function calculateTier(points) {
   return "Bronze";
 }
 
-// Get a customer's current points and tier. 
+// Get a customer's current points and tier. If no record exists yet
+// (e.g. a newly registered user), create one with the default 0 points / Bronze tier
 async function getLoyaltyPoints(userId) {
   let connection;
   try {
@@ -274,7 +275,8 @@ async function getRedemptionWithRewardDetails(redemptionId) {
   }
 }
 
-// Mark a redemption as claimed
+// Mark a redemption as claimed by deleting its record - this both completes
+// the claim and prevents the same voucher from being reused
 async function claimRedemption(redemptionId) {
   let connection;
   try {

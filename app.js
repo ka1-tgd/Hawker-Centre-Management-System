@@ -191,7 +191,7 @@ app.get("/complaints/stall/:stallId", verifyJWT, validateSalesStallId, complaint
 app.delete("/complaints/:id", verifyJWT, validateComplaintId, complaintController.deleteComplaint);
 app.put("/complaints/:id/status", verifyJWT, validateComplaintId, validateStatusUpdate, complaintController.updateComplaintStatus);
 
-// Routes - Vendor Satisfaction Dashboard (per-stall ratings + complaints, SCRUM-72)
+// Routes - Vendor Satisfaction Dashboard (per-stall ratings)
 app.get("/vendor/satisfaction", verifyJWT, vendorDashboardValidation.validateStallId, vendorDashboardController.getSatisfaction);
 
 // Start server

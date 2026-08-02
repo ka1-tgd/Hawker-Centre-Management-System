@@ -1,3 +1,6 @@
+// userId is declared inline in likes.html
+
+// The login token saved by login.js after a successful login
 const token = localStorage.getItem("token");
 
 const likesListDiv = document.getElementById("likesList");
